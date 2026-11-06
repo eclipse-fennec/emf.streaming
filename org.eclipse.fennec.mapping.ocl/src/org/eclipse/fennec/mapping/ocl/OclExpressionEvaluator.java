@@ -14,7 +14,9 @@ package org.eclipse.fennec.mapping.ocl;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.TreeSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -76,15 +78,25 @@ public final class OclExpressionEvaluator implements ExpressionEvaluator {
 
 	@Override
 	public Optional<Object> evaluate(String expression, EObject self) {
+		return evaluate(expression, self, Map.of());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * The variables are OCL external variables; a {@code null} value is OCL null.
+	 */
+	@Override
+	public Optional<Object> evaluate(String expression, EObject self, Map<String, Object> variables) {
 		if (expression == null || expression.isBlank() || self == null) {
 			return Optional.empty();
 		}
-		String key = key(expression, self.eClass());
+		String key = key(expression, self.eClass(), variables);
 		if (unparseable.contains(key)) {
 			return Optional.empty();
 		}
 		try {
-			Object result = engine.evaluate(expression, context(self));
+			Object result = engine.evaluate(expression, context(self, variables));
 			if (result == null) {
 				return Optional.empty();
 			}
@@ -104,13 +116,14 @@ public final class OclExpressionEvaluator implements ExpressionEvaluator {
 		}
 	}
 
-	private static OclContext context(EObject self) {
+	private static OclContext context(EObject self, Map<String, Object> variables) {
 		Resource resource = self.eResource();
 		ResourceSet resourceSet = resource == null ? null : resource.getResourceSet();
-		return resourceSet == null ? OclContext.of(self) : OclContext.of(self, resourceSet);
+		return new OclContext(self, null, variables, resourceSet);
 	}
 
-	private String key(String expression, EClass contextType) {
+	/** Whether a text parses depends on the model version, the context type and the names of the variables. */
+	private String key(String expression, EClass contextType, Map<String, Object> variables) {
 		EPackage ePackage = contextType.getEPackage();
 		String version = "";
 		if (ePackage != null) {
@@ -120,7 +133,7 @@ public final class OclExpressionEvaluator implements ExpressionEvaluator {
 				version = NS_URI.apply(ePackage);
 			}
 		}
-		return version + '#' + contextType.getName() + '\u0000' + expression;
+		return version + '#' + contextType.getName() + new TreeSet<>(variables.keySet()) + '\u0000' + expression;
 	}
 
 	private void report(String key, Level level, String message, Exception cause) {

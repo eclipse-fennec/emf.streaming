@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" copyrightText="Copyright (c) 2026 Contributors to the Eclipse Foundation.&#xA;&#xA;This program and the accompanying materials are made&#xA;available under the terms of the Eclipse Public License 2.0&#xA;which is available at https://www.eclipse.org/legal/epl-2.0/&#xA;&#xA;SPDX-License-Identifier: EPL-2.0&#xA;&#xA;Contributors:&#xA;  Data In Motion Consulting - initial implementation"
+    modelDirectory="/org.eclipse.fennec.stream.mapping.model/src-gen" modelPluginID="org.eclipse.fennec.stream.mapping.model"
+    modelName="StreamMapping" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="21.0" copyrightFields="false"
+    operationReflection="true" importOrganizing="true" oSGiCompatible="true"
+    usedGenPackages="../../org.eclipse.fennec.mapping.model/model/mapping.genmodel#//mapping ../../org.eclipse.fennec.atlas.configuration.model/model/configuration.genmodel#//configuration">
+  <foreignModel>streammapping.ecore</foreignModel>
+  <genPackages prefix="StreamMapping" basePackage="org.eclipse.fennec.model" resource="XMI" disposableProviderFactory="true"
+      ecorePackage="streammapping.ecore#/">
+    <genClasses ecoreClass="streammapping.ecore#//StreamMapping">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamMapping/mode"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamMapping/recording"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamMapping/lateness"/>
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference streammapping.ecore#//StreamMapping/batch"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamMapping/executionGroup"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamMapping/guard"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamMapping/keyframeEverySets"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamMapping/keyframeEveryMinutes"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamMapping/undoable"/>
+    </genClasses>
+    <genClasses ecoreClass="streammapping.ecore#//StreamSlot">
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference streammapping.ecore#//StreamSlot/rule"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamSlot/mode"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamSlot/recording"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamSlot/lateness"/>
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference streammapping.ecore#//StreamSlot/batch"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamSlot/executionGroup"/>
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference streammapping.ecore#//StreamSlot/deletionRule"/>
+    </genClasses>
+    <genClasses ecoreClass="streammapping.ecore#//ChangeRule">
+    </genClasses>
+    <genClasses ecoreClass="streammapping.ecore#//AbsoluteChange">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//AbsoluteChange/delta"/>
+    </genClasses>
+    <genClasses ecoreClass="streammapping.ecore#//PercentageChange">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//PercentageChange/percent"/>
+    </genClasses>
+    <genClasses ecoreClass="streammapping.ecore#//CountChange">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//CountChange/n"/>
+    </genClasses>
+    <genClasses ecoreClass="streammapping.ecore#//TimeThrottle">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//TimeThrottle/interval"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//TimeThrottle/unit"/>
+    </genClasses>
+    <genClasses ecoreClass="streammapping.ecore#//CompositeRule">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//CompositeRule/operator"/>
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference streammapping.ecore#//CompositeRule/rules"/>
+    </genClasses>
+    <genClasses ecoreClass="streammapping.ecore#//ExpressionRule">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//ExpressionRule/expression"/>
+    </genClasses>
+    <genClasses ecoreClass="streammapping.ecore#//BatchStrategy">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//BatchStrategy/kind"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//BatchStrategy/count"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//BatchStrategy/window"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//BatchStrategy/unit"/>
+    </genClasses>
+    <genClasses ecoreClass="streammapping.ecore#//DeletionRule">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//DeletionRule/retention"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//DeletionRule/retentionUnit"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//DeletionRule/maxCount"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//DeletionRule/cleanupInterval"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//DeletionRule/cleanupIntervalUnit"/>
+    </genClasses>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="streammapping.ecore#//ProjectionMode">
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//ProjectionMode/PROJECT"/>
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//ProjectionMode/AUDIT_ONLY"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="streammapping.ecore#//RecordingMode">
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//RecordingMode/TIMESERIES"/>
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//RecordingMode/CHANGELOG"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="streammapping.ecore#//Lateness">
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//Lateness/ARRIVAL"/>
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//Lateness/EVENT_TIME"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="streammapping.ecore#//GuardPolicy">
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//GuardPolicy/FAIL"/>
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//GuardPolicy/LAST_WRITER_WINS"/>
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//GuardPolicy/MERGE"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="streammapping.ecore#//BatchKind">
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//BatchKind/IMMEDIATE"/>
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//BatchKind/COMMIT"/>
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//BatchKind/COUNT"/>
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//BatchKind/WINDOW"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="streammapping.ecore#//RuleOperator">
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//RuleOperator/AND"/>
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//RuleOperator/OR"/>
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//RuleOperator/NOT"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="streammapping.ecore#//DurationUnit">
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//DurationUnit/MILLISECONDS"/>
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//DurationUnit/SECONDS"/>
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//DurationUnit/MINUTES"/>
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//DurationUnit/HOURS"/>
+      <genEnumLiterals ecoreEnumLiteral="streammapping.ecore#//DurationUnit/DAYS"/>
+    </genEnums>
+  </genPackages>
+</genmodel:GenModel>

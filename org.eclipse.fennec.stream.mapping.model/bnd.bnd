@@ -1,0 +1,27 @@
+Bundle-Name: Eclipse Fennec Stream Mapping Model
+Bundle-Description: Streaming policies on top of the generic Fennec mapping: StreamMapping and \
+	StreamSlot (change rules, projection and recording mode, lateness, batching, execution group, \
+	retention), with their defaults on the mapping.
+
+src=${^src},src-gen
+
+-workingset: streaming
+
+-library: enableEMF
+
+-generate:\
+	model/streammapping.genmodel;\
+		generate=fennecEMF;\
+		lineEndings=lf;\
+		genmodel=model/streammapping.genmodel;\
+		output=src-gen
+
+-includeresource.model: model=model
+
+-buildpath: \
+	org.osgi.service.condition;version=latest,\
+	org.eclipse.fennec.atlas.configuration.model;version=latest,\
+	org.eclipse.fennec.mapping.model;version=snapshot
+
+-testpath: \
+	assertj-core
