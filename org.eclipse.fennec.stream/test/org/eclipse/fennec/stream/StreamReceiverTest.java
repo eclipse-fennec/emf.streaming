@@ -237,12 +237,13 @@ class StreamReceiverTest {
 
 	@Test
 	void streamIdsSplitIntoClassAndId() {
-		assertThat(StreamReceiver.splitStreamId("https://example.org/pool#//Pool/pool-1"))
-				.containsExactly("https://example.org/pool#//Pool", "pool-1");
-		assertThat(StreamReceiver.splitStreamId("https://example.org/pool#//Pool/a/b"))
-				.containsExactly("https://example.org/pool#//Pool", "a/b");
-		assertThat(StreamReceiver.splitStreamId("no-class")).isNull();
-		assertThat(StreamReceiver.splitStreamId("https://example.org/pool#//Pool/")).isNull();
+		assertThat(StreamId.parse("https://example.org/pool#//Pool/pool-1"))
+				.contains(new StreamId("https://example.org/pool#//Pool", "pool-1"));
+		assertThat(StreamId.parse("https://example.org/pool#//Pool/a/b"))
+				.contains(new StreamId("https://example.org/pool#//Pool", "a/b"));
+		assertThat(StreamId.parse("no-class")).isEmpty();
+		assertThat(StreamId.parse("https://example.org/pool#//Pool/")).isEmpty();
+		assertThat(StreamId.of(fx.pool, "x/y").toString()).isEqualTo("https://example.org/pool#//Pool/x/y");
 	}
 
 	private StreamReceiver.Builder receiver() {

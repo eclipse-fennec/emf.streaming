@@ -138,3 +138,8 @@ org.eclipse.fennec.m2x:org.eclipse.fennec.m2x.ocl.engine:0.1.1-SNAPSHOT
 org.eclipse.fennec.m2x:org.eclipse.fennec.m2x.ocl.parser:0.1.1-SNAPSHOT
 org.eclipse.fennec.m2x:org.eclipse.fennec.m2x.unit:0.1.1-SNAPSHOT
 org.antlr:antlr4-runtime:4.13.2
+
+# Gecko Messaging 2.0 (protocol-neutral messaging: MQTT, AMQP, WebSocket, in-memory). The API is
+# what the stream transport builds on; core brings the in-memory broker for plain JUnit tests.
+org.geckoprojects.messaging:org.gecko.messaging.api:2.0.0-SNAPSHOT
+org.geckoprojects.messaging:org.gecko.messaging.core:2.0.0-SNAPSHOT

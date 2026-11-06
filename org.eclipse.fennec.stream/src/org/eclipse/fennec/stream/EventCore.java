@@ -274,7 +274,7 @@ public final class EventCore implements AutoCloseable {
 	 * @return the id of its stream
 	 */
 	public static String streamId(EClass targetClass, String targetId) {
-		return Mappings.uriOf(targetClass) + "/" + targetId;
+		return StreamId.of(targetClass, targetId).toString();
 	}
 
 	/**

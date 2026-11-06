@@ -1,0 +1,29 @@
+Bundle-Name: Eclipse Fennec Stream Messaging
+Bundle-Description: Transport of the Fennec change stream over Gecko Messaging (MQTT, AMQP, \
+	WebSocket, in-memory): change sets as CloudEvents on a channel per object, a pluggable \
+	payload codec, and the receiving side into a StreamReceiver. No OSGi needed.
+
+-workingset: streaming
+
+-library: enableEMF
+
+-buildpath: \
+	org.osgi.service.condition;version=latest,\
+	org.osgi.util.pushstream;version=latest,\
+	org.osgi.util.promise;version=latest,\
+	org.osgi.util.function;version=latest,\
+	org.gecko.messaging.api;version=latest,\
+	org.eclipse.fennec.stream.model;version=snapshot,\
+	org.eclipse.fennec.stream;version=snapshot
+
+# The in-memory broker of Gecko Messaging carries the plain JUnit tests.
+-testpath: \
+	assertj-core,\
+	org.gecko.messaging.core;version=latest,\
+	org.osgi.framework;version=latest,\
+	org.osgi.util.tracker;version=latest,\
+	org.osgi.dto;version=latest,\
+	org.eclipse.fennec.atlas.configuration.model;version=latest,\
+	org.eclipse.fennec.mapping.model;version=snapshot,\
+	org.eclipse.fennec.mapping;version=snapshot,\
+	org.eclipse.fennec.stream.mapping.model;version=snapshot
