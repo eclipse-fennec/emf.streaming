@@ -1,0 +1,46 @@
+name: CI Build
+
+on:
+  # Pull requests only. A branch with an open PR used to be built twice for every
+  # push — once for `push`, once for `pull_request` — two full matrix builds and
+  # two sets of test check runs per commit, with identical results. `main` and
+  # `snapshot` never reached this workflow anyway; they publish via their own
+  # orchestrators. What the `push` trigger uniquely covered was a branch with no
+  # PR yet, which workflow_dispatch now covers on demand.
+  pull_request:
+    branches:
+      - '*'
+  workflow_dispatch:
+
+# Least privilege by default; verification only reads the repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    uses: eclipse-fennec/.github/.github/workflows/reusable-verify.yml@2a98ad6e2459556b858e1273bff2f8d87fc11a06 # v1.3.0
+    # java-versions unset on purpose: the reusable default '["21","25"]' runs
+    # both legs. The artifacts target Java 21 (cnf/ext/fennec.bnd); the 25 leg is
+    # a toolchain check.
+
+  test-report:
+    name: Render test results
+    needs: verify
+    # Render whatever `verify` produced, red or green — a failing run is exactly
+    # when the per-test annotations are worth having.
+    if: ${{ !cancelled() }}
+    permissions:
+      contents: read
+      checks: write
+    # Opt-in check runs from the central set (moved there from this repo's
+    # trial in #241, see eclipse-fennec/.github#34). verify already renders the
+    # same XML as a job summary with inline annotations; this job adds the one
+    # check run per JDK leg, which needs `checks: write` — granted on this job
+    # alone, so verify itself keeps running with `contents: read`.
+    uses: eclipse-fennec/.github/.github/workflows/reusable-test-report.yml@2a98ad6e2459556b858e1273bff2f8d87fc11a06 # v1.3.0
+    # java-versions deliberately unset: it defaults to the same '["21","25"]' as
+    # reusable-verify, so the two stay in step.

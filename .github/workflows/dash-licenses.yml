@@ -1,0 +1,50 @@
+name: License Check (IP Dash)
+
+on:
+  push:
+    # Run on the primary branches.
+    branches:
+      - main
+      - snapshot
+  pull_request:
+    # Run for all pull requests.
+    branches:
+      - '*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  dash:
+    name: Eclipse Dash license check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v7
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: "temurin"
+          java-version: 21
+      - name: Generate DEPENDENCIES and check licenses
+        # The script exits with the number of "restricted" artifacts, so a
+        # non-zero exit means something is not vetted yet. That is reported here
+        # but does NOT fail the job while new dependencies (e.g. the ANTLR 4
+        # tool, used to generate the CQL2 parser) still wait for vetting — a hard
+        # gate would only teach everyone to ignore a red check.
+        # Drop continue-on-error the moment the count reaches zero — that is the
+        # whole point of having the check.
+        continue-on-error: true
+        run: bash tools/dash-licenses.sh
+      - name: Upload DEPENDENCIES
+        uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: DEPENDENCIES
+          path: DEPENDENCIES
+          if-no-files-found: warn

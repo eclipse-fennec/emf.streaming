@@ -1,0 +1,55 @@
+name: Snapshot Build
+
+# Orchestrator for the snapshot branch (development branch -> Maven Snapshot).
+#
+# verify, release, the test-result check runs come from the central
+# reusables in eclipse-fennec/.github. Docs/Pages jobs are added once a docs-site exists.
+on:
+  push:
+    # This snapshot build should only happen on pushes to the snapshot branch.
+    branches:
+      - snapshot
+  pull_request:
+    # This snapshot build should NOT happen on pull requests.
+    branches-ignore:
+      - '*'
+
+permissions:
+  contents: read
+
+
+jobs:
+  verify:
+    name: Verify
+    uses: eclipse-fennec/.github/.github/workflows/reusable-verify.yml@2a98ad6e2459556b858e1273bff2f8d87fc11a06 # v1.3.0
+    # java-versions unset on purpose: the reusable default '["21","25"]' runs
+    # both legs. The artifacts target Java 21 (cnf/ext/fennec.bnd); the 25 leg is
+    # a toolchain check.
+
+  release:
+    name: Release snapshot
+    needs: verify
+    uses: eclipse-fennec/.github/.github/workflows/reusable-release.yml@2a98ad6e2459556b858e1273bff2f8d87fc11a06 # v1.3.0
+    with:
+      do-release: false
+    secrets: inherit
+
+
+
+  test-report:
+    name: Render test results
+    needs: verify
+    # Render whatever `verify` produced, red or green — a failing run is exactly
+    # when the per-test annotations are worth having.
+    if: ${{ !cancelled() }}
+    permissions:
+      contents: read
+      checks: write
+    # Opt-in check runs from the central set (moved there from this repo's
+    # trial in #241, see eclipse-fennec/.github#34). verify already renders the
+    # same XML as a job summary with inline annotations; this job adds the one
+    # check run per JDK leg, which needs `checks: write` — granted on this job
+    # alone, so verify itself keeps running with `contents: read`.
+    uses: eclipse-fennec/.github/.github/workflows/reusable-test-report.yml@2a98ad6e2459556b858e1273bff2f8d87fc11a06 # v1.3.0
+    # java-versions deliberately unset: it defaults to the same '["21","25"]' as
+    # reusable-verify, so the two stay in step.

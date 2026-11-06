@@ -1,0 +1,12 @@
+# Text files are stored and checked out with LF, whatever the tool on Windows writes:
+# the EMF codegen and Eclipse write CRLF there, which otherwise shows every generated
+# file as changed.
+* text=auto eol=lf
+
+# Windows wrapper script keeps its CRLF as committed
+gradlew.bat -text
+
+# binaries
+*.jar binary
+*.png binary
+*.ico binary
