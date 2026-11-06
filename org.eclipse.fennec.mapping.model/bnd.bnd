@@ -1,0 +1,26 @@
+Bundle-Name: Eclipse Fennec Mapping Model
+Bundle-Description: Generic EObject-to-EObject mapping metamodel: target class, slots, identity \
+	resolution per source class and the shared value ladder (OCL expression, function, feature path, \
+	constant, converter). Consumed by streaming, search, OGC features and the event atlas.
+
+src=${^src},src-gen
+
+-workingset: mapping
+
+-library: enableEMF
+
+-generate:\
+	model/mapping.genmodel;\
+		generate=fennecEMF;\
+		lineEndings=lf;\
+		genmodel=model/mapping.genmodel;\
+		output=src-gen
+
+-includeresource.model: model=model
+
+-buildpath: \
+	org.osgi.service.condition;version=latest,\
+	org.eclipse.fennec.atlas.configuration.model;version=latest
+
+-testpath: \
+	assertj-core

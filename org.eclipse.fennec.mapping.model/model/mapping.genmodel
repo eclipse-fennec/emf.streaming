@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" copyrightText="Copyright (c) 2026 Contributors to the Eclipse Foundation.&#xA;&#xA;This program and the accompanying materials are made&#xA;available under the terms of the Eclipse Public License 2.0&#xA;which is available at https://www.eclipse.org/legal/epl-2.0/&#xA;&#xA;SPDX-License-Identifier: EPL-2.0&#xA;&#xA;Contributors:&#xA;  Data In Motion Consulting - initial implementation"
+    modelDirectory="/org.eclipse.fennec.mapping.model/src-gen" modelPluginID="org.eclipse.fennec.mapping.model"
+    modelName="Mapping" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="21.0" copyrightFields="false"
+    operationReflection="true" importOrganizing="true" oSGiCompatible="true"
+    usedGenPackages="../../org.eclipse.fennec.atlas.configuration.model/model/configuration.genmodel#//configuration">
+  <foreignModel>mapping.ecore</foreignModel>
+  <genPackages prefix="Mapping" basePackage="org.eclipse.fennec.model" resource="XMI" disposableProviderFactory="true"
+      ecorePackage="mapping.ecore#/">
+    <genClasses ecoreClass="mapping.ecore#//Mapping">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference mapping.ecore#//Mapping/target"/>
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference mapping.ecore#//Mapping/identities"/>
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference mapping.ecore#//Mapping/slots"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mapping.ecore#//Mapping/includeUnmapped"/>
+    </genClasses>
+    <genClasses ecoreClass="mapping.ecore#//IdentityResolution">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference mapping.ecore#//IdentityResolution/sourceClass"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference mapping.ecore#//IdentityResolution/targetClass"/>
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference mapping.ecore#//IdentityResolution/resolver"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mapping.ecore#//IdentityResolution/cacheable"/>
+    </genClasses>
+    <genClasses ecoreClass="mapping.ecore#//Slot">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mapping.ecore#//Slot/name"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference mapping.ecore#//Slot/targetFeature"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference mapping.ecore#//Slot/sourceClass"/>
+      <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference mapping.ecore#//Slot/value"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mapping.ecore#//Slot/targetConverterId"/>
+    </genClasses>
+    <genClasses ecoreClass="mapping.ecore#//ValueSource">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference mapping.ecore#//ValueSource/featurePath"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mapping.ecore#//ValueSource/collectionIndex"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mapping.ecore#//ValueSource/collectionFilter"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mapping.ecore#//ValueSource/expression"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mapping.ecore#//ValueSource/functionId"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mapping.ecore#//ValueSource/converterId"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute mapping.ecore#//ValueSource/constant"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>
