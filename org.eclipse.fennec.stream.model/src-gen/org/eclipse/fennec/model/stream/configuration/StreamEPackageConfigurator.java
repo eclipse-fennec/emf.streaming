@@ -27,7 +27,7 @@ import org.eclipse.fennec.model.stream.StreamPackage;
  * The package will be registered into a OSGi base model registry.
  * <!-- end-user-doc -->
  * <!-- begin-model-doc -->
- * Fennec change-stream metamodel (the 'diff-Ecore'). Promoted from the unified-persistence concept draft — see docs/unified-persistence/concept.md (§5, §20).
+ * Fennec change-stream metamodel (the 'diff-Ecore'). Promoted from the unified-persistence concept draft (concept §5, §20) and maintained in eclipse-fennec/emf.streaming.
  * 
  * DISCIPLINE (concept §12.3): this package is the ONLY schema sender and receiver must share. It cannot fingerprint-bootstrap itself, so the protobuf doctrine applies manually: evolution is additive-only (append, never remove/reorder), the semantics of an existing feature are never rebound. Keep it small and boring — convenience belongs in projections, not here.
  * 
@@ -44,7 +44,7 @@ public class StreamEPackageConfigurator implements EPackageConfigurator {
 	 * service property.
 	 * @generated
 	 */
-	public static final String FINGERPRINT = "fp1:b88eae543d45edf2b5c2f4aeefa350ca67a578d35551931ca03d206879591ffc";
+	public static final String FINGERPRINT = "fp1:2d45e5ac995a4bc06a5cf4b6820793ac13088967344bb7b41507c38f1e309878";
 
 	private StreamPackage ePackage;
 

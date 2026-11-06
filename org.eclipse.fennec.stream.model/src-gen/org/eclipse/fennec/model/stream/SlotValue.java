@@ -32,6 +32,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * </p>
  * <ul>
  *   <li>{@link org.eclipse.fennec.model.stream.SlotValue#getFeatureId <em>Feature Id</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.SlotValue#getFeatureUri <em>Feature Uri</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.SlotValue#getIndex <em>Index</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.SlotValue#getKey <em>Key</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.SlotValue#getCoords <em>Coords</em>}</li>
@@ -46,15 +47,16 @@ import org.osgi.annotation.versioning.ProviderType;
 public interface SlotValue extends EObject {
 	/**
 	 * Returns the value of the '<em><b>Feature Id</b></em>' attribute.
+	 * The default value is <code>"-1"</code>.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
-	 * Stable feature id of the slot's feature (§4.2).
+	 * EMF feature ID of the slot's feature under contextFingerprint (-1 = unset, then featureUri is required).
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Feature Id</em>' attribute.
 	 * @see #setFeatureId(int)
 	 * @see org.eclipse.fennec.model.stream.StreamPackage#getSlotValue_FeatureId()
-	 * @model required="true"
+	 * @model default="-1"
 	 * @generated
 	 */
 	int getFeatureId();
@@ -68,6 +70,31 @@ public interface SlotValue extends EObject {
 	 * @generated
 	 */
 	void setFeatureId(int value);
+
+	/**
+	 * Returns the value of the '<em><b>Feature Uri</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * <!-- begin-model-doc -->
+	 * Alternative address of the slot's feature (nsURI#//Class/feature). Wins over featureId when set.
+	 * <!-- end-model-doc -->
+	 * @return the value of the '<em>Feature Uri</em>' attribute.
+	 * @see #setFeatureUri(String)
+	 * @see org.eclipse.fennec.model.stream.StreamPackage#getSlotValue_FeatureUri()
+	 * @model
+	 * @generated
+	 */
+	String getFeatureUri();
+
+	/**
+	 * Sets the value of the '{@link org.eclipse.fennec.model.stream.SlotValue#getFeatureUri <em>Feature Uri</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Feature Uri</em>' attribute.
+	 * @see #getFeatureUri()
+	 * @generated
+	 */
+	void setFeatureUri(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Index</b></em>' attribute.

@@ -16,16 +16,19 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeSet/commitTime"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeSet/contextFingerprint"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeSet/author"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeSet/cause"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeSet/reason"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeSet/transactionId"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeSet/manifest"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference stream.ecore#//ChangeSet/entries"/>
     </genClasses>
     <genClasses ecoreClass="stream.ecore#//ChangeEntry">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/objectId"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/classUri"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/classId"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/kind"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/featureId"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/featureUri"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/timestamp"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/index"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/toIndex"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/key"/>
@@ -36,6 +39,7 @@
     </genClasses>
     <genClasses ecoreClass="stream.ecore#//SlotValue">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//SlotValue/featureId"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//SlotValue/featureUri"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//SlotValue/index"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//SlotValue/key"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//SlotValue/coords"/>

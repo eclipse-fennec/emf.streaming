@@ -35,7 +35,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * </ul>
  * <!-- end-user-doc -->
  * <!-- begin-model-doc -->
- * Fennec change-stream metamodel (the 'diff-Ecore'). Promoted from the unified-persistence concept draft — see docs/unified-persistence/concept.md (§5, §20).
+ * Fennec change-stream metamodel (the 'diff-Ecore'). Promoted from the unified-persistence concept draft (concept §5, §20) and maintained in eclipse-fennec/emf.streaming.
  * 
  * DISCIPLINE (concept §12.3): this package is the ONLY schema sender and receiver must share. It cannot fingerprint-bootstrap itself, so the protobuf doctrine applies manually: evolution is additive-only (append, never remove/reorder), the semantics of an existing feature are never rebound. Keep it small and boring — convenience belongs in projections, not here.
  * 
@@ -46,7 +46,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @ProviderType
-@EPackage(uri = StreamPackage.eNS_URI, fingerprint = "fp1:b88eae543d45edf2b5c2f4aeefa350ca67a578d35551931ca03d206879591ffc", genModel = "/model/stream.genmodel", genModelSourceLocations = {"model/stream.genmodel","org.eclipse.fennec.stream.model/model/stream.genmodel"}, ecore = "/model/stream.ecore", ecoreSourceLocations = "/model/stream.ecore")
+@EPackage(uri = StreamPackage.eNS_URI, fingerprint = "fp1:2d45e5ac995a4bc06a5cf4b6820793ac13088967344bb7b41507c38f1e309878", genModel = "/model/stream.genmodel", genModelSourceLocations = {"model/stream.genmodel","org.eclipse.fennec.stream.model/model/stream.genmodel"}, ecore = "/model/stream.ecore", ecoreSourceLocations = "/model/stream.ecore")
 public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	/**
 	 * The package name.
@@ -154,13 +154,13 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	int CHANGE_SET__AUTHOR = 6;
 
 	/**
-	 * The feature id for the '<em><b>Cause</b></em>' attribute.
+	 * The feature id for the '<em><b>Reason</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_SET__CAUSE = 7;
+	int CHANGE_SET__REASON = 7;
 
 	/**
 	 * The feature id for the '<em><b>Transaction Id</b></em>' attribute.
@@ -227,13 +227,22 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	int CHANGE_ENTRY__OBJECT_ID = 0;
 
 	/**
+	 * The feature id for the '<em><b>Class Uri</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CHANGE_ENTRY__CLASS_URI = 1;
+
+	/**
 	 * The feature id for the '<em><b>Class Id</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__CLASS_ID = 1;
+	int CHANGE_ENTRY__CLASS_ID = 2;
 
 	/**
 	 * The feature id for the '<em><b>Kind</b></em>' attribute.
@@ -242,7 +251,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__KIND = 2;
+	int CHANGE_ENTRY__KIND = 3;
 
 	/**
 	 * The feature id for the '<em><b>Feature Id</b></em>' attribute.
@@ -251,7 +260,25 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__FEATURE_ID = 3;
+	int CHANGE_ENTRY__FEATURE_ID = 4;
+
+	/**
+	 * The feature id for the '<em><b>Feature Uri</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CHANGE_ENTRY__FEATURE_URI = 5;
+
+	/**
+	 * The feature id for the '<em><b>Timestamp</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CHANGE_ENTRY__TIMESTAMP = 6;
 
 	/**
 	 * The feature id for the '<em><b>Index</b></em>' attribute.
@@ -260,7 +287,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__INDEX = 4;
+	int CHANGE_ENTRY__INDEX = 7;
 
 	/**
 	 * The feature id for the '<em><b>To Index</b></em>' attribute.
@@ -269,7 +296,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__TO_INDEX = 5;
+	int CHANGE_ENTRY__TO_INDEX = 8;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' attribute.
@@ -278,7 +305,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__KEY = 6;
+	int CHANGE_ENTRY__KEY = 9;
 
 	/**
 	 * The feature id for the '<em><b>Coords</b></em>' attribute list.
@@ -287,7 +314,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__COORDS = 7;
+	int CHANGE_ENTRY__COORDS = 10;
 
 	/**
 	 * The feature id for the '<em><b>Value Old</b></em>' attribute.
@@ -296,7 +323,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__VALUE_OLD = 8;
+	int CHANGE_ENTRY__VALUE_OLD = 11;
 
 	/**
 	 * The feature id for the '<em><b>Value New</b></em>' attribute.
@@ -305,7 +332,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__VALUE_NEW = 9;
+	int CHANGE_ENTRY__VALUE_NEW = 12;
 
 	/**
 	 * The feature id for the '<em><b>State</b></em>' containment reference list.
@@ -314,7 +341,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__STATE = 10;
+	int CHANGE_ENTRY__STATE = 13;
 
 	/**
 	 * The number of structural features of the '<em>Change Entry</em>' class.
@@ -323,7 +350,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY_FEATURE_COUNT = 11;
+	int CHANGE_ENTRY_FEATURE_COUNT = 14;
 
 	/**
 	 * The number of operations of the '<em>Change Entry</em>' class.
@@ -354,13 +381,22 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	int SLOT_VALUE__FEATURE_ID = 0;
 
 	/**
+	 * The feature id for the '<em><b>Feature Uri</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int SLOT_VALUE__FEATURE_URI = 1;
+
+	/**
 	 * The feature id for the '<em><b>Index</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SLOT_VALUE__INDEX = 1;
+	int SLOT_VALUE__INDEX = 2;
 
 	/**
 	 * The feature id for the '<em><b>Key</b></em>' attribute.
@@ -369,7 +405,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SLOT_VALUE__KEY = 2;
+	int SLOT_VALUE__KEY = 3;
 
 	/**
 	 * The feature id for the '<em><b>Coords</b></em>' attribute list.
@@ -378,7 +414,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SLOT_VALUE__COORDS = 3;
+	int SLOT_VALUE__COORDS = 4;
 
 	/**
 	 * The feature id for the '<em><b>Value</b></em>' attribute.
@@ -387,7 +423,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SLOT_VALUE__VALUE = 4;
+	int SLOT_VALUE__VALUE = 5;
 
 	/**
 	 * The number of structural features of the '<em>Slot Value</em>' class.
@@ -396,7 +432,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int SLOT_VALUE_FEATURE_COUNT = 5;
+	int SLOT_VALUE_FEATURE_COUNT = 6;
 
 	/**
 	 * The number of operations of the '<em>Slot Value</em>' class.
@@ -707,15 +743,15 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	EAttribute getChangeSet_Author();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.ChangeSet#getCause <em>Cause</em>}'.
+	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.ChangeSet#getReason <em>Reason</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Cause</em>'.
-	 * @see org.eclipse.fennec.model.stream.ChangeSet#getCause()
+	 * @return the meta object for the attribute '<em>Reason</em>'.
+	 * @see org.eclipse.fennec.model.stream.ChangeSet#getReason()
 	 * @see #getChangeSet()
 	 * @generated
 	 */
-	EAttribute getChangeSet_Cause();
+	EAttribute getChangeSet_Reason();
 
 	/**
 	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.ChangeSet#getTransactionId <em>Transaction Id</em>}'.
@@ -772,6 +808,17 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	EAttribute getChangeEntry_ObjectId();
 
 	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.ChangeEntry#getClassUri <em>Class Uri</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Class Uri</em>'.
+	 * @see org.eclipse.fennec.model.stream.ChangeEntry#getClassUri()
+	 * @see #getChangeEntry()
+	 * @generated
+	 */
+	EAttribute getChangeEntry_ClassUri();
+
+	/**
 	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.ChangeEntry#getClassId <em>Class Id</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -803,6 +850,28 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 */
 	EAttribute getChangeEntry_FeatureId();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.ChangeEntry#getFeatureUri <em>Feature Uri</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Feature Uri</em>'.
+	 * @see org.eclipse.fennec.model.stream.ChangeEntry#getFeatureUri()
+	 * @see #getChangeEntry()
+	 * @generated
+	 */
+	EAttribute getChangeEntry_FeatureUri();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.ChangeEntry#getTimestamp <em>Timestamp</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Timestamp</em>'.
+	 * @see org.eclipse.fennec.model.stream.ChangeEntry#getTimestamp()
+	 * @see #getChangeEntry()
+	 * @generated
+	 */
+	EAttribute getChangeEntry_Timestamp();
 
 	/**
 	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.ChangeEntry#getIndex <em>Index</em>}'.
@@ -901,6 +970,17 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 */
 	EAttribute getSlotValue_FeatureId();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.SlotValue#getFeatureUri <em>Feature Uri</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Feature Uri</em>'.
+	 * @see org.eclipse.fennec.model.stream.SlotValue#getFeatureUri()
+	 * @see #getSlotValue()
+	 * @generated
+	 */
+	EAttribute getSlotValue_FeatureUri();
 
 	/**
 	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.SlotValue#getIndex <em>Index</em>}'.
@@ -1219,12 +1299,12 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 		EAttribute CHANGE_SET__AUTHOR = eINSTANCE.getChangeSet_Author();
 
 		/**
-		 * The meta object literal for the '<em><b>Cause</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Reason</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute CHANGE_SET__CAUSE = eINSTANCE.getChangeSet_Cause();
+		EAttribute CHANGE_SET__REASON = eINSTANCE.getChangeSet_Reason();
 
 		/**
 		 * The meta object literal for the '<em><b>Transaction Id</b></em>' attribute feature.
@@ -1269,6 +1349,14 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 		EAttribute CHANGE_ENTRY__OBJECT_ID = eINSTANCE.getChangeEntry_ObjectId();
 
 		/**
+		 * The meta object literal for the '<em><b>Class Uri</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute CHANGE_ENTRY__CLASS_URI = eINSTANCE.getChangeEntry_ClassUri();
+
+		/**
 		 * The meta object literal for the '<em><b>Class Id</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -1291,6 +1379,22 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 		 * @generated
 		 */
 		EAttribute CHANGE_ENTRY__FEATURE_ID = eINSTANCE.getChangeEntry_FeatureId();
+
+		/**
+		 * The meta object literal for the '<em><b>Feature Uri</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute CHANGE_ENTRY__FEATURE_URI = eINSTANCE.getChangeEntry_FeatureUri();
+
+		/**
+		 * The meta object literal for the '<em><b>Timestamp</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute CHANGE_ENTRY__TIMESTAMP = eINSTANCE.getChangeEntry_Timestamp();
 
 		/**
 		 * The meta object literal for the '<em><b>Index</b></em>' attribute feature.
@@ -1365,6 +1469,14 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 		 * @generated
 		 */
 		EAttribute SLOT_VALUE__FEATURE_ID = eINSTANCE.getSlotValue_FeatureId();
+
+		/**
+		 * The meta object literal for the '<em><b>Feature Uri</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute SLOT_VALUE__FEATURE_URI = eINSTANCE.getSlotValue_FeatureUri();
 
 		/**
 		 * The meta object literal for the '<em><b>Index</b></em>' attribute feature.

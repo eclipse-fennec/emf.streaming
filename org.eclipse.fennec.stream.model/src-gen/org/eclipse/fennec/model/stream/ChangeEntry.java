@@ -32,9 +32,12 @@ import org.osgi.annotation.versioning.ProviderType;
  * </p>
  * <ul>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getObjectId <em>Object Id</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getClassUri <em>Class Uri</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getClassId <em>Class Id</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getKind <em>Kind</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getFeatureId <em>Feature Id</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getFeatureUri <em>Feature Uri</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getTimestamp <em>Timestamp</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getIndex <em>Index</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getToIndex <em>To Index</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getKey <em>Key</em>}</li>
@@ -76,12 +79,37 @@ public interface ChangeEntry extends EObject {
 	void setObjectId(String value);
 
 	/**
+	 * Returns the value of the '<em><b>Class Uri</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * <!-- begin-model-doc -->
+	 * URI of the object's EClass (nsURI#//Name). REQUIRED for CREATE and KEYFRAME, redundant otherwise (the class is known from objectId). The default way to address a class: the classifier order of a package is NOT part of the model fingerprint, so a classifier index is not stable.
+	 * <!-- end-model-doc -->
+	 * @return the value of the '<em>Class Uri</em>' attribute.
+	 * @see #setClassUri(String)
+	 * @see org.eclipse.fennec.model.stream.StreamPackage#getChangeEntry_ClassUri()
+	 * @model
+	 * @generated
+	 */
+	String getClassUri();
+
+	/**
+	 * Sets the value of the '{@link org.eclipse.fennec.model.stream.ChangeEntry#getClassUri <em>Class Uri</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Class Uri</em>' attribute.
+	 * @see #getClassUri()
+	 * @generated
+	 */
+	void setClassUri(String value);
+
+	/**
 	 * Returns the value of the '<em><b>Class Id</b></em>' attribute.
 	 * The default value is <code>"-1"</code>.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
-	 * Stable class id, resolved via (contextFingerprint, classId) — assigned in the tracking aspect (tracking.ecore). Required for CREATE; redundant otherwise.
+	 * Optional numeric class id (-1 = unset). Only meaningful when a producer assigns its own stable class numbers; classUri wins when both are set.
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Class Id</em>' attribute.
 	 * @see #setClassId(int)
@@ -135,7 +163,7 @@ public interface ChangeEntry extends EObject {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
-	 * Stable feature id (§4.2, protobuf discipline: bound to semantics, never renamed away, never reused). Absent (-1) for CREATE/DELETE/KEYFRAME.
+	 * Feature id = the EMF feature ID of the class (EClass#getFeatureID) under contextFingerprint: the declared feature order is part of the model fingerprint, so the id is stable for a model version. Absent (-1) for CREATE/DELETE/KEYFRAME. featureUri wins when both are set.
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Feature Id</em>' attribute.
 	 * @see #setFeatureId(int)
@@ -154,6 +182,56 @@ public interface ChangeEntry extends EObject {
 	 * @generated
 	 */
 	void setFeatureId(int value);
+
+	/**
+	 * Returns the value of the '<em><b>Feature Uri</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * <!-- begin-model-doc -->
+	 * Alternative feature address: URI of the EStructuralFeature (nsURI#//Class/feature). Wins over featureId when set.
+	 * <!-- end-model-doc -->
+	 * @return the value of the '<em>Feature Uri</em>' attribute.
+	 * @see #setFeatureUri(String)
+	 * @see org.eclipse.fennec.model.stream.StreamPackage#getChangeEntry_FeatureUri()
+	 * @model
+	 * @generated
+	 */
+	String getFeatureUri();
+
+	/**
+	 * Sets the value of the '{@link org.eclipse.fennec.model.stream.ChangeEntry#getFeatureUri <em>Feature Uri</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Feature Uri</em>' attribute.
+	 * @see #getFeatureUri()
+	 * @generated
+	 */
+	void setFeatureUri(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Timestamp</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * <!-- begin-model-doc -->
+	 * Event time of this entry (epoch millis), e.g. the measurement time of a sample (SensorThings phenomenonTime). Unset (null) = the batch time ChangeSet.timestamp applies. Lets one batch carry samples with different event times.
+	 * <!-- end-model-doc -->
+	 * @return the value of the '<em>Timestamp</em>' attribute.
+	 * @see #setTimestamp(Long)
+	 * @see org.eclipse.fennec.model.stream.StreamPackage#getChangeEntry_Timestamp()
+	 * @model
+	 * @generated
+	 */
+	Long getTimestamp();
+
+	/**
+	 * Sets the value of the '{@link org.eclipse.fennec.model.stream.ChangeEntry#getTimestamp <em>Timestamp</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Timestamp</em>' attribute.
+	 * @see #getTimestamp()
+	 * @generated
+	 */
+	void setTimestamp(Long value);
 
 	/**
 	 * Returns the value of the '<em><b>Index</b></em>' attribute.

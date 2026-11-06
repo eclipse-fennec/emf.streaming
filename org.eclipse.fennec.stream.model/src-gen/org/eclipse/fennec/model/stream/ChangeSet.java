@@ -24,7 +24,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * <!-- end-user-doc -->
  *
  * <!-- begin-model-doc -->
- * Atomic batch of change entries: one commit / one editor save / one ingest message (concept §5.1, §5.5). Applied all-or-nothing, in two phases (§5.4f): first all CREATE entries, then all feature deltas — forward references within the batch are legal. COALESCED by definition (§5.5): at most one entry per (objectId, featureId, address) — valueOld = before the batch, valueNew = after it; net-zero changes are not written. Exception: ordered-list features keep their ADD/REMOVE/MOVE sequences as an ordered operation list (index ops do not commute).
+ * Atomic batch of change entries: one commit / one editor save / one ingest message (concept §5.1, §5.5). Applied all-or-nothing, in two phases (§5.4f): first all CREATE entries, then all feature deltas — forward references within the batch are legal. For CHANGELOG slots the batch is COALESCED (§5.5): at most one entry per (objectId, feature, address) — valueOld = before the batch, valueNew = after it; net-zero changes are not written. Exception: ordered-list features keep their ADD/REMOVE/MOVE sequences as an ordered operation list (index ops do not commute). TIMESERIES slots are NEVER coalesced: every sample is its own entry with its own event time (ChangeEntry.timestamp).
  * <!-- end-model-doc -->
  *
  * <p>
@@ -38,7 +38,7 @@ import org.osgi.annotation.versioning.ProviderType;
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeSet#getCommitTime <em>Commit Time</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeSet#getContextFingerprint <em>Context Fingerprint</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeSet#getAuthor <em>Author</em>}</li>
- *   <li>{@link org.eclipse.fennec.model.stream.ChangeSet#getCause <em>Cause</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.ChangeSet#getReason <em>Reason</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeSet#getTransactionId <em>Transaction Id</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeSet#isManifest <em>Manifest</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeSet#getEntries <em>Entries</em>}</li>
@@ -105,7 +105,7 @@ public interface ChangeSet extends EObject {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
-	 * Per-stream contiguous monotonic sequence — the authoritative order (§4.3). Used for gap detection, replay, undo, idempotent apply.
+	 * Per-stream contiguous monotonic sequence — the authoritative order (§4.3). ASSIGNED BY THE EVENT CORE when the batch is built (the processing order of the stream, never an input of a producer); a received batch keeps the sender's sequence. Used for gap detection, undo, idempotent apply.
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Sequence</em>' attribute.
 	 * @see #setSequence(long)
@@ -130,7 +130,7 @@ public interface ChangeSet extends EObject {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
-	 * Event time (epoch millis) — domain time, may arrive late/out of order (§4.3). Range queries use this; ordering uses sequence.
+	 * Batch time (epoch millis): the event time of the batch as a whole — commit time of a save, or the closing time of a count/time window. Entries without their own timestamp inherit it. Ordering uses sequence, never time (§4.3).
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Timestamp</em>' attribute.
 	 * @see #setTimestamp(long)
@@ -180,7 +180,7 @@ public interface ChangeSet extends EObject {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
-	 * Fingerprint of the interpretation context this batch was written under: the COMPOSITE root (§6.4, §22 decision #2) — one batch may touch classes from several packages, and the composite stamp keeps every entry resolvable via (compositeFp, classId). LOGICALLY present on every batch; storage formats may run-length/delta-encode it (§6.3). Resolvable against the snapshot registry: CompositeSnapshot → per-package ContextSnapshots.
+	 * Fingerprint of the interpretation context this batch was written under: the COMPOSITE root (§6.4, §22 decision #2) — one batch may touch classes from several packages, and the composite stamp keeps every entry resolvable via (compositeFp, classUri, feature). LOGICALLY present on every batch; storage formats may run-length/delta-encode it (§6.3). Resolvable against the snapshot registry: CompositeSnapshot → per-package ContextSnapshots.
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Context Fingerprint</em>' attribute.
 	 * @see #setContextFingerprint(String)
@@ -205,12 +205,12 @@ public interface ChangeSet extends EObject {
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
-	 * Provenance: user, device, import job, ...
+	 * The source that emits the change: device, ingest adapter, mapping, user, replicating node. Set by the event core from the input channel; a mapping may override it.
 	 * <!-- end-model-doc -->
 	 * @return the value of the '<em>Author</em>' attribute.
 	 * @see #setAuthor(String)
 	 * @see org.eclipse.fennec.model.stream.StreamPackage#getChangeSet_Author()
-	 * @model
+	 * @model required="true"
 	 * @generated
 	 */
 	String getAuthor();
@@ -226,29 +226,29 @@ public interface ChangeSet extends EObject {
 	void setAuthor(String value);
 
 	/**
-	 * Returns the value of the '<em><b>Cause</b></em>' attribute.
+	 * Returns the value of the '<em><b>Reason</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
-	 * Optional cause/correlation info (e.g. the capture source, an ingest message id).
+	 * Optional: out of which use case the change was sent, e.g. ingest, undo:<sequence>, migration, or free text / a correlation id.
 	 * <!-- end-model-doc -->
-	 * @return the value of the '<em>Cause</em>' attribute.
-	 * @see #setCause(String)
-	 * @see org.eclipse.fennec.model.stream.StreamPackage#getChangeSet_Cause()
+	 * @return the value of the '<em>Reason</em>' attribute.
+	 * @see #setReason(String)
+	 * @see org.eclipse.fennec.model.stream.StreamPackage#getChangeSet_Reason()
 	 * @model
 	 * @generated
 	 */
-	String getCause();
+	String getReason();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.fennec.model.stream.ChangeSet#getCause <em>Cause</em>}' attribute.
+	 * Sets the value of the '{@link org.eclipse.fennec.model.stream.ChangeSet#getReason <em>Reason</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Cause</em>' attribute.
-	 * @see #getCause()
+	 * @param value the new value of the '<em>Reason</em>' attribute.
+	 * @see #getReason()
 	 * @generated
 	 */
-	void setCause(String value);
+	void setReason(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Transaction Id</b></em>' attribute.
