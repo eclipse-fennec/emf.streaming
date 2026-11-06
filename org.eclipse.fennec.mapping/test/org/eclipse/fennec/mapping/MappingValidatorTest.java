@@ -138,6 +138,8 @@ class MappingValidatorTest {
 		assertThat(registry.forTarget(fx.pool)).containsExactly(mapping);
 		assertThat(registry.forSource(fx.phSensor)).containsExactly(mapping);
 		assertThat(registry.forSource(fx.station)).isEmpty();
+		assertThat(mapping.getSupportedEClasses()).as("registering does not change the mapping").isEmpty();
+		Mappings.normalize(mapping);
 		assertThat(mapping.getSupportedEClasses()).containsExactly(fx.tempSensor, fx.phSensor);
 		assertThat(mapping.getResultEClasses()).containsExactly(fx.pool);
 

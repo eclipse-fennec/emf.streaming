@@ -31,7 +31,8 @@ import org.eclipse.fennec.model.mapping.Slot;
 
 /**
  * Plain-Java {@link MappingRegistry}: mappings are put and removed by code. A mapping is
- * validated when it is registered; one with errors is refused. Thread-safe.
+ * validated when it is registered; one with errors is refused. Registered mappings are not changed
+ * (they may be owned by someone else, e.g. an EObject registry). Thread-safe.
  */
 public final class InMemoryMappingRegistry implements MappingRegistry {
 
@@ -72,7 +73,6 @@ public final class InMemoryMappingRegistry implements MappingRegistry {
 		if (diagnostic.getSeverity() >= Diagnostic.ERROR) {
 			throw new IllegalArgumentException("Mapping '" + id + "' is invalid: " + messages(diagnostic));
 		}
-		Mappings.normalize(mapping);
 		Mapping previous = mappings.put(id, mapping);
 		notifyListeners(previous, mapping);
 		return diagnostic;
