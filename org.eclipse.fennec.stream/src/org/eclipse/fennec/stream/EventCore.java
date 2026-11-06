@@ -54,6 +54,7 @@ import org.eclipse.fennec.model.stream.SlotValue;
 import org.eclipse.fennec.model.stream.StreamFactory;
 import org.eclipse.fennec.model.streammapping.BatchKind;
 import org.eclipse.fennec.model.streammapping.BatchStrategy;
+import org.eclipse.fennec.model.streammapping.DeletionRule;
 import org.eclipse.fennec.model.streammapping.Lateness;
 import org.eclipse.fennec.model.streammapping.ProjectionMode;
 import org.eclipse.fennec.model.streammapping.RecordingMode;
@@ -113,8 +114,10 @@ public final class EventCore implements AutoCloseable {
 	 * @param changeSets change sets written, keyframes included
 	 * @param keyframes keyframe change sets written
 	 * @param lanes lanes currently holding work
+	 * @param retentionRuns deletion rules handed to the store
 	 */
-	public record Metrics(long offered, long passed, long rejected, long changeSets, long keyframes, int lanes) {
+	public record Metrics(long offered, long passed, long rejected, long changeSets, long keyframes, int lanes,
+			long retentionRuns) {
 	}
 
 	private static final Logger LOGGER = Logger.getLogger(EventCore.class.getName());
@@ -141,6 +144,8 @@ public final class EventCore implements AutoCloseable {
 	private final AtomicLong rejected = new AtomicLong();
 	private final AtomicLong changeSets = new AtomicLong();
 	private final AtomicLong keyframes = new AtomicLong();
+	private final AtomicLong retentionRuns = new AtomicLong();
+	private final Set<String> retentionUnsupported = ConcurrentHashMap.newKeySet();
 
 	private EventCore(Builder builder) {
 		this.mappings = requireNonNull(builder.mappings, "MappingRegistry is required");
@@ -156,6 +161,10 @@ public final class EventCore implements AutoCloseable {
 		}
 		this.timer = Executors.newSingleThreadScheduledExecutor(threads("fennec-stream-timer"));
 		this.output = pushStreams.createSimpleEventSource(ChangeSet.class);
+		long retention = builder.retentionInterval.toMillis();
+		if (retention > 0) {
+			timer.scheduleWithFixedDelay(this::sweepRetention, retention, retention, TimeUnit.MILLISECONDS);
+		}
 	}
 
 	/**
@@ -394,10 +403,37 @@ public final class EventCore implements AutoCloseable {
 	}
 
 	/**
+	 * Hands the deletion rules of every slot to the store now, each stream in its own lane
+	 * (requirement STO-05). Runs on its own every retention interval of the builder.
+	 */
+	public void sweepRetention() {
+		for (TargetStream stream : streams.values()) {
+			enqueue(stream.streamId, stream.group, () -> retain(stream));
+		}
+	}
+
+	/** Lane task. */
+	private void retain(TargetStream stream) {
+		long now = clock.millis();
+		for (Map.Entry<String, StreamSlot> slot : stream.slots.entrySet()) {
+			DeletionRule rule = slot.getValue().getDeletionRule();
+			if (rule == null || rule.getRetention() <= 0 && rule.getMaxCount() <= 0) {
+				continue;
+			}
+			if (store.retain(stream.streamId, slot.getKey(), rule, now) == StreamStore.RetentionOutcome.UNSUPPORTED
+					&& retentionUnsupported.add(slot.getKey())) {
+				LOGGER.warning(() -> "The store cannot apply the deletion rule of " + slot.getKey() + " - values are kept");
+			}
+			retentionRuns.incrementAndGet();
+		}
+	}
+
+	/**
 	 * @return the counters
 	 */
 	public Metrics metrics() {
-		return new Metrics(offered.get(), passed.get(), rejected.get(), changeSets.get(), keyframes.get(), mailboxes.size());
+		return new Metrics(offered.get(), passed.get(), rejected.get(), changeSets.get(), keyframes.get(), mailboxes.size(),
+				retentionRuns.get());
 	}
 
 	@Override
@@ -728,6 +764,7 @@ public final class EventCore implements AutoCloseable {
 		private Projection projection;
 		private Function<EPackage, String> fingerprints = ePackage -> String.valueOf(ePackage.getNsURI());
 		private Clock clock = Clock.systemUTC();
+		private Duration retentionInterval = Duration.ofHours(1);
 		private final List<ExecutionGroup> groups = new ArrayList<>();
 
 		private Builder() {
@@ -805,6 +842,16 @@ public final class EventCore implements AutoCloseable {
 		 */
 		public Builder group(ExecutionGroup group) {
 			groups.add(requireNonNull(group));
+			return this;
+		}
+
+		/**
+		 * @param retentionInterval how often the deletion rules go to the store; zero or negative
+		 *        disables the sweep (call {@link EventCore#sweepRetention()} yourself); default 1 h
+		 * @return this
+		 */
+		public Builder retentionInterval(Duration retentionInterval) {
+			this.retentionInterval = requireNonNull(retentionInterval);
 			return this;
 		}
 
