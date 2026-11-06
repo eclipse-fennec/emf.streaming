@@ -16,7 +16,15 @@ The concept and the first metamodel come from the *unified persistence* work in
 
 | Bundle | Content |
 |---|---|
-| `org.eclipse.fennec.stream.model` | Change-stream metamodel (`stream.ecore`): `ChangeSet`, `ChangeEntry`, `DeltaKind`, `SlotValue`, the context-snapshot chain (`ContextSnapshot`, `CompositeSnapshot`, `PackageFingerprint`). Wire/log format, evolution is additive-only. |
+| `org.eclipse.fennec.stream.model` | The wire/log format (`stream.ecore`): `ChangeSet`, `ChangeEntry`, `DeltaKind`, `SlotValue`, the snapshot chain; validator and class/feature addressing |
+| `org.eclipse.fennec.mapping.model` | Generic EObject-to-EObject mapping: target class, slots, identity resolution, value sources (extends `DataTransformation` of the shared atlas configuration model) |
+| `org.eclipse.fennec.mapping` | Plain-Java mapping engine: value ladder (OCL > function > feature path, constant, converter), identity resolution with cache, validator, registry |
+| `org.eclipse.fennec.mapping.ocl` | OCL expressions through the Fennec M2X engine |
+| `org.eclipse.fennec.mapping.osgi` | Function/converter whiteboards, mapping registry on an emf.osgi EObject registry |
+| `org.eclipse.fennec.stream.mapping.model` | Streaming policies: `StreamMapping`, `StreamSlot`, change rules, batching, retention |
+| `org.eclipse.fennec.stream` | Plain-Java core: change rules, event core (lanes per object, batching, keyframes, backpressure, retention), store and projection SPIs, receiver, undo/redo, as-of |
+| `org.eclipse.fennec.stream.messaging` | Transport over Gecko Messaging: channels per object, CloudEvents, payload codec SPI, retained keyframes ([docs/transport.md](docs/transport.md)) |
+| `org.eclipse.fennec.stream.codec.json` | JSON payload through the Fennec EMF codec |
 
 ## Build
 
