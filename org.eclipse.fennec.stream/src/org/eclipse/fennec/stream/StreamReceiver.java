@@ -252,14 +252,14 @@ public final class StreamReceiver {
 			return new Result(Outcome.REJECTED,
 					error("Unknown model version " + changeSet.getContextFingerprint() + " - change set refused"));
 		}
-		String[] classAndId = splitStreamId(changeSet.getStreamId());
-		Optional<EClass> resolved = classAndId == null ? Optional.empty() : StreamAddresses.resolveClass(registry, classAndId[0]);
+		Optional<StreamId> parsed = StreamId.parse(changeSet.getStreamId());
+		Optional<EClass> resolved = parsed.flatMap(p -> StreamAddresses.resolveClass(registry, p.classUri()));
 		if (resolved.isEmpty()) {
 			stream.state = State.STALE;
 			return new Result(Outcome.REJECTED, error("Stream " + changeSet.getStreamId() + " names no known class"));
 		}
 		EClass eClass = resolved.get();
-		String id = classAndId[1];
+		String id = parsed.get().objectId();
 		boolean introduces = changeSet.getEntries().stream()
 				.anyMatch(e -> e.getKind() == DeltaKind.KEYFRAME || e.getKind() == DeltaKind.CREATE);
 		boolean keyframe = changeSet.getEntries().stream().anyMatch(e -> e.getKind() == DeltaKind.KEYFRAME);
@@ -380,19 +380,6 @@ public final class StreamReceiver {
 		if (idAttribute != null) {
 			EcoreUtil.setID(object, id);
 		}
-	}
-
-	/** {@code nsURI#//Class/id} → {nsURI#//Class, id}. */
-	static String[] splitStreamId(String streamId) {
-		int fragment = streamId.indexOf(StreamAddresses.FRAGMENT_SEPARATOR);
-		if (fragment < 0) {
-			return null;
-		}
-		int slash = streamId.indexOf('/', fragment + StreamAddresses.FRAGMENT_SEPARATOR.length());
-		if (slash < 0 || slash == streamId.length() - 1) {
-			return null;
-		}
-		return new String[] { streamId.substring(0, slash), streamId.substring(slash + 1) };
 	}
 
 	private static String encode(Object value) {
