@@ -20,7 +20,10 @@ Bundle-Description: OSGi integration tests of the stream core: the StreamCore se
 	org.eclipse.fennec.mapping;version=snapshot,\
 	org.eclipse.fennec.stream.model;version=snapshot,\
 	org.eclipse.fennec.stream.mapping.model;version=snapshot,\
-	org.eclipse.fennec.stream;version=snapshot
+	org.eclipse.fennec.stream;version=snapshot,\
+	org.eclipse.fennec.stream.messaging;version=snapshot,\
+	org.eclipse.fennec.emf.osgi.metadata;version=latest,\
+	org.gecko.messaging.api;version=latest
 
 -testpath: \
 	assertj-core
