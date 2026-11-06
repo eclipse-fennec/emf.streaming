@@ -13,7 +13,8 @@ Bundle-Description: OSGi layer of the Fennec mapping: whiteboards for value func
 	org.eclipse.fennec.atlas.configuration.model;version=latest,\
 	org.eclipse.fennec.mapping.model;version=snapshot,\
 	org.eclipse.fennec.mapping;version=snapshot,\
-	org.eclipse.fennec.emf.osgi.eobject.registry;version=latest
+	org.eclipse.fennec.emf.osgi.eobject.registry;version=latest,\
+	org.eclipse.fennec.emf.osgi.metadata;version=latest
 
 -testpath: \
 	assertj-core
