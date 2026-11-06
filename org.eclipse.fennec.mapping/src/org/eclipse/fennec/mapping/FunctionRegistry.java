@@ -27,9 +27,10 @@ import java.util.logging.Logger;
  * there is no identity answer for that. A function that throws or returns {@code null} produces
  * nothing as well. Either way the value source's constant then answers, if it has one.
  * <p>
- * Thread-safe. In OSGi the whiteboard registers and unregisters the function services here.
+ * Thread-safe. In OSGi the whiteboard registers and unregisters the function services here; it is a
+ * subclass so that it can be the registered service itself.
  */
-public final class FunctionRegistry {
+public class FunctionRegistry {
 
 	private static final Logger LOGGER = Logger.getLogger(FunctionRegistry.class.getName());
 

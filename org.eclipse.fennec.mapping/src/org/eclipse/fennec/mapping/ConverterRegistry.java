@@ -28,9 +28,10 @@ import java.util.logging.Logger;
  * is logged once, so a typo does not silently empty a slot. A converter that throws or returns
  * {@code null} has no result to offer: the value is dropped.
  * <p>
- * Thread-safe. In OSGi the whiteboard registers and unregisters the converter services here.
+ * Thread-safe. In OSGi the whiteboard registers and unregisters the converter services here; it is a
+ * subclass so that it can be the registered service itself.
  */
-public final class ConverterRegistry {
+public class ConverterRegistry {
 
 	private static final Logger LOGGER = Logger.getLogger(ConverterRegistry.class.getName());
 
