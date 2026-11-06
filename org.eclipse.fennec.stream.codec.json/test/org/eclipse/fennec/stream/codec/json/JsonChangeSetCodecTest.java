@@ -15,11 +15,31 @@ package org.eclipse.fennec.stream.codec.json;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EAttribute;
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EcoreFactory;
+import org.eclipse.emf.ecore.EcorePackage;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceImpl;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.fennec.codec.config.ConfigurationResolver;
+import org.eclipse.fennec.codec.resource.CodecResourceFactory;
+import org.eclipse.fennec.codec.util.MetadataServiceFactory;
+import org.eclipse.fennec.emf.osgi.metadata.MetadataWhiteboard;
 import org.eclipse.fennec.model.stream.ChangeEntry;
 import org.eclipse.fennec.model.stream.ChangeSet;
 import org.eclipse.fennec.model.stream.DeltaKind;
@@ -50,6 +70,75 @@ class JsonChangeSetCodecTest {
 	void thePayloadIsJson() throws IOException {
 		String json = text(codec.encode(changeSet()));
 		assertThat(json).startsWith("{").contains("\"streamId\"").contains("pool-1").contains("24.5");
+	}
+
+	@Test
+	void aClassWithKeyAndValueIsNoMapEntry() throws IOException {
+		// emf.codec#291: classes with features key and value used to be written as map entries
+		EPackage ePackage = EcoreFactory.eINSTANCE.createEPackage();
+		ePackage.setName("kv");
+		ePackage.setNsPrefix("kv");
+		ePackage.setNsURI("https://example.org/kv");
+		EClass holder = eClass(ePackage, "Holder");
+		EClass slot = eClass(ePackage, "Slot");
+		for (String name : new String[] { "key", "value", "address" }) {
+			EAttribute attribute = EcoreFactory.eINSTANCE.createEAttribute();
+			attribute.setName(name);
+			attribute.setEType(EcorePackage.Literals.ESTRING);
+			slot.getEStructuralFeatures().add(attribute);
+		}
+		EReference slots = EcoreFactory.eINSTANCE.createEReference();
+		slots.setName("slots");
+		slots.setEType(slot);
+		slots.setContainment(true);
+		slots.setUpperBound(-1);
+		holder.getEStructuralFeatures().add(slots);
+		// as for a registered model: the package sits in a resource under its nsURI, so types are absolute
+		new ResourceImpl(URI.createURI(ePackage.getNsURI())).getContents().add(ePackage);
+		MetadataWhiteboard metadata = MetadataServiceFactory.create();
+		metadata.registerPackage(ePackage);
+		// the codec reads the _type of a document through the global package registry
+		EPackage.Registry.INSTANCE.put(ePackage.getNsURI(), ePackage);
+		try {
+			roundTrip(ePackage, holder, slot, slots, metadata);
+		} finally {
+			EPackage.Registry.INSTANCE.remove(ePackage.getNsURI());
+		}
+	}
+
+	private static void roundTrip(EPackage ePackage, EClass holder, EClass slot, EReference slots,
+			MetadataWhiteboard metadata) throws IOException {
+
+		ResourceSet resourceSet = new ResourceSetImpl();
+		resourceSet.getPackageRegistry().put(ePackage.getNsURI(), ePackage);
+		resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("json",
+				new CodecResourceFactory(metadata, ConfigurationResolver.defaults()));
+		EObject original = EcoreUtil.create(holder);
+		EObject element = EcoreUtil.create(slot);
+		element.eSet(slot.getEStructuralFeature("key"), "k");
+		element.eSet(slot.getEStructuralFeature("value"), "v");
+		element.eSet(slot.getEStructuralFeature("address"), "a");
+		@SuppressWarnings("unchecked")
+		List<EObject> list = (List<EObject>) original.eGet(slots);
+		list.add(element);
+
+		Resource out = resourceSet.createResource(URI.createURI("out.json"));
+		out.getContents().add(original);
+		ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+		out.save(bytes, Map.of());
+		Resource in = resourceSet.createResource(URI.createURI("in.json"));
+		in.load(new ByteArrayInputStream(bytes.toByteArray()), Map.of());
+
+		String json = bytes.toString(StandardCharsets.UTF_8);
+		assertThat(in.getContents()).as(json).hasSize(1);
+		assertThat(EcoreUtil.equals(original, in.getContents().get(0))).as(json).isTrue();
+	}
+
+	private static EClass eClass(EPackage ePackage, String name) {
+		EClass eClass = EcoreFactory.eINSTANCE.createEClass();
+		eClass.setName(name);
+		ePackage.getEClassifiers().add(eClass);
+		return eClass;
 	}
 
 	@Test
