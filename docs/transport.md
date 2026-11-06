@@ -62,7 +62,9 @@ type; references are the id of the referenced object. The typing resolves from
   and skipped, by configuration).
 - An object the receiver does not hold enters with its next `KEYFRAME`; senders write one on a
   stream's first change set and then every 100 change sets or 15 minutes (configurable).
-  Planned, not implemented yet: retaining the last keyframe (MQTT), so a new subscriber starts at once.
+  Publishers may retain change sets holding a keyframe (option of `StreamPublisher`, only for
+  instances with the `retain` feature such as MQTT): a new subscriber of an object's channel then
+  gets its latest keyframe at once.
 - Messages are untrusted input: payloads above a size limit (default 1 MiB), payloads the codec
   cannot read, structurally invalid change sets and change sets of an unknown model version are
   dropped, never applied.

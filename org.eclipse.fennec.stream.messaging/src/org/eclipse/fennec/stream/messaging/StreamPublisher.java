@@ -26,12 +26,14 @@ import java.util.logging.Logger;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.fennec.model.stream.ChangeSet;
+import org.eclipse.fennec.model.stream.DeltaKind;
 import org.eclipse.fennec.model.stream.support.StreamAddresses;
 import org.eclipse.fennec.stream.EventCore;
 import org.eclipse.fennec.stream.StreamId;
 import org.gecko.messaging.api.Message;
 import org.gecko.messaging.api.MessageContextBuilder;
 import org.gecko.messaging.api.MessagePublisher;
+import org.gecko.messaging.api.MessagingConstants;
 import org.gecko.messaging.api.cloudevents.CloudEventMessageContextBuilder;
 import org.osgi.util.promise.Promise;
 import org.osgi.util.promise.Promises;
@@ -59,8 +61,29 @@ public final class StreamPublisher {
 	private final ChangeSetCodec codec;
 	private final StreamChannels channels;
 	private final EPackage.Registry models;
+	private final boolean retainKeyframes;
 
 	/**
+	 * @param publisher the messaging instance
+	 * @param codec encodes the payload
+	 * @param channels the channel scheme
+	 * @param models resolves the class of a stream from its class URI
+	 * @param retainKeyframes whether change sets holding a keyframe are published retained, so a new
+	 *        subscriber of an object's channel gets its latest keyframe at once. Only for instances
+	 *        offering the {@code retain} feature (MQTT, in-memory) - others refuse retained messages.
+	 */
+	public StreamPublisher(MessagePublisher publisher, ChangeSetCodec codec, StreamChannels channels,
+			EPackage.Registry models, boolean retainKeyframes) {
+		this.publisher = requireNonNull(publisher, "MessagePublisher is required");
+		this.codec = requireNonNull(codec, "ChangeSetCodec is required");
+		this.channels = requireNonNull(channels, "StreamChannels are required");
+		this.models = requireNonNull(models, "EPackage registry is required");
+		this.retainKeyframes = retainKeyframes;
+	}
+
+	/**
+	 * A publisher that retains nothing.
+	 *
 	 * @param publisher the messaging instance
 	 * @param codec encodes the payload
 	 * @param channels the channel scheme
@@ -68,10 +91,7 @@ public final class StreamPublisher {
 	 */
 	public StreamPublisher(MessagePublisher publisher, ChangeSetCodec codec, StreamChannels channels,
 			EPackage.Registry models) {
-		this.publisher = requireNonNull(publisher, "MessagePublisher is required");
-		this.codec = requireNonNull(codec, "ChangeSetCodec is required");
-		this.channels = requireNonNull(channels, "StreamChannels are required");
-		this.models = requireNonNull(models, "EPackage registry is required");
+		this(publisher, codec, channels, models, false);
 	}
 
 	/**
@@ -113,6 +133,9 @@ public final class StreamPublisher {
 	private Message message(MessageContextBuilder builder, String channel, ByteBuffer payload,
 			ChangeSet changeSet, StreamId streamId) {
 		builder.channel(channel).contentType(codec.contentType()).content(payload);
+		if (retainKeyframes && changeSet.getEntries().stream().anyMatch(e -> e.getKind() == DeltaKind.KEYFRAME)) {
+			builder.extensionEntry(MessagingConstants.EXTENSION_RETAIN, Boolean.TRUE);
+		}
 		if (builder.isAdaptable(CloudEventMessageContextBuilder.class)) {
 			builder.adapt(CloudEventMessageContextBuilder.class).id(changeSet.getId()).source(changeSet.getStreamId())
 					.type(CLOUD_EVENT_TYPE).subject(streamId.objectId()).dataSchema(changeSet.getContextFingerprint())
