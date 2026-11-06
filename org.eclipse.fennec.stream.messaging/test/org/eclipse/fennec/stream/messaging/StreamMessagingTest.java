@@ -16,6 +16,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -143,6 +144,28 @@ class StreamMessagingTest {
 		assertThat(copy.eGet(poolId)).isEqualTo("pool/1");
 		assertThat(receiver.state(EventCore.streamId(pool, "pool/1"))).isEqualTo(StreamReceiver.State.COMPLETE);
 		assertThat(subscriber.dropped()).isZero();
+	}
+
+	@Test
+	void aLateSubscriberStartsAtTheRetainedKeyframe() throws Exception {
+		InMemoryInstance originSide = start("binary");
+		EventCore origin = core(new HashMap<>());
+		closeables.add(new StreamPublisher(publisher(originSide), codec, channels, models, true).attach(origin));
+		origin.offer(sensor("t1", "pool-1", 24.5), 1_000, null); // value, then the stream's first keyframe
+		origin.offer(sensor("t1", "pool-1", 25.0), 2_000, null);
+		assertThat(origin.awaitIdle(Duration.ofSeconds(10))).isTrue();
+		Thread.sleep(200); // let the broker take the messages before anyone subscribes
+
+		InMemoryInstance lateSide = start("binary");
+		EventCore replica = core(new HashMap<>());
+		ReplicaTargets targets = ReplicaTargets.inMemory();
+		StreamReceiver receiver = StreamReceiver.builder().core(replica).targets(targets)
+				.modelVersions(fp -> ePackage.getNsURI().equals(fp) ? models : null).build();
+		closeables.add(new StreamSubscriber(subscription(lateSide), codec, receiver).subscribe("stream/pool/#"));
+
+		// nothing new is published: the copy can only come from the retained keyframe
+		await(() -> receiver.state(EventCore.streamId(pool, "pool-1")) == StreamReceiver.State.COMPLETE);
+		assertThat(targets.find(pool, "pool-1").eGet(currentTemperature)).isEqualTo(24.5);
 	}
 
 	@Test
