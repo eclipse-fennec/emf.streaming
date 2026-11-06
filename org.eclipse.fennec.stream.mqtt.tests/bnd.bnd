@@ -1,0 +1,29 @@
+Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
+Bundle-Name: Eclipse Fennec Stream MQTT Tests
+Bundle-Description: OSGi tests of the stream transport over MQTT 5 against Mosquitto 2 \
+	(tools/brokers.sh, port 11893); they skip themselves without a broker.
+
+-workingset: streaming
+
+-library: \
+	enableEMF,\
+	enableOSGi-Test
+
+-buildpath: \
+	org.eclipse.fennec.emf.osgi.api;version=latest,\
+	org.osgi.service.component;version=latest,\
+	org.osgi.service.cm;version=latest,\
+	org.osgi.util.pushstream;version=latest,\
+	org.osgi.util.promise;version=latest,\
+	org.eclipse.fennec.atlas.configuration.model;version=latest,\
+	org.eclipse.fennec.mapping.model;version=snapshot,\
+	org.eclipse.fennec.mapping;version=snapshot,\
+	org.eclipse.fennec.stream.model;version=snapshot,\
+	org.eclipse.fennec.stream.mapping.model;version=snapshot,\
+	org.eclipse.fennec.stream;version=snapshot,\
+	org.eclipse.fennec.stream.messaging;version=snapshot,\
+	org.eclipse.fennec.emf.osgi.metadata;version=latest,\
+	org.gecko.messaging.api;version=latest
+
+-testpath: \
+	assertj-core

@@ -33,6 +33,7 @@ bnd workspace driven by Gradle 9 (`biz.aQute.bnd.workspace`), Java 21.
 ```bash
 ./gradlew build        # build + unit tests
 ./gradlew testOSGi     # OSGi integration tests
+tools/brokers.sh up    # Mosquitto 2 (podman or docker) for the MQTT OSGi tests; without it they skip
 ```
 
 Project coordinates live in `gradle.properties`, the library selection in `cnf/ext/fennec.bnd`

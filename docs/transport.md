@@ -54,6 +54,14 @@ by a pluggable codec: JSON through emf.codec (`org.eclipse.fennec.stream.codec.j
 type; references are the id of the referenced object. The typing resolves from
 (`dataschema`, feature) on the receiving side.
 
+## Publishing
+
+A messaging instance refuses publishing while it is not connected, and buffers nothing. The
+publisher therefore publishes the change sets of a core one after the other and retries a refused
+one with a growing pause until the instance takes it. During a long outage the core's output buffer
+drops its oldest change sets; receivers notice the gap, go stale and come back with the next
+keyframe.
+
 ## Receiving
 
 - A sequence seen before is a duplicate and ignored.
