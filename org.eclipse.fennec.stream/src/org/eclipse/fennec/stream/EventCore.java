@@ -132,6 +132,7 @@ public final class EventCore implements AutoCloseable {
 	private final ScheduledExecutorService timer;
 	private final Map<String, Mailbox> mailboxes = new ConcurrentHashMap<>();
 	private final Map<String, TargetStream> streams = new ConcurrentHashMap<>();
+	private final Set<String> replicated = ConcurrentHashMap.newKeySet();
 	private final PushStreamProvider pushStreams = new PushStreamProvider();
 	private final SimplePushEventSource<ChangeSet> output;
 	private final AtomicLong offered = new AtomicLong();
@@ -239,6 +240,27 @@ public final class EventCore implements AutoCloseable {
 	}
 
 	/**
+	 * Schedules a task into the lane of a stream after a delay.
+	 */
+	void schedule(String streamId, String group, Runnable task, long delayMillis) {
+		timer.schedule(() -> enqueue(streamId, group, task), delayMillis, TimeUnit.MILLISECONDS);
+	}
+
+	/**
+	 * @return the clock of the core
+	 */
+	Clock clock() {
+		return clock;
+	}
+
+	/**
+	 * Publishes a change set to the consumers of {@link #changes()} - for change sets the receiver applied.
+	 */
+	void publish(ChangeSet changeSet) {
+		output.publish(changeSet);
+	}
+
+	/**
 	 * @return the store the core writes to
 	 */
 	public StreamStore store() {
@@ -282,6 +304,11 @@ public final class EventCore implements AutoCloseable {
 				}
 				for (Map.Entry<String, List<MappedValue>> target : byTarget.entrySet()) {
 					String streamId = streamId(streamMapping.getTarget(), target.getKey());
+					if (replicated.contains(streamId)) {
+						// single master: a replicated object is written by its origin only
+						LOGGER.warning(() -> "Stream " + streamId + " is replicated here - local values are refused");
+						continue;
+					}
 					keys.putIfAbsent(streamId, new TargetKey(streamMapping, target.getKey()));
 					// created here, so flush() sees the stream as soon as offer() returned
 					TargetStream stream = stream(streamId, streamMapping, target.getKey());
@@ -307,7 +334,19 @@ public final class EventCore implements AutoCloseable {
 	private record TargetKey(StreamMapping mapping, String targetId) {
 	}
 
-	private void enqueue(String streamId, String group, Runnable task) {
+	/**
+	 * Marks a stream as replicated: its change sets come from another node, local capture is refused
+	 * (requirement OPS-03).
+	 */
+	void markReplicated(String streamId) {
+		replicated.add(streamId);
+	}
+
+	/**
+	 * Runs a task in the lane of a stream - for the receiver, so received and captured change sets of
+	 * one object never overtake each other.
+	 */
+	void enqueue(String streamId, String group, Runnable task) {
 		ExecutorService pool = pools.getOrDefault(group, pools.get(StreamSlots.DEFAULT_GROUP));
 		int slice = sliceOf(group);
 		mailboxes.compute(streamId, (id, mailbox) -> {
