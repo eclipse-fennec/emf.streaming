@@ -82,7 +82,7 @@ import org.osgi.util.pushstream.SimplePushEventSource;
  * <p>
  * Plain Java; {@link #close()} stops the pools.
  */
-public final class EventCore implements AutoCloseable {
+public final class EventCore implements StreamCore, AutoCloseable {
 
 	/**
 	 * A named thread pool of the core. The order in which groups are configured is their rank: a
@@ -197,6 +197,7 @@ public final class EventCore implements AutoCloseable {
 	 *
 	 * @param source the source object
 	 */
+	@Override
 	public void offer(EObject source) {
 		offer(source, clock.millis(), null);
 	}
@@ -209,6 +210,7 @@ public final class EventCore implements AutoCloseable {
 	 * @param eventTime the event time of its values, epoch millis
 	 * @param author who emits the change; {@code null} = {@code mapping:<id>}
 	 */
+	@Override
 	public void offer(EObject source, long eventTime, String author) {
 		route(List.of(requireNonNull(source, "Source object is required")), eventTime, author, false);
 	}
@@ -221,6 +223,7 @@ public final class EventCore implements AutoCloseable {
 	 * @param eventTime the event time, epoch millis
 	 * @param author who emits the change; {@code null} = {@code mapping:<id>}
 	 */
+	@Override
 	public void offerUnitOfWork(Collection<? extends EObject> sources, long eventTime, String author) {
 		route(List.copyOf(requireNonNull(sources, "Sources are required")), eventTime, author, true);
 	}
@@ -231,6 +234,7 @@ public final class EventCore implements AutoCloseable {
 	 *
 	 * @return the stream; closing it ends the subscription
 	 */
+	@Override
 	public PushStream<ChangeSet> changes() {
 		return pushStreams.buildStream(output).withBuffer(new ArrayBlockingQueue<>(OUTPUT_BUFFER))
 				.withQueuePolicy(QueuePolicyOption.DISCARD_OLDEST).build();
@@ -239,6 +243,7 @@ public final class EventCore implements AutoCloseable {
 	/**
 	 * Writes every pending batch now, whatever its strategy.
 	 */
+	@Override
 	public void flush() {
 		for (TargetStream stream : streams.values()) {
 			enqueue(stream.streamId, stream.group, () -> {
@@ -291,6 +296,12 @@ public final class EventCore implements AutoCloseable {
 	/**
 	 * @return the store the core writes to
 	 */
+	@Override
+	public StreamReceiver.Builder receiver() {
+		return StreamReceiver.builder().core(this);
+	}
+
+	@Override
 	public StreamStore store() {
 		return store;
 	}
@@ -316,6 +327,7 @@ public final class EventCore implements AutoCloseable {
 	 *         {@link UnsupportedOperationException} when the mapping is not undoable and with
 	 *         {@link IllegalStateException} when the change set holds time-series values
 	 */
+	@Override
 	public CompletableFuture<Optional<ChangeSet>> undo(EClass targetClass, String targetId) {
 		return revert(targetClass, targetId, true);
 	}
@@ -327,6 +339,7 @@ public final class EventCore implements AutoCloseable {
 	 * @param targetId its id
 	 * @return the redo change set ({@code reason = redo:<sequence>}), or empty when there is nothing to redo
 	 */
+	@Override
 	public CompletableFuture<Optional<ChangeSet>> redo(EClass targetClass, String targetId) {
 		return revert(targetClass, targetId, false);
 	}
@@ -449,6 +462,7 @@ public final class EventCore implements AutoCloseable {
 	/**
 	 * @return the counters
 	 */
+	@Override
 	public Metrics metrics() {
 		return new Metrics(offered.get(), passed.get(), rejected.get(), changeSets.get(), keyframes.get(), mailboxes.size(),
 				retentionRuns.get(), droppedOffers.get());

@@ -1,0 +1,25 @@
+Bundle-Name: Eclipse Fennec Stream OSGi
+Bundle-Description: OSGi layer of the Fennec change stream: the StreamCore service, an in-memory \
+	store and a no-projection component for explicit configuration.
+
+-workingset: streaming
+
+-library: enableEMF
+
+-buildpath: \
+	org.osgi.service.condition;version=latest,\
+	org.osgi.service.component.annotations;version=latest,\
+	org.osgi.service.metatype.annotations;version=latest,\
+	org.osgi.util.pushstream;version=latest,\
+	org.osgi.util.promise;version=latest,\
+	org.osgi.util.function;version=latest,\
+	org.eclipse.fennec.emf.osgi.metadata;version=latest,\
+	org.eclipse.fennec.atlas.configuration.model;version=latest,\
+	org.eclipse.fennec.mapping.model;version=snapshot,\
+	org.eclipse.fennec.mapping;version=snapshot,\
+	org.eclipse.fennec.stream.model;version=snapshot,\
+	org.eclipse.fennec.stream.mapping.model;version=snapshot,\
+	org.eclipse.fennec.stream;version=snapshot
+
+-testpath: \
+	assertj-core
