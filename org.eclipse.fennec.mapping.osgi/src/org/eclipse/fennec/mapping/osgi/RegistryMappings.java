@@ -19,12 +19,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.fennec.emf.osgi.constants.EMFNamespaces;
 import org.eclipse.fennec.emf.osgi.eobject.registry.EObjectRegistry;
 import org.eclipse.fennec.emf.osgi.eobject.registry.EObjectRegistryEntry;
 import org.eclipse.fennec.emf.osgi.eobject.registry.EObjectRegistryListener;
+import org.eclipse.fennec.emf.osgi.metadata.MetadataService;
+import org.eclipse.fennec.emf.osgi.model.metadata.PackageMetadata;
 import org.eclipse.fennec.mapping.InMemoryMappingRegistry;
 import org.eclipse.fennec.mapping.MappingRegistry;
 import org.eclipse.fennec.model.mapping.Mapping;
@@ -42,7 +47,9 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
  * validated and offered here under its id; one that does not validate is logged and left out.
  * <p>
  * The EObject registry is mandatory: it is published only once its initial load completed, so this
- * component never answers from a half-loaded registry. By default it is the registry named
+ * component never answers from a half-loaded registry. A registry entry carrying
+ * {@code emf.fingerprint} reaches only the model version with that fingerprint (requirement MAP-13);
+ * the metadata service, also mandatory, names the fingerprint of the mapping's target package. By default it is the registry named
  * {@value #DEFAULT_REGISTRY}; a configuration (PID {@value #PID}, optional) can name another through
  * {@code registry.target}. The mappings are read, never changed.
  */
@@ -74,15 +81,30 @@ public class RegistryMappings implements MappingRegistry, EObjectRegistryListene
 	}
 
 	private final EObjectRegistry registry;
+	private final Function<EPackage, String> fingerprints;
 	private final InMemoryMappingRegistry mappings = new InMemoryMappingRegistry();
 	private final Map<String, String> idsByKey = new ConcurrentHashMap<>();
 
 	/**
 	 * @param registry the EObject registry holding the mappings
+	 * @param metadata names the fingerprint of a model version
 	 */
 	@Activate
-	public RegistryMappings(@Reference(name = "registry", target = DEFAULT_TARGET) EObjectRegistry registry) {
+	public RegistryMappings(@Reference(name = "registry", target = DEFAULT_TARGET) EObjectRegistry registry,
+			@Reference(name = "metadata") MetadataService metadata) {
+		this(registry, ePackage -> metadata.getPackageMetadata(ePackage).map(PackageMetadata::getModelFingerprint)
+				.orElse(null));
+	}
+
+	/**
+	 * Plain-Java constructor.
+	 *
+	 * @param registry the EObject registry holding the mappings
+	 * @param fingerprints the fingerprint of a package, {@code null} when it is unknown
+	 */
+	public RegistryMappings(EObjectRegistry registry, Function<EPackage, String> fingerprints) {
 		this.registry = requireNonNull(registry, "EObjectRegistry is required");
+		this.fingerprints = requireNonNull(fingerprints, "Fingerprint function is required");
 	}
 
 	/**
@@ -110,6 +132,15 @@ public class RegistryMappings implements MappingRegistry, EObjectRegistryListene
 			LOGGER.warning(() -> "Mapping under key '" + entry.key() + "' of registry " + registry.getName()
 					+ " has no id - left out");
 			return;
+		}
+		Object bound = entry.properties().get(EMFNamespaces.EMF_MODEL_FINGERPRINT);
+		if (bound != null && mapping.getTarget() != null) {
+			String actual = fingerprints.apply(mapping.getTarget().getEPackage());
+			if (!String.valueOf(bound).equals(actual)) {
+				LOGGER.info(() -> "Mapping '" + mapping.getId() + "' is bound to model version " + bound + ", the live one is "
+						+ actual + " - left out");
+				return;
+			}
 		}
 		try {
 			mappings.register(mapping);
