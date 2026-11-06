@@ -232,7 +232,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeSet_Cause() {
+	public EAttribute getChangeSet_Reason() {
 		return (EAttribute)changeSetEClass.getEStructuralFeatures().get(7);
 	}
 
@@ -292,7 +292,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_ClassId() {
+	public EAttribute getChangeEntry_ClassUri() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -302,7 +302,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_Kind() {
+	public EAttribute getChangeEntry_ClassId() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -312,7 +312,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_FeatureId() {
+	public EAttribute getChangeEntry_Kind() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -322,7 +322,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_Index() {
+	public EAttribute getChangeEntry_FeatureId() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(4);
 	}
 
@@ -332,7 +332,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_ToIndex() {
+	public EAttribute getChangeEntry_FeatureUri() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(5);
 	}
 
@@ -342,7 +342,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_Key() {
+	public EAttribute getChangeEntry_Timestamp() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(6);
 	}
 
@@ -352,7 +352,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_Coords() {
+	public EAttribute getChangeEntry_Index() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(7);
 	}
 
@@ -362,7 +362,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_ValueOld() {
+	public EAttribute getChangeEntry_ToIndex() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(8);
 	}
 
@@ -372,7 +372,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_ValueNew() {
+	public EAttribute getChangeEntry_Key() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(9);
 	}
 
@@ -382,8 +382,38 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
+	public EAttribute getChangeEntry_Coords() {
+		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(10);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EAttribute getChangeEntry_ValueOld() {
+		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(11);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EAttribute getChangeEntry_ValueNew() {
+		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(12);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public EReference getChangeEntry_State() {
-		return (EReference)changeEntryEClass.getEStructuralFeatures().get(10);
+		return (EReference)changeEntryEClass.getEStructuralFeatures().get(13);
 	}
 
 	/**
@@ -412,7 +442,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getSlotValue_Index() {
+	public EAttribute getSlotValue_FeatureUri() {
 		return (EAttribute)slotValueEClass.getEStructuralFeatures().get(1);
 	}
 
@@ -422,7 +452,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getSlotValue_Key() {
+	public EAttribute getSlotValue_Index() {
 		return (EAttribute)slotValueEClass.getEStructuralFeatures().get(2);
 	}
 
@@ -432,7 +462,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getSlotValue_Coords() {
+	public EAttribute getSlotValue_Key() {
 		return (EAttribute)slotValueEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -442,8 +472,18 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getSlotValue_Value() {
+	public EAttribute getSlotValue_Coords() {
 		return (EAttribute)slotValueEClass.getEStructuralFeatures().get(4);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EAttribute getSlotValue_Value() {
+		return (EAttribute)slotValueEClass.getEStructuralFeatures().get(5);
 	}
 
 	/**
@@ -653,16 +693,19 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 		createEAttribute(changeSetEClass, CHANGE_SET__COMMIT_TIME);
 		createEAttribute(changeSetEClass, CHANGE_SET__CONTEXT_FINGERPRINT);
 		createEAttribute(changeSetEClass, CHANGE_SET__AUTHOR);
-		createEAttribute(changeSetEClass, CHANGE_SET__CAUSE);
+		createEAttribute(changeSetEClass, CHANGE_SET__REASON);
 		createEAttribute(changeSetEClass, CHANGE_SET__TRANSACTION_ID);
 		createEAttribute(changeSetEClass, CHANGE_SET__MANIFEST);
 		createEReference(changeSetEClass, CHANGE_SET__ENTRIES);
 
 		changeEntryEClass = createEClass(CHANGE_ENTRY);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__OBJECT_ID);
+		createEAttribute(changeEntryEClass, CHANGE_ENTRY__CLASS_URI);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__CLASS_ID);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__KIND);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__FEATURE_ID);
+		createEAttribute(changeEntryEClass, CHANGE_ENTRY__FEATURE_URI);
+		createEAttribute(changeEntryEClass, CHANGE_ENTRY__TIMESTAMP);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__INDEX);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__TO_INDEX);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__KEY);
@@ -673,6 +716,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 
 		slotValueEClass = createEClass(SLOT_VALUE);
 		createEAttribute(slotValueEClass, SLOT_VALUE__FEATURE_ID);
+		createEAttribute(slotValueEClass, SLOT_VALUE__FEATURE_URI);
 		createEAttribute(slotValueEClass, SLOT_VALUE__INDEX);
 		createEAttribute(slotValueEClass, SLOT_VALUE__KEY);
 		createEAttribute(slotValueEClass, SLOT_VALUE__COORDS);
@@ -738,17 +782,20 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 		initEAttribute(getChangeSet_Timestamp(), ecorePackage.getELong(), "timestamp", null, 1, 1, ChangeSet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeSet_CommitTime(), ecorePackage.getELong(), "commitTime", null, 0, 1, ChangeSet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeSet_ContextFingerprint(), ecorePackage.getEString(), "contextFingerprint", null, 1, 1, ChangeSet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getChangeSet_Author(), ecorePackage.getEString(), "author", null, 0, 1, ChangeSet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getChangeSet_Cause(), ecorePackage.getEString(), "cause", null, 0, 1, ChangeSet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getChangeSet_Author(), ecorePackage.getEString(), "author", null, 1, 1, ChangeSet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getChangeSet_Reason(), ecorePackage.getEString(), "reason", null, 0, 1, ChangeSet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeSet_TransactionId(), ecorePackage.getEString(), "transactionId", null, 0, 1, ChangeSet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeSet_Manifest(), ecorePackage.getEBoolean(), "manifest", "false", 0, 1, ChangeSet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEReference(getChangeSet_Entries(), this.getChangeEntry(), null, "entries", null, 0, -1, ChangeSet.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(changeEntryEClass, ChangeEntry.class, "ChangeEntry", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getChangeEntry_ObjectId(), ecorePackage.getEString(), "objectId", null, 1, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getChangeEntry_ClassUri(), ecorePackage.getEString(), "classUri", null, 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_ClassId(), ecorePackage.getEInt(), "classId", "-1", 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_Kind(), this.getDeltaKind(), "kind", null, 1, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_FeatureId(), ecorePackage.getEInt(), "featureId", "-1", 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getChangeEntry_FeatureUri(), ecorePackage.getEString(), "featureUri", null, 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getChangeEntry_Timestamp(), ecorePackage.getELongObject(), "timestamp", null, 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_Index(), ecorePackage.getEInt(), "index", "-1", 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_ToIndex(), ecorePackage.getEInt(), "toIndex", "-1", 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_Key(), ecorePackage.getEString(), "key", null, 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -758,7 +805,8 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 		initEReference(getChangeEntry_State(), this.getSlotValue(), null, "state", null, 0, -1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(slotValueEClass, SlotValue.class, "SlotValue", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
-		initEAttribute(getSlotValue_FeatureId(), ecorePackage.getEInt(), "featureId", null, 1, 1, SlotValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSlotValue_FeatureId(), ecorePackage.getEInt(), "featureId", "-1", 0, 1, SlotValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSlotValue_FeatureUri(), ecorePackage.getEString(), "featureUri", null, 0, 1, SlotValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getSlotValue_Index(), ecorePackage.getEInt(), "index", "-1", 0, 1, SlotValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getSlotValue_Key(), ecorePackage.getEString(), "key", null, 0, 1, SlotValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getSlotValue_Coords(), ecorePackage.getEInt(), "coords", null, 0, -1, SlotValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

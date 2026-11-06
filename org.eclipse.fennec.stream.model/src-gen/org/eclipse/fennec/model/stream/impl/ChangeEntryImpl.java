@@ -43,9 +43,12 @@ import org.eclipse.fennec.model.stream.StreamPackage;
  * </p>
  * <ul>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getObjectId <em>Object Id</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getClassUri <em>Class Uri</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getClassId <em>Class Id</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getKind <em>Kind</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getFeatureId <em>Feature Id</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getFeatureUri <em>Feature Uri</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getTimestamp <em>Timestamp</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getIndex <em>Index</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getToIndex <em>To Index</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getKey <em>Key</em>}</li>
@@ -77,6 +80,26 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 	 * @ordered
 	 */
 	protected String objectId = OBJECT_ID_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getClassUri() <em>Class Uri</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getClassUri()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String CLASS_URI_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getClassUri() <em>Class Uri</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getClassUri()
+	 * @generated
+	 * @ordered
+	 */
+	protected String classUri = CLASS_URI_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getClassId() <em>Class Id</em>}' attribute.
@@ -137,6 +160,46 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 	 * @ordered
 	 */
 	protected int featureId = FEATURE_ID_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getFeatureUri() <em>Feature Uri</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFeatureUri()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String FEATURE_URI_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getFeatureUri() <em>Feature Uri</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFeatureUri()
+	 * @generated
+	 * @ordered
+	 */
+	protected String featureUri = FEATURE_URI_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getTimestamp() <em>Timestamp</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTimestamp()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final Long TIMESTAMP_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getTimestamp() <em>Timestamp</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTimestamp()
+	 * @generated
+	 * @ordered
+	 */
+	protected Long timestamp = TIMESTAMP_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getIndex() <em>Index</em>}' attribute.
@@ -306,6 +369,29 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 	 * @generated
 	 */
 	@Override
+	public String getClassUri() {
+		return classUri;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void setClassUri(String newClassUri) {
+		String oldClassUri = classUri;
+		classUri = newClassUri;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, StreamPackage.CHANGE_ENTRY__CLASS_URI, oldClassUri, classUri));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public int getClassId() {
 		return classId;
 	}
@@ -367,6 +453,52 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 		featureId = newFeatureId;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, StreamPackage.CHANGE_ENTRY__FEATURE_ID, oldFeatureId, featureId));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public String getFeatureUri() {
+		return featureUri;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void setFeatureUri(String newFeatureUri) {
+		String oldFeatureUri = featureUri;
+		featureUri = newFeatureUri;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, StreamPackage.CHANGE_ENTRY__FEATURE_URI, oldFeatureUri, featureUri));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public Long getTimestamp() {
+		return timestamp;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void setTimestamp(Long newTimestamp) {
+		Long oldTimestamp = timestamp;
+		timestamp = newTimestamp;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, StreamPackage.CHANGE_ENTRY__TIMESTAMP, oldTimestamp, timestamp));
 	}
 
 	/**
@@ -534,12 +666,18 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 		switch (featureID) {
 			case StreamPackage.CHANGE_ENTRY__OBJECT_ID:
 				return getObjectId();
+			case StreamPackage.CHANGE_ENTRY__CLASS_URI:
+				return getClassUri();
 			case StreamPackage.CHANGE_ENTRY__CLASS_ID:
 				return getClassId();
 			case StreamPackage.CHANGE_ENTRY__KIND:
 				return getKind();
 			case StreamPackage.CHANGE_ENTRY__FEATURE_ID:
 				return getFeatureId();
+			case StreamPackage.CHANGE_ENTRY__FEATURE_URI:
+				return getFeatureUri();
+			case StreamPackage.CHANGE_ENTRY__TIMESTAMP:
+				return getTimestamp();
 			case StreamPackage.CHANGE_ENTRY__INDEX:
 				return getIndex();
 			case StreamPackage.CHANGE_ENTRY__TO_INDEX:
@@ -570,6 +708,9 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 			case StreamPackage.CHANGE_ENTRY__OBJECT_ID:
 				setObjectId((String)newValue);
 				return;
+			case StreamPackage.CHANGE_ENTRY__CLASS_URI:
+				setClassUri((String)newValue);
+				return;
 			case StreamPackage.CHANGE_ENTRY__CLASS_ID:
 				setClassId((Integer)newValue);
 				return;
@@ -578,6 +719,12 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 				return;
 			case StreamPackage.CHANGE_ENTRY__FEATURE_ID:
 				setFeatureId((Integer)newValue);
+				return;
+			case StreamPackage.CHANGE_ENTRY__FEATURE_URI:
+				setFeatureUri((String)newValue);
+				return;
+			case StreamPackage.CHANGE_ENTRY__TIMESTAMP:
+				setTimestamp((Long)newValue);
 				return;
 			case StreamPackage.CHANGE_ENTRY__INDEX:
 				setIndex((Integer)newValue);
@@ -617,6 +764,9 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 			case StreamPackage.CHANGE_ENTRY__OBJECT_ID:
 				setObjectId(OBJECT_ID_EDEFAULT);
 				return;
+			case StreamPackage.CHANGE_ENTRY__CLASS_URI:
+				setClassUri(CLASS_URI_EDEFAULT);
+				return;
 			case StreamPackage.CHANGE_ENTRY__CLASS_ID:
 				setClassId(CLASS_ID_EDEFAULT);
 				return;
@@ -625,6 +775,12 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 				return;
 			case StreamPackage.CHANGE_ENTRY__FEATURE_ID:
 				setFeatureId(FEATURE_ID_EDEFAULT);
+				return;
+			case StreamPackage.CHANGE_ENTRY__FEATURE_URI:
+				setFeatureUri(FEATURE_URI_EDEFAULT);
+				return;
+			case StreamPackage.CHANGE_ENTRY__TIMESTAMP:
+				setTimestamp(TIMESTAMP_EDEFAULT);
 				return;
 			case StreamPackage.CHANGE_ENTRY__INDEX:
 				setIndex(INDEX_EDEFAULT);
@@ -661,12 +817,18 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 		switch (featureID) {
 			case StreamPackage.CHANGE_ENTRY__OBJECT_ID:
 				return OBJECT_ID_EDEFAULT == null ? objectId != null : !OBJECT_ID_EDEFAULT.equals(objectId);
+			case StreamPackage.CHANGE_ENTRY__CLASS_URI:
+				return CLASS_URI_EDEFAULT == null ? classUri != null : !CLASS_URI_EDEFAULT.equals(classUri);
 			case StreamPackage.CHANGE_ENTRY__CLASS_ID:
 				return classId != CLASS_ID_EDEFAULT;
 			case StreamPackage.CHANGE_ENTRY__KIND:
 				return kind != KIND_EDEFAULT;
 			case StreamPackage.CHANGE_ENTRY__FEATURE_ID:
 				return featureId != FEATURE_ID_EDEFAULT;
+			case StreamPackage.CHANGE_ENTRY__FEATURE_URI:
+				return FEATURE_URI_EDEFAULT == null ? featureUri != null : !FEATURE_URI_EDEFAULT.equals(featureUri);
+			case StreamPackage.CHANGE_ENTRY__TIMESTAMP:
+				return TIMESTAMP_EDEFAULT == null ? timestamp != null : !TIMESTAMP_EDEFAULT.equals(timestamp);
 			case StreamPackage.CHANGE_ENTRY__INDEX:
 				return index != INDEX_EDEFAULT;
 			case StreamPackage.CHANGE_ENTRY__TO_INDEX:
@@ -697,12 +859,18 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (objectId: ");
 		result.append(objectId);
+		result.append(", classUri: ");
+		result.append(classUri);
 		result.append(", classId: ");
 		result.append(classId);
 		result.append(", kind: ");
 		result.append(kind);
 		result.append(", featureId: ");
 		result.append(featureId);
+		result.append(", featureUri: ");
+		result.append(featureUri);
+		result.append(", timestamp: ");
+		result.append(timestamp);
 		result.append(", index: ");
 		result.append(index);
 		result.append(", toIndex: ");

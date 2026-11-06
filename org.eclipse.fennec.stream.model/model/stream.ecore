@@ -2,7 +2,7 @@
 <ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="stream" nsURI="https://org.eclipse/fennec/stream/1.0.0" nsPrefix="stream">
   <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
-    <details key="documentation" value="Fennec change-stream metamodel (the 'diff-Ecore'). Promoted from the unified-persistence concept draft — see docs/unified-persistence/concept.md (§5, §20).&#xA;&#xA;DISCIPLINE (concept §12.3): this package is the ONLY schema sender and receiver must share. It cannot fingerprint-bootstrap itself, so the protobuf doctrine applies manually: evolution is additive-only (append, never remove/reorder), the semantics of an existing feature are never rebound. Keep it small and boring — convenience belongs in projections, not here.&#xA;&#xA;Values (valueOld/valueNew/value) are encoded literals or object IDs as strings; their typing resolves EXCLUSIVELY from (contextFingerprint, featureId) via the snapshot registry. Deliberately no type flags in this model."/>
+    <details key="documentation" value="Fennec change-stream metamodel (the 'diff-Ecore'). Promoted from the unified-persistence concept draft (concept §5, §20) and maintained in eclipse-fennec/emf.streaming.&#xA;&#xA;DISCIPLINE (concept §12.3): this package is the ONLY schema sender and receiver must share. It cannot fingerprint-bootstrap itself, so the protobuf doctrine applies manually: evolution is additive-only (append, never remove/reorder), the semantics of an existing feature are never rebound. Keep it small and boring — convenience belongs in projections, not here.&#xA;&#xA;Values (valueOld/valueNew/value) are encoded literals or object IDs as strings; their typing resolves EXCLUSIVELY from (contextFingerprint, featureId) via the snapshot registry. Deliberately no type flags in this model."/>
     <details key="basePackage" value="org.eclipse.fennec.model"/>
     <details key="copyrightText" value="Copyright (c) 2026 Contributors to the Eclipse Foundation.&#xA;&#xA;This program and the accompanying materials are made&#xA;available under the terms of the Eclipse Public License 2.0&#xA;which is available at https://www.eclipse.org/legal/epl-2.0/&#xA;&#xA;SPDX-License-Identifier: EPL-2.0&#xA;&#xA;Contributors:&#xA;  Data In Motion Consulting - initial implementation"/>
     <details key="complianceLevel" value="21.0"/>
@@ -10,7 +10,7 @@
   </eAnnotations>
   <eClassifiers xsi:type="ecore:EClass" name="ChangeSet">
     <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
-      <details key="documentation" value="Atomic batch of change entries: one commit / one editor save / one ingest message (concept §5.1, §5.5). Applied all-or-nothing, in two phases (§5.4f): first all CREATE entries, then all feature deltas — forward references within the batch are legal. COALESCED by definition (§5.5): at most one entry per (objectId, featureId, address) — valueOld = before the batch, valueNew = after it; net-zero changes are not written. Exception: ordered-list features keep their ADD/REMOVE/MOVE sequences as an ordered operation list (index ops do not commute)."/>
+      <details key="documentation" value="Atomic batch of change entries: one commit / one editor save / one ingest message (concept §5.1, §5.5). Applied all-or-nothing, in two phases (§5.4f): first all CREATE entries, then all feature deltas — forward references within the batch are legal. For CHANGELOG slots the batch is COALESCED (§5.5): at most one entry per (objectId, feature, address) — valueOld = before the batch, valueNew = after it; net-zero changes are not written. Exception: ordered-list features keep their ADD/REMOVE/MOVE sequences as an ordered operation list (index ops do not commute). TIMESERIES slots are NEVER coalesced: every sample is its own entry with its own event time (ChangeEntry.timestamp)."/>
     </eAnnotations>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="id" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" iD="true">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
@@ -24,12 +24,12 @@
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="sequence" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
-        <details key="documentation" value="Per-stream contiguous monotonic sequence — the authoritative order (§4.3). Used for gap detection, replay, undo, idempotent apply."/>
+        <details key="documentation" value="Per-stream contiguous monotonic sequence — the authoritative order (§4.3). ASSIGNED BY THE EVENT CORE when the batch is built (the processing order of the stream, never an input of a producer); a received batch keeps the sender's sequence. Used for gap detection, undo, idempotent apply."/>
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="timestamp" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
-        <details key="documentation" value="Event time (epoch millis) — domain time, may arrive late/out of order (§4.3). Range queries use this; ordering uses sequence."/>
+        <details key="documentation" value="Batch time (epoch millis): the event time of the batch as a whole — commit time of a save, or the closing time of a count/time window. Entries without their own timestamp inherit it. Ordering uses sequence, never time (§4.3)."/>
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="commitTime" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELong">
@@ -39,17 +39,17 @@
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="contextFingerprint" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
-        <details key="documentation" value="Fingerprint of the interpretation context this batch was written under: the COMPOSITE root (§6.4, §22 decision #2) — one batch may touch classes from several packages, and the composite stamp keeps every entry resolvable via (compositeFp, classId). LOGICALLY present on every batch; storage formats may run-length/delta-encode it (§6.3). Resolvable against the snapshot registry: CompositeSnapshot → per-package ContextSnapshots."/>
+        <details key="documentation" value="Fingerprint of the interpretation context this batch was written under: the COMPOSITE root (§6.4, §22 decision #2) — one batch may touch classes from several packages, and the composite stamp keeps every entry resolvable via (compositeFp, classUri, feature). LOGICALLY present on every batch; storage formats may run-length/delta-encode it (§6.3). Resolvable against the snapshot registry: CompositeSnapshot → per-package ContextSnapshots."/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="author" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="author" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
-        <details key="documentation" value="Provenance: user, device, import job, ..."/>
+        <details key="documentation" value="The source that emits the change: device, ingest adapter, mapping, user, replicating node. Set by the event core from the input channel; a mapping may override it."/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="cause" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="reason" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
-        <details key="documentation" value="Optional cause/correlation info (e.g. the capture source, an ingest message id)."/>
+        <details key="documentation" value="Optional: out of which use case the change was sent, e.g. ingest, undo:&lt;sequence&gt;, migration, or free text / a correlation id."/>
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="transactionId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
@@ -77,9 +77,14 @@
         <details key="documentation" value="Stable object id (§4.1). Containment children carry their own id but live in the root's stream."/>
       </eAnnotations>
     </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="classUri" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="URI of the object's EClass (nsURI#//Name). REQUIRED for CREATE and KEYFRAME, redundant otherwise (the class is known from objectId). The default way to address a class: the classifier order of a package is NOT part of the model fingerprint, so a classifier index is not stable."/>
+      </eAnnotations>
+    </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="classId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt" defaultValueLiteral="-1">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
-        <details key="documentation" value="Stable class id, resolved via (contextFingerprint, classId) — assigned in the tracking aspect (tracking.ecore). Required for CREATE; redundant otherwise."/>
+        <details key="documentation" value="Optional numeric class id (-1 = unset). Only meaningful when a producer assigns its own stable class numbers; classUri wins when both are set."/>
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind" lowerBound="1" eType="#//DeltaKind">
@@ -89,7 +94,17 @@
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="featureId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt" defaultValueLiteral="-1">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
-        <details key="documentation" value="Stable feature id (§4.2, protobuf discipline: bound to semantics, never renamed away, never reused). Absent (-1) for CREATE/DELETE/KEYFRAME."/>
+        <details key="documentation" value="Feature id = the EMF feature ID of the class (EClass#getFeatureID) under contextFingerprint: the declared feature order is part of the model fingerprint, so the id is stable for a model version. Absent (-1) for CREATE/DELETE/KEYFRAME. featureUri wins when both are set."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="featureUri" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Alternative feature address: URI of the EStructuralFeature (nsURI#//Class/feature). Wins over featureId when set."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="timestamp" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELongObject">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Event time of this entry (epoch millis), e.g. the measurement time of a sample (SensorThings phenomenonTime). Unset (null) = the batch time ChangeSet.timestamp applies. Lets one batch carry samples with different event times."/>
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="index" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt" defaultValueLiteral="-1">
@@ -132,9 +147,14 @@
     <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
       <details key="documentation" value="One addressed slot within a keyframe: featureId plus the same addressing modes as ChangeEntry (index for ordered lists, key for maps, coords for arrays; none for single-valued)."/>
     </eAnnotations>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="featureId" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="featureId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt" defaultValueLiteral="-1">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
-        <details key="documentation" value="Stable feature id of the slot's feature (§4.2)."/>
+        <details key="documentation" value="EMF feature ID of the slot's feature under contextFingerprint (-1 = unset, then featureUri is required)."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="featureUri" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Alternative address of the slot's feature (nsURI#//Class/feature). Wins over featureId when set."/>
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="index" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt" defaultValueLiteral="-1">

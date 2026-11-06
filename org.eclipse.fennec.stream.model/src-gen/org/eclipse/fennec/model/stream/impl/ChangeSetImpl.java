@@ -47,7 +47,7 @@ import org.eclipse.fennec.model.stream.StreamPackage;
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeSetImpl#getCommitTime <em>Commit Time</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeSetImpl#getContextFingerprint <em>Context Fingerprint</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeSetImpl#getAuthor <em>Author</em>}</li>
- *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeSetImpl#getCause <em>Cause</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeSetImpl#getReason <em>Reason</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeSetImpl#getTransactionId <em>Transaction Id</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeSetImpl#isManifest <em>Manifest</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeSetImpl#getEntries <em>Entries</em>}</li>
@@ -197,24 +197,24 @@ public class ChangeSetImpl extends MinimalEObjectImpl.Container implements Chang
 	protected String author = AUTHOR_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getCause() <em>Cause</em>}' attribute.
+	 * The default value of the '{@link #getReason() <em>Reason</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getCause()
+	 * @see #getReason()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String CAUSE_EDEFAULT = null;
+	protected static final String REASON_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getCause() <em>Cause</em>}' attribute.
+	 * The cached value of the '{@link #getReason() <em>Reason</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getCause()
+	 * @see #getReason()
 	 * @generated
 	 * @ordered
 	 */
-	protected String cause = CAUSE_EDEFAULT;
+	protected String reason = REASON_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getTransactionId() <em>Transaction Id</em>}' attribute.
@@ -452,8 +452,8 @@ public class ChangeSetImpl extends MinimalEObjectImpl.Container implements Chang
 	 * @generated
 	 */
 	@Override
-	public String getCause() {
-		return cause;
+	public String getReason() {
+		return reason;
 	}
 
 	/**
@@ -462,11 +462,11 @@ public class ChangeSetImpl extends MinimalEObjectImpl.Container implements Chang
 	 * @generated
 	 */
 	@Override
-	public void setCause(String newCause) {
-		String oldCause = cause;
-		cause = newCause;
+	public void setReason(String newReason) {
+		String oldReason = reason;
+		reason = newReason;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, StreamPackage.CHANGE_SET__CAUSE, oldCause, cause));
+			eNotify(new ENotificationImpl(this, Notification.SET, StreamPackage.CHANGE_SET__REASON, oldReason, reason));
 	}
 
 	/**
@@ -564,8 +564,8 @@ public class ChangeSetImpl extends MinimalEObjectImpl.Container implements Chang
 				return getContextFingerprint();
 			case StreamPackage.CHANGE_SET__AUTHOR:
 				return getAuthor();
-			case StreamPackage.CHANGE_SET__CAUSE:
-				return getCause();
+			case StreamPackage.CHANGE_SET__REASON:
+				return getReason();
 			case StreamPackage.CHANGE_SET__TRANSACTION_ID:
 				return getTransactionId();
 			case StreamPackage.CHANGE_SET__MANIFEST:
@@ -606,8 +606,8 @@ public class ChangeSetImpl extends MinimalEObjectImpl.Container implements Chang
 			case StreamPackage.CHANGE_SET__AUTHOR:
 				setAuthor((String)newValue);
 				return;
-			case StreamPackage.CHANGE_SET__CAUSE:
-				setCause((String)newValue);
+			case StreamPackage.CHANGE_SET__REASON:
+				setReason((String)newValue);
 				return;
 			case StreamPackage.CHANGE_SET__TRANSACTION_ID:
 				setTransactionId((String)newValue);
@@ -652,8 +652,8 @@ public class ChangeSetImpl extends MinimalEObjectImpl.Container implements Chang
 			case StreamPackage.CHANGE_SET__AUTHOR:
 				setAuthor(AUTHOR_EDEFAULT);
 				return;
-			case StreamPackage.CHANGE_SET__CAUSE:
-				setCause(CAUSE_EDEFAULT);
+			case StreamPackage.CHANGE_SET__REASON:
+				setReason(REASON_EDEFAULT);
 				return;
 			case StreamPackage.CHANGE_SET__TRANSACTION_ID:
 				setTransactionId(TRANSACTION_ID_EDEFAULT);
@@ -690,8 +690,8 @@ public class ChangeSetImpl extends MinimalEObjectImpl.Container implements Chang
 				return CONTEXT_FINGERPRINT_EDEFAULT == null ? contextFingerprint != null : !CONTEXT_FINGERPRINT_EDEFAULT.equals(contextFingerprint);
 			case StreamPackage.CHANGE_SET__AUTHOR:
 				return AUTHOR_EDEFAULT == null ? author != null : !AUTHOR_EDEFAULT.equals(author);
-			case StreamPackage.CHANGE_SET__CAUSE:
-				return CAUSE_EDEFAULT == null ? cause != null : !CAUSE_EDEFAULT.equals(cause);
+			case StreamPackage.CHANGE_SET__REASON:
+				return REASON_EDEFAULT == null ? reason != null : !REASON_EDEFAULT.equals(reason);
 			case StreamPackage.CHANGE_SET__TRANSACTION_ID:
 				return TRANSACTION_ID_EDEFAULT == null ? transactionId != null : !TRANSACTION_ID_EDEFAULT.equals(transactionId);
 			case StreamPackage.CHANGE_SET__MANIFEST:
@@ -726,8 +726,8 @@ public class ChangeSetImpl extends MinimalEObjectImpl.Container implements Chang
 		result.append(contextFingerprint);
 		result.append(", author: ");
 		result.append(author);
-		result.append(", cause: ");
-		result.append(cause);
+		result.append(", reason: ");
+		result.append(reason);
 		result.append(", transactionId: ");
 		result.append(transactionId);
 		result.append(", manifest: ");

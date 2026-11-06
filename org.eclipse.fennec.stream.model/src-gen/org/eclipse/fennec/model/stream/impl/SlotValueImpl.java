@@ -37,6 +37,7 @@ import org.eclipse.fennec.model.stream.StreamPackage;
  * </p>
  * <ul>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.SlotValueImpl#getFeatureId <em>Feature Id</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.impl.SlotValueImpl#getFeatureUri <em>Feature Uri</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.SlotValueImpl#getIndex <em>Index</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.SlotValueImpl#getKey <em>Key</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.SlotValueImpl#getCoords <em>Coords</em>}</li>
@@ -54,7 +55,7 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 	 * @generated
 	 * @ordered
 	 */
-	protected static final int FEATURE_ID_EDEFAULT = 0;
+	protected static final int FEATURE_ID_EDEFAULT = -1;
 
 	/**
 	 * The cached value of the '{@link #getFeatureId() <em>Feature Id</em>}' attribute.
@@ -65,6 +66,26 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 	 * @ordered
 	 */
 	protected int featureId = FEATURE_ID_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getFeatureUri() <em>Feature Uri</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFeatureUri()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final String FEATURE_URI_EDEFAULT = null;
+
+	/**
+	 * The cached value of the '{@link #getFeatureUri() <em>Feature Uri</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getFeatureUri()
+	 * @generated
+	 * @ordered
+	 */
+	protected String featureUri = FEATURE_URI_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getIndex() <em>Index</em>}' attribute.
@@ -184,6 +205,29 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 	 * @generated
 	 */
 	@Override
+	public String getFeatureUri() {
+		return featureUri;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void setFeatureUri(String newFeatureUri) {
+		String oldFeatureUri = featureUri;
+		featureUri = newFeatureUri;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, StreamPackage.SLOT_VALUE__FEATURE_URI, oldFeatureUri, featureUri));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public int getIndex() {
 		return index;
 	}
@@ -270,6 +314,8 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 		switch (featureID) {
 			case StreamPackage.SLOT_VALUE__FEATURE_ID:
 				return getFeatureId();
+			case StreamPackage.SLOT_VALUE__FEATURE_URI:
+				return getFeatureUri();
 			case StreamPackage.SLOT_VALUE__INDEX:
 				return getIndex();
 			case StreamPackage.SLOT_VALUE__KEY:
@@ -293,6 +339,9 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 		switch (featureID) {
 			case StreamPackage.SLOT_VALUE__FEATURE_ID:
 				setFeatureId((Integer)newValue);
+				return;
+			case StreamPackage.SLOT_VALUE__FEATURE_URI:
+				setFeatureUri((String)newValue);
 				return;
 			case StreamPackage.SLOT_VALUE__INDEX:
 				setIndex((Integer)newValue);
@@ -322,6 +371,9 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 			case StreamPackage.SLOT_VALUE__FEATURE_ID:
 				setFeatureId(FEATURE_ID_EDEFAULT);
 				return;
+			case StreamPackage.SLOT_VALUE__FEATURE_URI:
+				setFeatureUri(FEATURE_URI_EDEFAULT);
+				return;
 			case StreamPackage.SLOT_VALUE__INDEX:
 				setIndex(INDEX_EDEFAULT);
 				return;
@@ -348,6 +400,8 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 		switch (featureID) {
 			case StreamPackage.SLOT_VALUE__FEATURE_ID:
 				return featureId != FEATURE_ID_EDEFAULT;
+			case StreamPackage.SLOT_VALUE__FEATURE_URI:
+				return FEATURE_URI_EDEFAULT == null ? featureUri != null : !FEATURE_URI_EDEFAULT.equals(featureUri);
 			case StreamPackage.SLOT_VALUE__INDEX:
 				return index != INDEX_EDEFAULT;
 			case StreamPackage.SLOT_VALUE__KEY:
@@ -372,6 +426,8 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 		StringBuilder result = new StringBuilder(super.toString());
 		result.append(" (featureId: ");
 		result.append(featureId);
+		result.append(", featureUri: ");
+		result.append(featureUri);
 		result.append(", index: ");
 		result.append(index);
 		result.append(", key: ");
