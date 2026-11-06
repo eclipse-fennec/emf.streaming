@@ -8,6 +8,7 @@ Bundle-Description: JSON payload of the Fennec change stream through the Eclipse
 
 -buildpath: \
 	org.osgi.service.condition;version=latest,\
+	org.osgi.service.component.annotations;version=latest,\
 	org.eclipse.fennec.stream.model;version=snapshot,\
 	org.eclipse.fennec.stream.messaging;version=snapshot,\
 	org.eclipse.fennec.codec;version=latest,\

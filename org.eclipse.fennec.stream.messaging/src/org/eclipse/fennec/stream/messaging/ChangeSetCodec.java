@@ -28,6 +28,9 @@ import org.osgi.annotation.versioning.ConsumerType;
 @ConsumerType
 public interface ChangeSetCodec {
 
+	/** Service property naming the content type of a codec service, e.g. {@code application/json}. */
+	String CONTENT_TYPE_PROPERTY = "fennec.stream.codec.contentType";
+
 	/**
 	 * @return the content type of the payload, e.g. {@code application/json}
 	 */

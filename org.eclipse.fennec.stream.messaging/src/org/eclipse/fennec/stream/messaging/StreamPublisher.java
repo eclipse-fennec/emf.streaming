@@ -28,7 +28,7 @@ import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.fennec.model.stream.ChangeSet;
 import org.eclipse.fennec.model.stream.DeltaKind;
 import org.eclipse.fennec.model.stream.support.StreamAddresses;
-import org.eclipse.fennec.stream.EventCore;
+import org.eclipse.fennec.stream.StreamCore;
 import org.eclipse.fennec.stream.StreamId;
 import org.gecko.messaging.api.Message;
 import org.gecko.messaging.api.MessageContextBuilder;
@@ -100,7 +100,7 @@ public final class StreamPublisher {
 	 * @param core the core
 	 * @return closing it stops publishing
 	 */
-	public AutoCloseable attach(EventCore core) {
+	public AutoCloseable attach(StreamCore core) {
 		PushStream<ChangeSet> changes = core.changes();
 		changes.forEach(changeSet -> publish(changeSet).onFailure(
 				e -> LOGGER.log(Level.WARNING, e, () -> "Change set " + changeSet.getId() + " was not published")));

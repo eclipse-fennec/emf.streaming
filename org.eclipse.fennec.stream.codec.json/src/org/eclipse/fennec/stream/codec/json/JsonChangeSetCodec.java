@@ -47,7 +47,7 @@ public final class JsonChangeSetCodec implements ChangeSetCodec {
 
 	private static final URI URI_OF_PAYLOAD = URI.createURI("changeset.json");
 
-	private final CodecResourceFactory factory;
+	private final Resource.Factory factory;
 
 	/**
 	 * @param metadata the metadata service the codec reads its configuration from; the stream model
@@ -58,6 +58,16 @@ public final class JsonChangeSetCodec implements ChangeSetCodec {
 		requireNonNull(metadata, "Metadata service is required");
 		metadata.registerPackage(StreamPackage.eINSTANCE);
 		this.factory = new CodecResourceFactory(metadata, requireNonNull(configuration, "ConfigurationResolver is required"));
+	}
+
+	/**
+	 * A codec on a resource factory that already reads and writes codec JSON - in OSGi the one the
+	 * Fennec codec registers for {@code application/json}.
+	 *
+	 * @param factory the resource factory
+	 */
+	public JsonChangeSetCodec(Resource.Factory factory) {
+		this.factory = requireNonNull(factory, "Resource factory is required");
 	}
 
 	/**
