@@ -1,0 +1,23 @@
+Bundle-Name: Eclipse Fennec Stream JSON Codec
+Bundle-Description: JSON payload of the Fennec change stream through the Eclipse Fennec EMF codec - \
+	the default codec of the stream transport.
+
+-workingset: streaming
+
+-library: enableEMF
+
+-buildpath: \
+	org.osgi.service.condition;version=latest,\
+	org.eclipse.fennec.stream.model;version=snapshot,\
+	org.eclipse.fennec.stream.messaging;version=snapshot,\
+	org.eclipse.fennec.codec;version=latest,\
+	org.eclipse.fennec.codec.api;version=latest,\
+	org.eclipse.fennec.emf.osgi.metadata;version=latest
+
+-testpath: \
+	assertj-core,\
+	org.eclipse.fennec.emf.osgi.component.minimal;version=latest,\
+	org.eclipse.fennec.codec.metadata;version=latest,\
+	tools.jackson.core.jackson-core;version=latest,\
+	tools.jackson.core.jackson-databind;version=latest,\
+	com.fasterxml.jackson.core.jackson-annotations;version=latest

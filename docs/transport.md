@@ -49,8 +49,8 @@ Everything a receiver needs is in the payload; the envelope serves routing and f
 ## Payload
 
 The change set itself (`stream.ecore`, nsURI `https://org.eclipse/fennec/stream/1.0.0`), encoded
-by a pluggable codec: XMI today, JSON through emf.codec as the intended default, Protobuf through
-emf.util as an option. Values inside the change set are strings in the EMF literal form of their
+by a pluggable codec: JSON through emf.codec (`org.eclipse.fennec.stream.codec.json`, the default,
+`application/json`), XMI (`application/xmi+xml`), Protobuf through emf.util as a later option. Values inside the change set are strings in the EMF literal form of their
 type; references are the id of the referenced object. The typing resolves from
 (`dataschema`, feature) on the receiving side.
 
