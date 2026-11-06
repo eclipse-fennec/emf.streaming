@@ -12,7 +12,9 @@
  ********************************************************************/
 package org.eclipse.fennec.stream;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +72,10 @@ final class TargetStream {
 	final Map<String, StreamSlot> slots = new LinkedHashMap<>();
 	final Map<String, Long> projectedTimes = new LinkedHashMap<>();
 	final Map<String, Batch> batches = new LinkedHashMap<>();
+	/** Sequences that can be undone, newest first. */
+	final Deque<Long> undoable = new ArrayDeque<>();
+	/** Sequences of undo change sets that can be redone, newest first. */
+	final Deque<Long> redoable = new ArrayDeque<>();
 
 	TargetStream(String streamId, String targetId, StreamMapping mapping, String group, long sequence) {
 		this.streamId = streamId;

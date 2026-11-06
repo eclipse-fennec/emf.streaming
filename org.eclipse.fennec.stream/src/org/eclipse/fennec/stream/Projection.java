@@ -35,7 +35,7 @@ public interface Projection {
 	 * @param targetClass the class of the target object
 	 * @param targetId its id
 	 * @param feature the feature to set
-	 * @param value the value
+	 * @param value the value; {@code null} unsets the feature (an undo back to "no value")
 	 * @return whether a target was changed (false when it is unknown)
 	 */
 	boolean project(EClass targetClass, String targetId, EStructuralFeature feature, Object value);
