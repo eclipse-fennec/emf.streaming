@@ -1,0 +1,8 @@
+{
+  ":configurator:resource-version": 1,
+  ":configurator:symbolic-name": "org.eclipse.fennec.stream.example.pool.h2",
+  ":configurator:version": "0.1.0",
+  "daanse.jdbc.datasource.h2.DataSource~bath": {
+    "identifier": "./generated/h2/bath;DB_CLOSE_DELAY=-1"
+  }
+}

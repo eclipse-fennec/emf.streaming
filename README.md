@@ -26,6 +26,17 @@ The concept and the first metamodel come from the *unified persistence* work in
 | `org.eclipse.fennec.stream.messaging` | Transport over Gecko Messaging: channels per object, CloudEvents, payload codec SPI, retained keyframes ([docs/transport.md](docs/transport.md)) |
 | `org.eclipse.fennec.stream.codec.json` | JSON payload through the Fennec EMF codec |
 
+## Example
+
+`org.eclipse.fennec.stream.example.pool` runs the leisure pool demo of emf.ogc.features with
+simulated temperature and pH sensors: a stream mapping feeds `waterTemperature` and `ph` of the
+pools, one update command per pool and window, and the OGC Features map shows them.
+
+```bash
+./gradlew :org.eclipse.fennec.stream.example.pool:run.pool
+# http://localhost:8080/ogc/collections/pools/items  -  map: http://localhost:8080/ogc/viewer/
+```
+
 ## Build
 
 bnd workspace driven by Gradle 9 (`biz.aQute.bnd.workspace`), Java 21.
