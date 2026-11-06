@@ -372,7 +372,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_Key() {
+	public EAttribute getChangeEntry_MapKey() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(9);
 	}
 
@@ -462,7 +462,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getSlotValue_Key() {
+	public EAttribute getSlotValue_MapKey() {
 		return (EAttribute)slotValueEClass.getEStructuralFeatures().get(3);
 	}
 
@@ -708,7 +708,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__TIMESTAMP);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__INDEX);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__TO_INDEX);
-		createEAttribute(changeEntryEClass, CHANGE_ENTRY__KEY);
+		createEAttribute(changeEntryEClass, CHANGE_ENTRY__MAP_KEY);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__COORDS);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__VALUE_OLD);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__VALUE_NEW);
@@ -718,7 +718,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 		createEAttribute(slotValueEClass, SLOT_VALUE__FEATURE_ID);
 		createEAttribute(slotValueEClass, SLOT_VALUE__FEATURE_URI);
 		createEAttribute(slotValueEClass, SLOT_VALUE__INDEX);
-		createEAttribute(slotValueEClass, SLOT_VALUE__KEY);
+		createEAttribute(slotValueEClass, SLOT_VALUE__MAP_KEY);
 		createEAttribute(slotValueEClass, SLOT_VALUE__COORDS);
 		createEAttribute(slotValueEClass, SLOT_VALUE__VALUE);
 
@@ -798,7 +798,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 		initEAttribute(getChangeEntry_Timestamp(), ecorePackage.getELongObject(), "timestamp", null, 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_Index(), ecorePackage.getEInt(), "index", "-1", 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_ToIndex(), ecorePackage.getEInt(), "toIndex", "-1", 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getChangeEntry_Key(), ecorePackage.getEString(), "key", null, 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getChangeEntry_MapKey(), ecorePackage.getEString(), "mapKey", null, 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_Coords(), ecorePackage.getEInt(), "coords", null, 0, -1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_ValueOld(), ecorePackage.getEString(), "valueOld", null, 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_ValueNew(), ecorePackage.getEString(), "valueNew", null, 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -808,7 +808,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 		initEAttribute(getSlotValue_FeatureId(), ecorePackage.getEInt(), "featureId", "-1", 0, 1, SlotValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getSlotValue_FeatureUri(), ecorePackage.getEString(), "featureUri", null, 0, 1, SlotValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getSlotValue_Index(), ecorePackage.getEInt(), "index", "-1", 0, 1, SlotValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
-		initEAttribute(getSlotValue_Key(), ecorePackage.getEString(), "key", null, 0, 1, SlotValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getSlotValue_MapKey(), ecorePackage.getEString(), "mapKey", null, 0, 1, SlotValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getSlotValue_Coords(), ecorePackage.getEInt(), "coords", null, 0, -1, SlotValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getSlotValue_Value(), ecorePackage.getEString(), "value", null, 0, 1, SlotValue.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 

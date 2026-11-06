@@ -40,7 +40,7 @@ import org.osgi.annotation.versioning.ProviderType;
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getTimestamp <em>Timestamp</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getIndex <em>Index</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getToIndex <em>To Index</em>}</li>
- *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getKey <em>Key</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getMapKey <em>Map Key</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getCoords <em>Coords</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getValueOld <em>Value Old</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getValueNew <em>Value New</em>}</li>
@@ -286,29 +286,29 @@ public interface ChangeEntry extends EObject {
 	void setToIndex(int value);
 
 	/**
-	 * Returns the value of the '<em><b>Key</b></em>' attribute.
+	 * Returns the value of the '<em><b>Map Key</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
-	 * Address for maps (PUT/REMOVE_KEY): encoded literal or objectId for object keys (§5.4h).
+	 * Address for maps (PUT/REMOVE_KEY): encoded literal or objectId for object keys (§5.4h). Named mapKey, not key: a class with features key and value is read as a Map.Entry by some serializers.
 	 * <!-- end-model-doc -->
-	 * @return the value of the '<em>Key</em>' attribute.
-	 * @see #setKey(String)
-	 * @see org.eclipse.fennec.model.stream.StreamPackage#getChangeEntry_Key()
+	 * @return the value of the '<em>Map Key</em>' attribute.
+	 * @see #setMapKey(String)
+	 * @see org.eclipse.fennec.model.stream.StreamPackage#getChangeEntry_MapKey()
 	 * @model
 	 * @generated
 	 */
-	String getKey();
+	String getMapKey();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.fennec.model.stream.ChangeEntry#getKey <em>Key</em>}' attribute.
+	 * Sets the value of the '{@link org.eclipse.fennec.model.stream.ChangeEntry#getMapKey <em>Map Key</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Key</em>' attribute.
-	 * @see #getKey()
+	 * @param value the new value of the '<em>Map Key</em>' attribute.
+	 * @see #getMapKey()
 	 * @generated
 	 */
-	void setKey(String value);
+	void setMapKey(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Coords</b></em>' attribute list.

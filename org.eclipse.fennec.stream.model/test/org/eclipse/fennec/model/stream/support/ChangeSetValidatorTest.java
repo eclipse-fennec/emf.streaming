@@ -116,7 +116,7 @@ class ChangeSetValidatorTest {
 
 		assertThat(messages(ChangeSetValidator.validate(changeSet))).containsExactly(
 				"entry 0 (MOVE, object pool-1): index and toIndex are required for MOVE",
-				"entry 1 (PUT, object pool-1): key is required for PUT",
+				"entry 1 (PUT, object pool-1): mapKey is required for PUT",
 				"entry 2 (SET_AT, object pool-1): coords are required for SET_AT");
 	}
 
