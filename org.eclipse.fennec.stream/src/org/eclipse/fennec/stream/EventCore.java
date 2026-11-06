@@ -91,17 +91,31 @@ public final class EventCore implements AutoCloseable {
 	 * @param name the name mappings refer to
 	 * @param threads the pool size
 	 * @param slice how many tasks a lane runs before it yields its thread
+	 * @param maxQueued how many offers may wait in one lane (0 = unbounded): beyond it, an offer of
+	 *        time-series values evicts the oldest waiting one of its kind, any other offer makes the
+	 *        producer wait (requirement COR-06)
 	 */
-	public record ExecutionGroup(String name, int threads, int slice) {
+	public record ExecutionGroup(String name, int threads, int slice, int maxQueued) {
 
 		/**
 		 * Canonical constructor.
 		 */
 		public ExecutionGroup {
 			requireNonNull(name, "Group name is required");
-			if (threads < 1 || slice < 1) {
-				throw new IllegalArgumentException("A group needs at least one thread and a slice of at least 1");
+			if (threads < 1 || slice < 1 || maxQueued < 0) {
+				throw new IllegalArgumentException("A group needs at least one thread, a slice of at least 1 and maxQueued >= 0");
 			}
+		}
+
+		/**
+		 * A group with unbounded lanes.
+		 *
+		 * @param name the name
+		 * @param threads the pool size
+		 * @param slice the slice
+		 */
+		public ExecutionGroup(String name, int threads, int slice) {
+			this(name, threads, slice, 0);
 		}
 	}
 
@@ -115,9 +129,10 @@ public final class EventCore implements AutoCloseable {
 	 * @param keyframes keyframe change sets written
 	 * @param lanes lanes currently holding work
 	 * @param retentionRuns deletion rules handed to the store
+	 * @param droppedOffers offers of time-series values evicted from a full lane
 	 */
 	public record Metrics(long offered, long passed, long rejected, long changeSets, long keyframes, int lanes,
-			long retentionRuns) {
+			long retentionRuns, long droppedOffers) {
 	}
 
 	private static final Logger LOGGER = Logger.getLogger(EventCore.class.getName());
@@ -145,6 +160,8 @@ public final class EventCore implements AutoCloseable {
 	private final AtomicLong changeSets = new AtomicLong();
 	private final AtomicLong keyframes = new AtomicLong();
 	private final AtomicLong retentionRuns = new AtomicLong();
+	private final AtomicLong droppedOffers = new AtomicLong();
+	private final long blockTimeout;
 	private final Set<String> retentionUnsupported = ConcurrentHashMap.newKeySet();
 
 	private EventCore(Builder builder) {
@@ -156,6 +173,7 @@ public final class EventCore implements AutoCloseable {
 		this.fingerprints = builder.fingerprints;
 		this.clock = builder.clock;
 		this.groups = List.copyOf(builder.groups());
+		this.blockTimeout = builder.blockTimeout.toMillis();
 		for (ExecutionGroup group : groups) {
 			pools.put(group.name(), Executors.newFixedThreadPool(group.threads(), threads("fennec-stream-" + group.name())));
 		}
@@ -433,7 +451,7 @@ public final class EventCore implements AutoCloseable {
 	 */
 	public Metrics metrics() {
 		return new Metrics(offered.get(), passed.get(), rejected.get(), changeSets.get(), keyframes.get(), mailboxes.size(),
-				retentionRuns.get());
+				retentionRuns.get(), droppedOffers.get());
 	}
 
 	@Override
@@ -444,7 +462,7 @@ public final class EventCore implements AutoCloseable {
 	}
 
 	private void route(List<EObject> sources, long eventTime, String author, boolean unitOfWork) {
-		Map<String, List<Runnable>> work = new LinkedHashMap<>();
+		Map<String, List<Offer>> work = new LinkedHashMap<>();
 		Map<String, TargetKey> keys = new LinkedHashMap<>();
 		for (EObject source : sources) {
 			for (Mapping mapping : mappings.forSource(source.eClass())) {
@@ -467,16 +485,18 @@ public final class EventCore implements AutoCloseable {
 					TargetStream stream = stream(streamId, streamMapping, target.getKey());
 					List<MappedValue> values = target.getValue();
 					offered.addAndGet(values.size());
+					boolean droppable = !unitOfWork && values.stream().allMatch(v -> v.slot() instanceof StreamSlot slot
+							&& StreamSlots.recording(slot) == RecordingMode.TIMESERIES);
 					work.computeIfAbsent(streamId, id -> new ArrayList<>())
-							.add(() -> handle(stream, values, eventTime, author, unitOfWork));
+							.add(new Offer(() -> handle(stream, values, eventTime, author, unitOfWork), droppable));
 				}
 			}
 		}
-		for (Map.Entry<String, List<Runnable>> entry : work.entrySet()) {
+		for (Map.Entry<String, List<Offer>> entry : work.entrySet()) {
 			TargetKey key = keys.get(entry.getKey());
 			String group = groupOf(key.mapping());
-			for (Runnable task : entry.getValue()) {
-				enqueue(entry.getKey(), group, task);
+			for (Offer offer : entry.getValue()) {
+				enqueueOffer(entry.getKey(), group, offer);
 			}
 			if (unitOfWork) {
 				enqueue(entry.getKey(), group, () -> commit(stream(entry.getKey(), key.mapping(), key.targetId()), author));
@@ -485,6 +505,44 @@ public final class EventCore implements AutoCloseable {
 	}
 
 	private record TargetKey(StreamMapping mapping, String targetId) {
+	}
+
+	/** Values of one offer for one target, and whether a full lane may drop them. */
+	private record Offer(Runnable task, boolean droppable) {
+	}
+
+	/** Enqueues a producer's offer under the bound of its group: evict (time series) or wait (changelog). */
+	private void enqueueOffer(String streamId, String group, Offer offer) {
+		int max = maxQueuedOf(group);
+		if (max > 0 && !offer.droppable()) {
+			Mailbox lane = mailboxes.get(streamId);
+			try {
+				if (lane != null && !lane.awaitSpace(max, blockTimeout)) {
+					LOGGER.warning(() -> "Lane " + streamId + " stayed full for " + blockTimeout + " ms - enqueued anyway");
+				}
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+		}
+		ExecutorService pool = pools.getOrDefault(group, pools.get(StreamSlots.DEFAULT_GROUP));
+		int slice = sliceOf(group);
+		mailboxes.compute(streamId, (id, mailbox) -> {
+			Mailbox lane = mailbox != null ? mailbox
+					: new Mailbox(pool, slice, () -> mailboxes.computeIfPresent(id, (k, m) -> m.isIdle() ? null : m));
+			if (lane.enqueue(offer.task(), offer.droppable(), max)) {
+				droppedOffers.incrementAndGet();
+			}
+			return lane;
+		});
+	}
+
+	private int maxQueuedOf(String name) {
+		for (ExecutionGroup group : groups) {
+			if (group.name().equals(name)) {
+				return group.maxQueued();
+			}
+		}
+		return 0;
 	}
 
 	/**
@@ -765,6 +823,7 @@ public final class EventCore implements AutoCloseable {
 		private Function<EPackage, String> fingerprints = ePackage -> String.valueOf(ePackage.getNsURI());
 		private Clock clock = Clock.systemUTC();
 		private Duration retentionInterval = Duration.ofHours(1);
+		private Duration blockTimeout = Duration.ofSeconds(30);
 		private final List<ExecutionGroup> groups = new ArrayList<>();
 
 		private Builder() {
@@ -852,6 +911,16 @@ public final class EventCore implements AutoCloseable {
 		 */
 		public Builder retentionInterval(Duration retentionInterval) {
 			this.retentionInterval = requireNonNull(retentionInterval);
+			return this;
+		}
+
+		/**
+		 * @param blockTimeout how long a producer waits for space in a full lane before it enqueues
+		 *        anyway (changelog values are never dropped); default 30 s
+		 * @return this
+		 */
+		public Builder blockTimeout(Duration blockTimeout) {
+			this.blockTimeout = requireNonNull(blockTimeout);
 			return this;
 		}
 
