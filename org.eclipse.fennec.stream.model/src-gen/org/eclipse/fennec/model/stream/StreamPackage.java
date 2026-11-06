@@ -46,7 +46,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @ProviderType
-@EPackage(uri = StreamPackage.eNS_URI, fingerprint = "fp1:2d45e5ac995a4bc06a5cf4b6820793ac13088967344bb7b41507c38f1e309878", genModel = "/model/stream.genmodel", genModelSourceLocations = {"model/stream.genmodel","org.eclipse.fennec.stream.model/model/stream.genmodel"}, ecore = "/model/stream.ecore", ecoreSourceLocations = "/model/stream.ecore")
+@EPackage(uri = StreamPackage.eNS_URI, fingerprint = "fp1:72863e2b858a9d9ecdebe5ef196642bd47e1f6718f8ca340a65adaf844afee41", genModel = "/model/stream.genmodel", genModelSourceLocations = {"model/stream.genmodel","org.eclipse.fennec.stream.model/model/stream.genmodel"}, ecore = "/model/stream.ecore", ecoreSourceLocations = "/model/stream.ecore")
 public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	/**
 	 * The package name.
@@ -299,13 +299,13 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	int CHANGE_ENTRY__TO_INDEX = 8;
 
 	/**
-	 * The feature id for the '<em><b>Key</b></em>' attribute.
+	 * The feature id for the '<em><b>Map Key</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__KEY = 9;
+	int CHANGE_ENTRY__MAP_KEY = 9;
 
 	/**
 	 * The feature id for the '<em><b>Coords</b></em>' attribute list.
@@ -399,13 +399,13 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	int SLOT_VALUE__INDEX = 2;
 
 	/**
-	 * The feature id for the '<em><b>Key</b></em>' attribute.
+	 * The feature id for the '<em><b>Map Key</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int SLOT_VALUE__KEY = 3;
+	int SLOT_VALUE__MAP_KEY = 3;
 
 	/**
 	 * The feature id for the '<em><b>Coords</b></em>' attribute list.
@@ -896,15 +896,15 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	EAttribute getChangeEntry_ToIndex();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.ChangeEntry#getKey <em>Key</em>}'.
+	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.ChangeEntry#getMapKey <em>Map Key</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Key</em>'.
-	 * @see org.eclipse.fennec.model.stream.ChangeEntry#getKey()
+	 * @return the meta object for the attribute '<em>Map Key</em>'.
+	 * @see org.eclipse.fennec.model.stream.ChangeEntry#getMapKey()
 	 * @see #getChangeEntry()
 	 * @generated
 	 */
-	EAttribute getChangeEntry_Key();
+	EAttribute getChangeEntry_MapKey();
 
 	/**
 	 * Returns the meta object for the attribute list '{@link org.eclipse.fennec.model.stream.ChangeEntry#getCoords <em>Coords</em>}'.
@@ -994,15 +994,15 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	EAttribute getSlotValue_Index();
 
 	/**
-	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.SlotValue#getKey <em>Key</em>}'.
+	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.SlotValue#getMapKey <em>Map Key</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @return the meta object for the attribute '<em>Key</em>'.
-	 * @see org.eclipse.fennec.model.stream.SlotValue#getKey()
+	 * @return the meta object for the attribute '<em>Map Key</em>'.
+	 * @see org.eclipse.fennec.model.stream.SlotValue#getMapKey()
 	 * @see #getSlotValue()
 	 * @generated
 	 */
-	EAttribute getSlotValue_Key();
+	EAttribute getSlotValue_MapKey();
 
 	/**
 	 * Returns the meta object for the attribute list '{@link org.eclipse.fennec.model.stream.SlotValue#getCoords <em>Coords</em>}'.
@@ -1413,12 +1413,12 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 		EAttribute CHANGE_ENTRY__TO_INDEX = eINSTANCE.getChangeEntry_ToIndex();
 
 		/**
-		 * The meta object literal for the '<em><b>Key</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Map Key</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute CHANGE_ENTRY__KEY = eINSTANCE.getChangeEntry_Key();
+		EAttribute CHANGE_ENTRY__MAP_KEY = eINSTANCE.getChangeEntry_MapKey();
 
 		/**
 		 * The meta object literal for the '<em><b>Coords</b></em>' attribute list feature.
@@ -1487,12 +1487,12 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 		EAttribute SLOT_VALUE__INDEX = eINSTANCE.getSlotValue_Index();
 
 		/**
-		 * The meta object literal for the '<em><b>Key</b></em>' attribute feature.
+		 * The meta object literal for the '<em><b>Map Key</b></em>' attribute feature.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
 		 * @generated
 		 */
-		EAttribute SLOT_VALUE__KEY = eINSTANCE.getSlotValue_Key();
+		EAttribute SLOT_VALUE__MAP_KEY = eINSTANCE.getSlotValue_MapKey();
 
 		/**
 		 * The meta object literal for the '<em><b>Coords</b></em>' attribute list feature.

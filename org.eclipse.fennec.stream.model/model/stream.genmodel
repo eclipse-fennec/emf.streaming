@@ -31,7 +31,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/timestamp"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/index"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/toIndex"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/key"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/mapKey"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/coords"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/valueOld"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/valueNew"/>
@@ -41,7 +41,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//SlotValue/featureId"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//SlotValue/featureUri"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//SlotValue/index"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//SlotValue/key"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//SlotValue/mapKey"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//SlotValue/coords"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//SlotValue/value"/>
     </genClasses>

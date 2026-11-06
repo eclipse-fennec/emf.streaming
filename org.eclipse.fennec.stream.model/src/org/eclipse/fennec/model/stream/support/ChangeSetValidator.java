@@ -34,7 +34,7 @@ import org.eclipse.fennec.model.stream.SlotValue;
  * <li>a set needs {@code id}, {@code streamId}, {@code contextFingerprint} and {@code author};</li>
  * <li>{@code CREATE} and {@code KEYFRAME} need a {@code classUri};</li>
  * <li>every feature delta needs a feature address ({@code featureUri} or {@code featureId &gt;= 0});</li>
- * <li>{@code MOVE} needs {@code index} and {@code toIndex}; {@code PUT} and {@code REMOVE_KEY} need a {@code key};
+ * <li>{@code MOVE} needs {@code index} and {@code toIndex}; {@code PUT} and {@code REMOVE_KEY} need a {@code mapKey};
  * {@code SET_AT} needs {@code coords};</li>
  * <li>every keyframe slot needs a feature address.</li>
  * </ul>
@@ -105,8 +105,8 @@ public final class ChangeSetValidator {
 			}
 		}
 		case PUT, REMOVE_KEY -> {
-			if (entry.getKey() == null) {
-				error(result, entry, where + ": key is required for " + kind);
+			if (entry.getMapKey() == null) {
+				error(result, entry, where + ": mapKey is required for " + kind);
 			}
 		}
 		case SET_AT -> {

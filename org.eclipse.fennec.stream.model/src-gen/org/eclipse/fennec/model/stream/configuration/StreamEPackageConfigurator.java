@@ -44,7 +44,7 @@ public class StreamEPackageConfigurator implements EPackageConfigurator {
 	 * service property.
 	 * @generated
 	 */
-	public static final String FINGERPRINT = "fp1:2d45e5ac995a4bc06a5cf4b6820793ac13088967344bb7b41507c38f1e309878";
+	public static final String FINGERPRINT = "fp1:72863e2b858a9d9ecdebe5ef196642bd47e1f6718f8ca340a65adaf844afee41";
 
 	private StreamPackage ePackage;
 

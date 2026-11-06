@@ -51,7 +51,7 @@ import org.eclipse.fennec.model.stream.StreamPackage;
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getTimestamp <em>Timestamp</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getIndex <em>Index</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getToIndex <em>To Index</em>}</li>
- *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getKey <em>Key</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getMapKey <em>Map Key</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getCoords <em>Coords</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getValueOld <em>Value Old</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getValueNew <em>Value New</em>}</li>
@@ -242,24 +242,24 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 	protected int toIndex = TO_INDEX_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getKey() <em>Key</em>}' attribute.
+	 * The default value of the '{@link #getMapKey() <em>Map Key</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getKey()
+	 * @see #getMapKey()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String KEY_EDEFAULT = null;
+	protected static final String MAP_KEY_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getKey() <em>Key</em>}' attribute.
+	 * The cached value of the '{@link #getMapKey() <em>Map Key</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getKey()
+	 * @see #getMapKey()
 	 * @generated
 	 * @ordered
 	 */
-	protected String key = KEY_EDEFAULT;
+	protected String mapKey = MAP_KEY_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getCoords() <em>Coords</em>}' attribute list.
@@ -553,8 +553,8 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 	 * @generated
 	 */
 	@Override
-	public String getKey() {
-		return key;
+	public String getMapKey() {
+		return mapKey;
 	}
 
 	/**
@@ -563,11 +563,11 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 	 * @generated
 	 */
 	@Override
-	public void setKey(String newKey) {
-		String oldKey = key;
-		key = newKey;
+	public void setMapKey(String newMapKey) {
+		String oldMapKey = mapKey;
+		mapKey = newMapKey;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, StreamPackage.CHANGE_ENTRY__KEY, oldKey, key));
+			eNotify(new ENotificationImpl(this, Notification.SET, StreamPackage.CHANGE_ENTRY__MAP_KEY, oldMapKey, mapKey));
 	}
 
 	/**
@@ -682,8 +682,8 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 				return getIndex();
 			case StreamPackage.CHANGE_ENTRY__TO_INDEX:
 				return getToIndex();
-			case StreamPackage.CHANGE_ENTRY__KEY:
-				return getKey();
+			case StreamPackage.CHANGE_ENTRY__MAP_KEY:
+				return getMapKey();
 			case StreamPackage.CHANGE_ENTRY__COORDS:
 				return getCoords();
 			case StreamPackage.CHANGE_ENTRY__VALUE_OLD:
@@ -732,8 +732,8 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 			case StreamPackage.CHANGE_ENTRY__TO_INDEX:
 				setToIndex((Integer)newValue);
 				return;
-			case StreamPackage.CHANGE_ENTRY__KEY:
-				setKey((String)newValue);
+			case StreamPackage.CHANGE_ENTRY__MAP_KEY:
+				setMapKey((String)newValue);
 				return;
 			case StreamPackage.CHANGE_ENTRY__COORDS:
 				getCoords().clear();
@@ -788,8 +788,8 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 			case StreamPackage.CHANGE_ENTRY__TO_INDEX:
 				setToIndex(TO_INDEX_EDEFAULT);
 				return;
-			case StreamPackage.CHANGE_ENTRY__KEY:
-				setKey(KEY_EDEFAULT);
+			case StreamPackage.CHANGE_ENTRY__MAP_KEY:
+				setMapKey(MAP_KEY_EDEFAULT);
 				return;
 			case StreamPackage.CHANGE_ENTRY__COORDS:
 				getCoords().clear();
@@ -833,8 +833,8 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 				return index != INDEX_EDEFAULT;
 			case StreamPackage.CHANGE_ENTRY__TO_INDEX:
 				return toIndex != TO_INDEX_EDEFAULT;
-			case StreamPackage.CHANGE_ENTRY__KEY:
-				return KEY_EDEFAULT == null ? key != null : !KEY_EDEFAULT.equals(key);
+			case StreamPackage.CHANGE_ENTRY__MAP_KEY:
+				return MAP_KEY_EDEFAULT == null ? mapKey != null : !MAP_KEY_EDEFAULT.equals(mapKey);
 			case StreamPackage.CHANGE_ENTRY__COORDS:
 				return coords != null && !coords.isEmpty();
 			case StreamPackage.CHANGE_ENTRY__VALUE_OLD:
@@ -875,8 +875,8 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 		result.append(index);
 		result.append(", toIndex: ");
 		result.append(toIndex);
-		result.append(", key: ");
-		result.append(key);
+		result.append(", mapKey: ");
+		result.append(mapKey);
 		result.append(", coords: ");
 		result.append(coords);
 		result.append(", valueOld: ");

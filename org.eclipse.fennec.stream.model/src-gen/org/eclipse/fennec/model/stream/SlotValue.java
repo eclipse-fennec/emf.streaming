@@ -34,7 +34,7 @@ import org.osgi.annotation.versioning.ProviderType;
  *   <li>{@link org.eclipse.fennec.model.stream.SlotValue#getFeatureId <em>Feature Id</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.SlotValue#getFeatureUri <em>Feature Uri</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.SlotValue#getIndex <em>Index</em>}</li>
- *   <li>{@link org.eclipse.fennec.model.stream.SlotValue#getKey <em>Key</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.SlotValue#getMapKey <em>Map Key</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.SlotValue#getCoords <em>Coords</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.SlotValue#getValue <em>Value</em>}</li>
  * </ul>
@@ -123,29 +123,29 @@ public interface SlotValue extends EObject {
 	void setIndex(int value);
 
 	/**
-	 * Returns the value of the '<em><b>Key</b></em>' attribute.
+	 * Returns the value of the '<em><b>Map Key</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * <!-- begin-model-doc -->
 	 * Slot address for maps: encoded literal or objectId for object keys.
 	 * <!-- end-model-doc -->
-	 * @return the value of the '<em>Key</em>' attribute.
-	 * @see #setKey(String)
-	 * @see org.eclipse.fennec.model.stream.StreamPackage#getSlotValue_Key()
+	 * @return the value of the '<em>Map Key</em>' attribute.
+	 * @see #setMapKey(String)
+	 * @see org.eclipse.fennec.model.stream.StreamPackage#getSlotValue_MapKey()
 	 * @model
 	 * @generated
 	 */
-	String getKey();
+	String getMapKey();
 
 	/**
-	 * Sets the value of the '{@link org.eclipse.fennec.model.stream.SlotValue#getKey <em>Key</em>}' attribute.
+	 * Sets the value of the '{@link org.eclipse.fennec.model.stream.SlotValue#getMapKey <em>Map Key</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @param value the new value of the '<em>Key</em>' attribute.
-	 * @see #getKey()
+	 * @param value the new value of the '<em>Map Key</em>' attribute.
+	 * @see #getMapKey()
 	 * @generated
 	 */
-	void setKey(String value);
+	void setMapKey(String value);
 
 	/**
 	 * Returns the value of the '<em><b>Coords</b></em>' attribute list.

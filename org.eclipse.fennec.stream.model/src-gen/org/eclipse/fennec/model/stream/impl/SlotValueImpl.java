@@ -39,7 +39,7 @@ import org.eclipse.fennec.model.stream.StreamPackage;
  *   <li>{@link org.eclipse.fennec.model.stream.impl.SlotValueImpl#getFeatureId <em>Feature Id</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.SlotValueImpl#getFeatureUri <em>Feature Uri</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.SlotValueImpl#getIndex <em>Index</em>}</li>
- *   <li>{@link org.eclipse.fennec.model.stream.impl.SlotValueImpl#getKey <em>Key</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.impl.SlotValueImpl#getMapKey <em>Map Key</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.SlotValueImpl#getCoords <em>Coords</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.SlotValueImpl#getValue <em>Value</em>}</li>
  * </ul>
@@ -108,24 +108,24 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 	protected int index = INDEX_EDEFAULT;
 
 	/**
-	 * The default value of the '{@link #getKey() <em>Key</em>}' attribute.
+	 * The default value of the '{@link #getMapKey() <em>Map Key</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getKey()
+	 * @see #getMapKey()
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String KEY_EDEFAULT = null;
+	protected static final String MAP_KEY_EDEFAULT = null;
 
 	/**
-	 * The cached value of the '{@link #getKey() <em>Key</em>}' attribute.
+	 * The cached value of the '{@link #getMapKey() <em>Map Key</em>}' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
-	 * @see #getKey()
+	 * @see #getMapKey()
 	 * @generated
 	 * @ordered
 	 */
-	protected String key = KEY_EDEFAULT;
+	protected String mapKey = MAP_KEY_EDEFAULT;
 
 	/**
 	 * The cached value of the '{@link #getCoords() <em>Coords</em>}' attribute list.
@@ -251,8 +251,8 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 	 * @generated
 	 */
 	@Override
-	public String getKey() {
-		return key;
+	public String getMapKey() {
+		return mapKey;
 	}
 
 	/**
@@ -261,11 +261,11 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 	 * @generated
 	 */
 	@Override
-	public void setKey(String newKey) {
-		String oldKey = key;
-		key = newKey;
+	public void setMapKey(String newMapKey) {
+		String oldMapKey = mapKey;
+		mapKey = newMapKey;
 		if (eNotificationRequired())
-			eNotify(new ENotificationImpl(this, Notification.SET, StreamPackage.SLOT_VALUE__KEY, oldKey, key));
+			eNotify(new ENotificationImpl(this, Notification.SET, StreamPackage.SLOT_VALUE__MAP_KEY, oldMapKey, mapKey));
 	}
 
 	/**
@@ -318,8 +318,8 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 				return getFeatureUri();
 			case StreamPackage.SLOT_VALUE__INDEX:
 				return getIndex();
-			case StreamPackage.SLOT_VALUE__KEY:
-				return getKey();
+			case StreamPackage.SLOT_VALUE__MAP_KEY:
+				return getMapKey();
 			case StreamPackage.SLOT_VALUE__COORDS:
 				return getCoords();
 			case StreamPackage.SLOT_VALUE__VALUE:
@@ -346,8 +346,8 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 			case StreamPackage.SLOT_VALUE__INDEX:
 				setIndex((Integer)newValue);
 				return;
-			case StreamPackage.SLOT_VALUE__KEY:
-				setKey((String)newValue);
+			case StreamPackage.SLOT_VALUE__MAP_KEY:
+				setMapKey((String)newValue);
 				return;
 			case StreamPackage.SLOT_VALUE__COORDS:
 				getCoords().clear();
@@ -377,8 +377,8 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 			case StreamPackage.SLOT_VALUE__INDEX:
 				setIndex(INDEX_EDEFAULT);
 				return;
-			case StreamPackage.SLOT_VALUE__KEY:
-				setKey(KEY_EDEFAULT);
+			case StreamPackage.SLOT_VALUE__MAP_KEY:
+				setMapKey(MAP_KEY_EDEFAULT);
 				return;
 			case StreamPackage.SLOT_VALUE__COORDS:
 				getCoords().clear();
@@ -404,8 +404,8 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 				return FEATURE_URI_EDEFAULT == null ? featureUri != null : !FEATURE_URI_EDEFAULT.equals(featureUri);
 			case StreamPackage.SLOT_VALUE__INDEX:
 				return index != INDEX_EDEFAULT;
-			case StreamPackage.SLOT_VALUE__KEY:
-				return KEY_EDEFAULT == null ? key != null : !KEY_EDEFAULT.equals(key);
+			case StreamPackage.SLOT_VALUE__MAP_KEY:
+				return MAP_KEY_EDEFAULT == null ? mapKey != null : !MAP_KEY_EDEFAULT.equals(mapKey);
 			case StreamPackage.SLOT_VALUE__COORDS:
 				return coords != null && !coords.isEmpty();
 			case StreamPackage.SLOT_VALUE__VALUE:
@@ -430,8 +430,8 @@ public class SlotValueImpl extends MinimalEObjectImpl.Container implements SlotV
 		result.append(featureUri);
 		result.append(", index: ");
 		result.append(index);
-		result.append(", key: ");
-		result.append(key);
+		result.append(", mapKey: ");
+		result.append(mapKey);
 		result.append(", coords: ");
 		result.append(coords);
 		result.append(", value: ");

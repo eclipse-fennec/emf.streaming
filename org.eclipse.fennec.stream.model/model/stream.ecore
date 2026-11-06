@@ -117,9 +117,9 @@
         <details key="documentation" value="Target index, MOVE only."/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="mapKey" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
-        <details key="documentation" value="Address for maps (PUT/REMOVE_KEY): encoded literal or objectId for object keys (§5.4h)."/>
+        <details key="documentation" value="Address for maps (PUT/REMOVE_KEY): encoded literal or objectId for object keys (§5.4h). Named mapKey, not key: a class with features key and value is read as a Map.Entry by some serializers."/>
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="coords" upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt">
@@ -162,7 +162,7 @@
         <details key="documentation" value="Slot address for ordered lists; -1 = not applicable."/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="key" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="mapKey" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value="Slot address for maps: encoded literal or objectId for object keys."/>
       </eAnnotations>

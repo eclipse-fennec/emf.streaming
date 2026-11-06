@@ -22,6 +22,7 @@ import java.util.Map;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -106,6 +107,17 @@ class StreamModelTest {
 		assertThat(fresh.getTimestamp()).isNull();
 		assertThat(fresh.getClassId()).isEqualTo(-1);
 		assertThat(fresh.getFeatureId()).isEqualTo(-1);
+	}
+
+	@Test
+	void noClassLooksLikeAMapEntry() {
+		// serializers read a class with features 'key' and 'value' as a Map.Entry
+		for (EClassifier classifier : PACKAGE.getEClassifiers()) {
+			if (classifier instanceof EClass eClass) {
+				assertThat(eClass.getEStructuralFeature("key")).as(eClass.getName()).isNull();
+			}
+		}
+		assertThat(PACKAGE.getSlotValue().getEStructuralFeature("mapKey")).isNotNull();
 	}
 
 	@Test
