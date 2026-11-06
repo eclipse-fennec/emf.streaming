@@ -26,6 +26,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -277,6 +278,122 @@ public final class EventCore implements AutoCloseable {
 	}
 
 	/**
+	 * Takes back the newest change set of a target object that was not taken back yet (requirements
+	 * APL-06, APL-07): its changelog entries are inverted and written as a new change set
+	 * ({@code reason = undo:<sequence>}), the target is projected back. The history is never shortened.
+	 * Only for mappings marked {@code undoable}, and only change sets of changelog slots.
+	 *
+	 * @param targetClass the class of the target object
+	 * @param targetId its id
+	 * @return the undo change set, or empty when there is nothing to undo; fails with
+	 *         {@link UnsupportedOperationException} when the mapping is not undoable and with
+	 *         {@link IllegalStateException} when the change set holds time-series values
+	 */
+	public CompletableFuture<Optional<ChangeSet>> undo(EClass targetClass, String targetId) {
+		return revert(targetClass, targetId, true);
+	}
+
+	/**
+	 * Takes back the newest undo of a target object, as long as no new change set was written since.
+	 *
+	 * @param targetClass the class of the target object
+	 * @param targetId its id
+	 * @return the redo change set ({@code reason = redo:<sequence>}), or empty when there is nothing to redo
+	 */
+	public CompletableFuture<Optional<ChangeSet>> redo(EClass targetClass, String targetId) {
+		return revert(targetClass, targetId, false);
+	}
+
+	private CompletableFuture<Optional<ChangeSet>> revert(EClass targetClass, String targetId, boolean undo) {
+		String streamId = streamId(targetClass, targetId);
+		TargetStream stream = streams.get(streamId);
+		if (stream == null) {
+			return CompletableFuture.completedFuture(Optional.empty());
+		}
+		if (!stream.mapping.isUndoable()) {
+			return CompletableFuture.failedFuture(
+					new UnsupportedOperationException("Mapping " + stream.mapping.getId() + " is not undoable"));
+		}
+		CompletableFuture<Optional<ChangeSet>> result = new CompletableFuture<>();
+		enqueue(streamId, stream.group, () -> {
+			try {
+				result.complete(revertInLane(stream, undo));
+			} catch (RuntimeException e) {
+				result.completeExceptionally(e);
+			}
+		});
+		return result;
+	}
+
+	/** Lane task. */
+	private Optional<ChangeSet> revertInLane(TargetStream stream, boolean undo) {
+		Long sequence = (undo ? stream.undoable : stream.redoable).peek();
+		if (sequence == null) {
+			return Optional.empty();
+		}
+		List<ChangeSet> stored = store.read(stream.streamId, sequence, sequence);
+		if (stored.isEmpty()) {
+			throw new IllegalStateException("Change set " + sequence + " of " + stream.streamId + " is no longer stored");
+		}
+		long now = clock.millis();
+		ChangeSet inverse = header(stream, null, now, now);
+		inverse.setReason((undo ? "undo:" : "redo:") + sequence);
+		List<ChangeEntry> entries = stored.get(0).getEntries();
+		for (int i = entries.size() - 1; i >= 0; i--) {
+			inverse.getEntries().add(invert(stream, entries.get(i)));
+		}
+		(undo ? stream.undoable : stream.redoable).pop();
+		write(inverse);
+		(undo ? stream.redoable : stream.undoable).push(inverse.getSequence());
+		for (ChangeEntry entry : inverse.getEntries()) {
+			projectReverted(stream, entry, now);
+		}
+		return Optional.of(inverse);
+	}
+
+	private ChangeEntry invert(TargetStream stream, ChangeEntry entry) {
+		StreamSlot slot = stream.slots.get(entry.getFeatureUri());
+		if (slot == null || StreamSlots.recording(slot) != RecordingMode.CHANGELOG
+				|| entry.getKind() != DeltaKind.SET && entry.getKind() != DeltaKind.UNSET) {
+			throw new IllegalStateException("Entry for " + entry.getFeatureUri() + " cannot be undone: only changelog SET/UNSET entries can");
+		}
+		ChangeEntry inverse = STREAM.createChangeEntry();
+		inverse.setObjectId(entry.getObjectId());
+		inverse.setFeatureId(entry.getFeatureId());
+		inverse.setFeatureUri(entry.getFeatureUri());
+		inverse.setTimestamp(clock.millis());
+		if (entry.getKind() == DeltaKind.UNSET || entry.getValueOld() != null) {
+			inverse.setKind(DeltaKind.SET);
+			inverse.setValueOld(entry.getKind() == DeltaKind.UNSET ? null : entry.getValueNew());
+			inverse.setValueNew(entry.getValueOld());
+		} else {
+			// the feature had no value before: taking the change back unsets it
+			inverse.setKind(DeltaKind.UNSET);
+			inverse.setValueOld(entry.getValueNew());
+		}
+		return inverse;
+	}
+
+	private void projectReverted(TargetStream stream, ChangeEntry entry, long now) {
+		StreamSlot slot = stream.slots.get(entry.getFeatureUri());
+		EStructuralFeature feature = slot.getTargetFeature();
+		if (entry.getKind() == DeltaKind.UNSET) {
+			stream.states.put(entry.getFeatureUri(), SlotState.empty());
+			if (feature != null && StreamSlots.mode(slot) == ProjectionMode.PROJECT) {
+				projection.project(stream.mapping.getTarget(), stream.targetId, feature, null);
+			}
+			return;
+		}
+		Object value = StreamValues.decode(entry.getValueNew(), null);
+		stream.states.put(entry.getFeatureUri(), SlotState.of(value, now));
+		if (feature != null && StreamSlots.mode(slot) == ProjectionMode.PROJECT) {
+			mapper.extractor().toTarget(slot, value)
+					.ifPresent(v -> projection.project(stream.mapping.getTarget(), stream.targetId, feature, v));
+		}
+		stream.projectedTimes.put(entry.getFeatureUri(), now);
+	}
+
+	/**
 	 * @return the counters
 	 */
 	public Metrics metrics() {
@@ -462,6 +579,10 @@ public final class EventCore implements AutoCloseable {
 		for (Pending pending : batch.pending) {
 			project(stream, pending);
 		}
+		if (stream.mapping.isUndoable()) {
+			stream.undoable.push(changeSet.getSequence());
+			stream.redoable.clear();
+		}
 		stream.setsSinceKeyframe++;
 		if (keyframeDue(stream, now)) {
 			writeKeyframe(stream, author, now);
@@ -495,7 +616,14 @@ public final class EventCore implements AutoCloseable {
 
 	private void writeKeyframe(TargetStream stream, String author, long now) {
 		EClass target = stream.mapping.getTarget();
-		ChangeSet changeSet = header(stream, author, now, now);
+		// a keyframe describes the state as of the newest event time of its slots, not as of the wall clock
+		long stateTime = Long.MIN_VALUE;
+		for (SlotState state : stream.states.values()) {
+			if (state.hasLast()) {
+				stateTime = Math.max(stateTime, state.lastTime());
+			}
+		}
+		ChangeSet changeSet = header(stream, author, stateTime == Long.MIN_VALUE ? now : stateTime, now);
 		ChangeEntry keyframe = STREAM.createChangeEntry();
 		keyframe.setObjectId(stream.targetId);
 		keyframe.setKind(DeltaKind.KEYFRAME);

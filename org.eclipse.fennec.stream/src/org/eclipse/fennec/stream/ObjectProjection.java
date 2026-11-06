@@ -42,7 +42,11 @@ public final class ObjectProjection implements Projection {
 		if (target == null || !target.eClass().getEAllStructuralFeatures().contains(feature)) {
 			return false;
 		}
-		target.eSet(feature, value);
+		if (value == null) {
+			target.eUnset(feature);
+		} else {
+			target.eSet(feature, value);
+		}
 		return true;
 	}
 }
