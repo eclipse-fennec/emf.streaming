@@ -14,6 +14,7 @@ package org.eclipse.fennec.stream.impl;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executor;
@@ -42,7 +43,12 @@ public final class Mailbox {
 
 	private final Executor executor;
 	private final int slice;
-	private final Queue<Runnable> tasks = new ConcurrentLinkedQueue<>();
+	private final Queue<Task> tasks = new ConcurrentLinkedQueue<>();
+	private final AtomicInteger queued = new AtomicInteger();
+	private final Object space = new Object();
+
+	private record Task(Runnable run, boolean droppable) {
+	}
 	private final AtomicInteger state = new AtomicInteger(IDLE);
 	private final Runnable onIdle;
 
@@ -64,7 +70,72 @@ public final class Mailbox {
 	 * @param task the task
 	 */
 	public void enqueue(Runnable task) {
-		tasks.add(requireNonNull(task, "Task is required"));
+		add(new Task(requireNonNull(task, "Task is required"), false));
+	}
+
+	/**
+	 * Enqueues a task under a bound (requirement COR-06). When {@code max} tasks wait already, a
+	 * droppable task takes the place of the oldest droppable one; the evicted task is returned so the
+	 * caller can count it. A task that is not droppable is enqueued anyway - waiting for space is
+	 * {@link #awaitSpace}'s job, before the caller takes any lock.
+	 *
+	 * @param task the task
+	 * @param droppable whether the task may be evicted by a newer droppable one
+	 * @param max the bound, 0 for none
+	 * @return whether an older task was evicted
+	 */
+	public boolean enqueue(Runnable task, boolean droppable, int max) {
+		boolean evicted = false;
+		if (max > 0 && droppable && queued.get() >= max) {
+			for (Iterator<Task> it = tasks.iterator(); it.hasNext();) {
+				Task held = it.next();
+				if (held.droppable() && tasks.remove(held)) {
+					queued.decrementAndGet();
+					evicted = true;
+					break;
+				}
+			}
+		}
+		add(new Task(requireNonNull(task, "Task is required"), droppable));
+		return evicted;
+	}
+
+	/**
+	 * Waits until fewer than {@code max} tasks are queued (requirement COR-06, BLOCK). Call it on the
+	 * producer's thread, never on a lane thread and never under a lock the lane needs.
+	 *
+	 * @param max the bound, 0 for none
+	 * @param timeoutMillis how long to wait at most
+	 * @return whether there is space
+	 * @throws InterruptedException if interrupted while waiting
+	 */
+	public boolean awaitSpace(int max, long timeoutMillis) throws InterruptedException {
+		if (max <= 0) {
+			return true;
+		}
+		long deadline = System.currentTimeMillis() + timeoutMillis;
+		synchronized (space) {
+			while (queued.get() >= max) {
+				long left = deadline - System.currentTimeMillis();
+				if (left <= 0) {
+					return false;
+				}
+				space.wait(left);
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * @return how many tasks wait
+	 */
+	public int queued() {
+		return queued.get();
+	}
+
+	private void add(Task task) {
+		tasks.add(task);
+		queued.incrementAndGet();
 		trySchedule();
 	}
 
@@ -89,10 +160,14 @@ public final class Mailbox {
 	private void run() {
 		state.set(RUNNING);
 		int done = 0;
-		Runnable task;
+		Task task;
 		while (done < slice && (task = tasks.poll()) != null) {
+			queued.decrementAndGet();
+			synchronized (space) {
+				space.notifyAll();
+			}
 			try {
-				task.run();
+				task.run().run();
 			} catch (RuntimeException e) {
 				LOGGER.log(Level.WARNING, "A lane task failed - the lane goes on", e);
 			}
