@@ -12,6 +12,8 @@
  ********************************************************************/
 package org.eclipse.fennec.stream;
 
+import java.util.Map;
+
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.osgi.annotation.versioning.ConsumerType;
@@ -39,4 +41,22 @@ public interface Projection {
 	 * @return whether a target was changed (false when it is unknown)
 	 */
 	boolean project(EClass targetClass, String targetId, EStructuralFeature feature, Object value);
+
+	/**
+	 * Writes several features of one target object at once - what a batch of the core yields. A
+	 * store implementation turns it into one update (e.g. one {@code UpdateCommand} with a template
+	 * entry per feature); the default writes feature by feature.
+	 *
+	 * @param targetClass the class of the target object
+	 * @param targetId its id
+	 * @param values the values by feature, in the order they were written; {@code null} unsets
+	 * @return whether the target was changed
+	 */
+	default boolean project(EClass targetClass, String targetId, Map<EStructuralFeature, Object> values) {
+		boolean changed = false;
+		for (Map.Entry<EStructuralFeature, Object> value : values.entrySet()) {
+			changed |= project(targetClass, targetId, value.getKey(), value.getValue());
+		}
+		return changed;
+	}
 }

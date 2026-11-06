@@ -18,10 +18,13 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.fennec.model.stream.ChangeEntry;
 import org.eclipse.fennec.model.stream.ChangeSet;
 import org.eclipse.fennec.model.stream.DeltaKind;
@@ -231,6 +234,35 @@ class EventCoreTest {
 
 		assertThat(values(fx.stream("pool-1"))).containsExactly("2.6");
 		assertThat(pool.eGet(fx.depth)).isEqualTo(3);
+	}
+
+	@Test
+	void aBatchIsProjectedWithOneCallPerTarget() throws Exception {
+		StreamMapping mapping = fx.mapping();
+		BatchStrategy commit = StreamMappingFactory.eINSTANCE.createBatchStrategy();
+		commit.setKind(BatchKind.COMMIT);
+		mapping.setBatch(commit);
+		fx.registry.register(mapping);
+		List<Map<EStructuralFeature, Object>> calls = Collections.synchronizedList(new ArrayList<>());
+		core = fx.core(store).projection(new Projection() {
+			@Override
+			public boolean project(EClass targetClass, String targetId, EStructuralFeature feature, Object value) {
+				throw new AssertionError("expected one call for the batch");
+			}
+
+			@Override
+			public boolean project(EClass targetClass, String targetId, Map<EStructuralFeature, Object> values) {
+				calls.add(Map.copyOf(values));
+				return true;
+			}
+		}).build();
+
+		core.offerUnitOfWork(List.of(fx.temp("t1", "pool-1", 24.5), fx.ph("ph-7", 7.2)), 1_000, null);
+		assertThat(core.awaitIdle(WAIT)).isTrue();
+
+		assertThat(calls).singleElement().satisfies(values -> {
+			assertThat(values).containsEntry(fx.currentTemperature, 24.5).containsEntry(fx.currentPh, 7.2);
+		});
 	}
 
 	@Test
