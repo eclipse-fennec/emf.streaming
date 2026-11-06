@@ -1,0 +1,43 @@
+Bundle-Name: Eclipse Fennec Stream Example - Pool
+Bundle-Description: Reference example of the change stream (UC-31): simulated temperature and pH \
+	sensors feed water temperature and pH of the pools of the leisure pool demo of \
+	emf.ogc.features; the pools are updated in their JPA repository by update commands and \
+	shown on the OGC Features map.
+
+src=${^src},src-gen
+
+-workingset: streaming
+
+-library: enableEMF
+
+-generate:\
+	model/sensor.genmodel;\
+		generate=fennecEMF;\
+		lineEndings=lf;\
+		genmodel=model/sensor.genmodel;\
+		output=src-gen
+
+-includeresource.model: model=model
+
+-buildpath: \
+	org.osgi.service.condition;version=latest,\
+	org.osgi.service.component.annotations;version=latest,\
+	org.osgi.service.metatype.annotations;version=latest,\
+	org.osgi.util.pushstream;version=latest,\
+	org.osgi.util.promise;version=latest,\
+	org.eclipse.fennec.atlas.configuration.model;version=latest,\
+	org.eclipse.fennec.mapping.model;version=snapshot,\
+	org.eclipse.fennec.mapping;version=snapshot,\
+	org.eclipse.fennec.stream.model;version=snapshot,\
+	org.eclipse.fennec.stream.mapping.model;version=snapshot,\
+	org.eclipse.fennec.stream;version=snapshot,\
+	org.eclipse.fennec.emf.osgi.eobject.registry;version=latest,\
+	org.eclipse.fennec.persistence.repository;version=latest,\
+	org.eclipse.fennec.command.model;version=latest,\
+	org.eclipse.fennec.query.model;version=latest,\
+	org.eclipse.fennec.expression.model;version=latest,\
+	org.eclipse.fennec.ogc.features.example.bath;version=latest,\
+	org.geojson.model;version=latest
+
+-testpath: \
+	assertj-core

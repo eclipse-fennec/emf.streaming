@@ -14,14 +14,16 @@
 
 # Enable the Fennec library setups (resolved from Maven Central via central.mvn).
 # fennecEMF provides the EMF runtime and the -generate code generator (enableEMF per project),
-# fennecCodec the EMF codec (JSON payload of the change stream). fennecPersistence (store
-# integration) is added once a bundle needs it.
+# fennecCodec the EMF codec (JSON payload of the change stream); fennecPersistence and
+# fennecEMFCommonModels serve the reference example (JPA repository, update commands, OGC demo).
 -library: \
 	fennec,\
 	fennecTest,\
 	fennecJacoco,\
 	fennecEMF,\
-	fennecCodec
+	fennecCodec,\
+	fennecPersistence,\
+	fennecEMFCommonModels
 
 base-version: 0.1.0
 javac.source: 21

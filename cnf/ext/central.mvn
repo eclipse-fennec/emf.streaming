@@ -150,3 +150,28 @@ org.geckoprojects.messaging:org.gecko.messaging.memory:2.0.0-SNAPSHOT
 # MQTT 5 binding of Gecko Messaging and its Paho build (MQTT OSGi tests against Mosquitto 2).
 org.geckoprojects.messaging:org.gecko.messaging.mqtt:2.0.0-SNAPSHOT
 org.geckoprojects.paho:org.eclipse.paho.mqttv5.client:1.3.0
+
+# --- Reference example "pool" (org.eclipse.fennec.stream.example.pool) only ---
+# Persistence (JPA/H2 repository, update commands) and the shared EMF models (query, expression, GeoJSON)
+org.eclipse.fennec.persistence:org.eclipse.fennec.persistence.workspace.library:0.1.0-SNAPSHOT
+org.eclipse.fennec.models:org.eclipse.fennec.common.models.library:0.1.0-SNAPSHOT
+# OGC API Features with the leisure pool demo (model, data loader, server, map viewer)
+org.eclipse.fennec.ogc:org.eclipse.fennec.ogc.features.api:0.1.0-SNAPSHOT
+org.eclipse.fennec.ogc:org.eclipse.fennec.ogc.features.runtime:0.1.0-SNAPSHOT
+org.eclipse.fennec.ogc:org.eclipse.fennec.ogc.features.geo:0.1.0-SNAPSHOT
+org.eclipse.fennec.ogc:org.eclipse.fennec.ogc.features.cql2:0.1.0-SNAPSHOT
+org.eclipse.fennec.ogc:org.eclipse.fennec.ogc.features.source.persistence:0.1.0-SNAPSHOT
+org.eclipse.fennec.ogc:org.eclipse.fennec.ogc.features.viewer:0.1.0-SNAPSHOT
+org.eclipse.fennec.ogc:org.eclipse.fennec.ogc.features.example.bath:0.1.0-SNAPSHOT
+org.eclipse.fennec.ogc:org.eclipse.fennec.ogc.features.example.bath.demo:0.1.0-SNAPSHOT
+org.eclipse.fennec.ogc:org.eclipse.fennec.ogc.features.example.city:0.1.0-SNAPSHOT
+org.eclipse.fennec.ogc:org.eclipse.fennec.codec.cql2:0.1.0-SNAPSHOT
+org.eclipse.fennec.ogc:net.opengis.cql2.model:0.1.0-SNAPSHOT
+org.eclipse.fennec.ogc:org.qgis.project.model:0.1.0-SNAPSHOT
+org.locationtech.jts:jts-core:1.20.0
+org.apache.aries.spifly:org.apache.aries.spifly.dynamic.bundle:1.3.7
+org.ow2.asm:asm:9.9.1
+org.ow2.asm:asm-commons:9.9.1
+org.ow2.asm:asm-util:9.9.1
+org.ow2.asm:asm-tree:9.9.1
+org.ow2.asm:asm-analysis:9.9.1
