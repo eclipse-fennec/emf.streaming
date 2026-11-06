@@ -1,0 +1,21 @@
+Bundle-Name: Eclipse Fennec Stream
+Bundle-Description: Plain-Java core of the Fennec change stream: effective slot settings, change \
+	rules, and the event core that turns mapped values into change sets. No OSGi needed.
+
+-workingset: streaming
+
+-library: enableEMF
+
+-buildpath: \
+	org.osgi.service.condition;version=latest,\
+	org.osgi.util.pushstream;version=latest,\
+	org.osgi.util.promise;version=latest,\
+	org.osgi.util.function;version=latest,\
+	org.eclipse.fennec.atlas.configuration.model;version=latest,\
+	org.eclipse.fennec.mapping.model;version=snapshot,\
+	org.eclipse.fennec.mapping;version=snapshot,\
+	org.eclipse.fennec.stream.model;version=snapshot,\
+	org.eclipse.fennec.stream.mapping.model;version=snapshot
+
+-testpath: \
+	assertj-core

@@ -12,6 +12,7 @@
  ********************************************************************/
 package org.eclipse.fennec.mapping;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.eclipse.emf.ecore.EObject;
@@ -38,4 +39,20 @@ public interface ExpressionEvaluator {
 	 *         {@code null} or {@code invalid} - one unmappable slot must not cost the others
 	 */
 	Optional<Object> evaluate(String expression, EObject self);
+
+	/**
+	 * Evaluates an expression with further variables bound beside {@code self}, e.g. the new and
+	 * the last value of a change rule.
+	 * <p>
+	 * The default supports no variables: without any it evaluates as {@link #evaluate(String, EObject)},
+	 * with some it produces nothing, because an expression naming them could not be evaluated faithfully.
+	 *
+	 * @param expression the expression text
+	 * @param self the source object
+	 * @param variables further variables by name, never {@code null}
+	 * @return the computed value, or empty
+	 */
+	default Optional<Object> evaluate(String expression, EObject self, Map<String, Object> variables) {
+		return variables.isEmpty() ? evaluate(expression, self) : Optional.empty();
+	}
 }

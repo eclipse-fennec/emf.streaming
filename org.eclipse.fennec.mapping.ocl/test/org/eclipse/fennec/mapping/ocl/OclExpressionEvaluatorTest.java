@@ -14,7 +14,9 @@ package org.eclipse.fennec.mapping.ocl;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.emf.ecore.EAttribute;
@@ -120,6 +122,20 @@ class OclExpressionEvaluatorTest {
 
 		assertThat(versionLookups.get()).isEqualTo(afterFirst + 1);
 		assertThat(evaluator.evaluate("self.readings->select(", s)).isEmpty();
+	}
+
+	@Test
+	void variablesAreBoundBesideSelf() {
+		EObject s = station("s1", "pool-1");
+		Map<String, Object> variables = new HashMap<>();
+		variables.put("value", 24.5);
+		variables.put("last", 24.0);
+
+		assertThat(evaluator.evaluate("value - last >= 0.5", s, variables)).contains(true);
+		assertThat(evaluator.evaluate("self.site = 'pool-1' and value > 30.0", s, variables)).contains(false);
+
+		variables.put("last", null);
+		assertThat(evaluator.evaluate("last.oclIsUndefined()", s, variables)).contains(true);
 	}
 
 	@Test
