@@ -684,9 +684,7 @@ public final class EventCore implements StreamCore, AutoCloseable {
 			changeSet.getEntries().add(entry);
 		}
 		write(changeSet);
-		for (Pending pending : batch.pending) {
-			project(stream, pending);
-		}
+		project(stream, batch.pending);
 		if (stream.mapping.isUndoable()) {
 			stream.undoable.push(changeSet.getSequence());
 			stream.redoable.clear();
@@ -697,18 +695,32 @@ public final class EventCore implements StreamCore, AutoCloseable {
 		}
 	}
 
-	private void project(TargetStream stream, Pending pending) {
-		EStructuralFeature feature = pending.slot.getTargetFeature();
-		if (feature == null || StreamSlots.mode(pending.slot) != ProjectionMode.PROJECT) {
-			return;
+	/** Projects the values of one batch with one call per target: the store may turn it into one update. */
+	private void project(TargetStream stream, List<Pending> batch) {
+		Map<EStructuralFeature, Object> values = new LinkedHashMap<>();
+		Map<String, Long> times = new LinkedHashMap<>();
+		for (Pending pending : batch) {
+			EStructuralFeature feature = pending.slot.getTargetFeature();
+			if (feature == null || StreamSlots.mode(pending.slot) != ProjectionMode.PROJECT) {
+				continue;
+			}
+			Long projected = stream.projectedTimes.get(pending.address);
+			if (StreamSlots.lateness(pending.slot) == Lateness.EVENT_TIME && projected != null
+					&& pending.eventTime < projected) {
+				continue; // the target already holds a newer value
+			}
+			Long inBatch = times.get(pending.address);
+			if (StreamSlots.lateness(pending.slot) == Lateness.EVENT_TIME && inBatch != null && pending.eventTime < inBatch) {
+				continue; // a newer value of the same feature is already in this batch
+			}
+			Optional<Object> value = mapper.extractor().toTarget(pending.slot, pending.value);
+			if (value.isPresent()) {
+				values.put(feature, value.get());
+				times.put(pending.address, pending.eventTime);
+			}
 		}
-		Long projected = stream.projectedTimes.get(pending.address);
-		if (StreamSlots.lateness(pending.slot) == Lateness.EVENT_TIME && projected != null && pending.eventTime < projected) {
-			return; // the target already holds a newer value
-		}
-		Optional<Object> value = mapper.extractor().toTarget(pending.slot, pending.value);
-		if (value.isPresent() && projection.project(stream.mapping.getTarget(), stream.targetId, feature, value.get())) {
-			stream.projectedTimes.put(pending.address, pending.eventTime);
+		if (!values.isEmpty() && projection.project(stream.mapping.getTarget(), stream.targetId, values)) {
+			stream.projectedTimes.putAll(times);
 		}
 	}
 
