@@ -72,11 +72,10 @@ class StreamCoreOsgiTest {
 				factory(configAdmin, "FileEObjectProvider", dictionary("emf.eobject.provider.name", "mapping-files",
 						"locations", new String[] { file.toString() }, "key.feature", "id")),
 				factory(configAdmin, "EObjectRegistry",
-						dictionary("name", "fennec-mappings", "initialProvider.target", "(emf.eobject.provider.name=mapping-files)")),
-				single(configAdmin, "FennecInMemoryStreamStore"), single(configAdmin, "FennecNoProjection"));
+						dictionary("name", "fennec-mappings", "initialProvider.target", "(emf.eobject.provider.name=mapping-files)")));
 		try {
 			StreamCore core = cores.waitForService(10_000);
-			assertThat(core).as("the core appears once everything it needs is there").isNotNull();
+			assertThat(core).as("the core appears without configuration: in-memory store, no projection").isNotNull();
 
 			EClass pool = EcoreFactory.eINSTANCE.createEClass();
 			pool.setName("Pool");
@@ -124,8 +123,9 @@ class StreamCoreOsgiTest {
 					public void ungetService(Bundle bundle, ServiceRegistration<Projection> reg, Projection service) {
 						ungets.incrementAndGet();
 					}
-				}, null);
-		Configuration store = single(configAdmin, "FennecInMemoryStreamStore");
+				}, dictionary("fennec.stream.projection", "counting"));
+		Configuration coreConfig = configAdmin.getConfiguration("FennecStreamCore", "?");
+		coreConfig.update(dictionary("projection.target", "(fennec.stream.projection=counting)"));
 		List<Configuration> configurations = List.of(
 				factory(configAdmin, "FileEObjectProvider", dictionary("emf.eobject.provider.name", "mapping-files",
 						"locations", new String[] { file.toString() }, "key.feature", "id")),
@@ -146,7 +146,7 @@ class StreamCoreOsgiTest {
 			assertThat(gets.get()).as("one instance per lane thread of the default group, not per call")
 					.isBetween(1, Runtime.getRuntime().availableProcessors());
 
-			store.delete(); // the core loses its store and stops
+			coreConfig.delete(); // the configured core stops; a core with the defaults takes its place
 			deadline = System.currentTimeMillis() + 10_000;
 			// DS unregisters the service before deactivate() closes the core: wait for the releases themselves
 			while (ungets.get() < gets.get() && System.currentTimeMillis() < deadline) {
@@ -187,12 +187,6 @@ class StreamCoreOsgiTest {
 			throws Exception {
 		Configuration configuration = configAdmin.getFactoryConfiguration(pid, "test", "?");
 		configuration.update(properties);
-		return configuration;
-	}
-
-	private static Configuration single(ConfigurationAdmin configAdmin, String pid) throws Exception {
-		Configuration configuration = configAdmin.getConfiguration(pid, "?");
-		configuration.update(new Hashtable<>());
 		return configuration;
 	}
 

@@ -39,7 +39,8 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
  * applies them to the replica objects. Factory configuration required (PID {@value #PID}):
  * {@code subscription.target} names the messaging instance, {@code channel} what to subscribe to. A
  * change set's model version is resolved through the metadata service (fingerprint → package). All
- * references are mandatory and static.
+ * references are mandatory and static; the replica targets default to the in-memory ones
+ * ({@code targets.target}).
  */
 @Component(name = StreamSubscriberComponent.PID, configurationPolicy = ConfigurationPolicy.REQUIRE)
 @Designate(ocd = StreamSubscriberComponent.Config.class, factory = true)
@@ -96,7 +97,16 @@ public class StreamSubscriberComponent {
 		 * @return the largest payload accepted in bytes
 		 */
 		int maxPayload() default StreamSubscriber.DEFAULT_MAX_PAYLOAD;
+
+		/**
+		 * @return the filter selecting the replica targets
+		 */
+		@AttributeDefinition(description = "Filter selecting the ReplicaTargets; default the in-memory targets")
+		String targets_target() default DEFAULT_TARGETS;
 	}
+
+	/** The in-memory replica targets of org.eclipse.fennec.stream.osgi, which run without configuration. */
+	static final String DEFAULT_TARGETS = "(fennec.stream.targets=memory)";
 
 	private final AutoCloseable subscription;
 
@@ -111,7 +121,7 @@ public class StreamSubscriberComponent {
 	@Activate
 	public StreamSubscriberComponent(@Reference(name = "core") StreamCore core,
 			@Reference(name = "subscription") MessageSubscription messaging, @Reference(name = "codec") ChangeSetCodec codec,
-			@Reference(name = "targets") ReplicaTargets targets, @Reference(name = "metadata") MetadataService metadata,
+			@Reference(name = "targets", target = DEFAULT_TARGETS) ReplicaTargets targets, @Reference(name = "metadata") MetadataService metadata,
 			Config config) {
 		StreamReceiver receiver = core.receiver().targets(targets).modelVersions(modelVersions(metadata))
 				.guard(config.guard()).unknownObjects(config.unknownObjects()).gapPolicy(config.gapPolicy())

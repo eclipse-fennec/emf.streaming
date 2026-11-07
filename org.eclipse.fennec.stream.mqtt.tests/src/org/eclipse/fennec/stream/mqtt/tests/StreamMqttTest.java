@@ -118,9 +118,6 @@ class StreamMqttTest {
 			factoryAs("org.gecko.messaging.mqtt", name, "osgi.messaging.name", name, "uri", uri, "cloudEvents", "binary",
 					"connectTimeout", 3000L, "publishAwaitConnection", 10_000L);
 		}
-		single("FennecInMemoryStreamStore");
-		single("FennecNoProjection");
-		single("FennecInMemoryReplicaTargets");
 		// only the subscribing side has to be on the broker before a test publishes
 		awaitConnected("replica");
 	}
@@ -280,12 +277,6 @@ class StreamMqttTest {
 	private void factoryAs(String pid, String alias, Object... keyValues) throws Exception {
 		Configuration configuration = configAdmin.getFactoryConfiguration(pid, alias, "?");
 		configuration.update(dictionary(keyValues));
-		configurations.add(configuration);
-	}
-
-	private void single(String pid) throws Exception {
-		Configuration configuration = configAdmin.getConfiguration(pid, "?");
-		configuration.update(new Hashtable<>());
 		configurations.add(configuration);
 	}
 

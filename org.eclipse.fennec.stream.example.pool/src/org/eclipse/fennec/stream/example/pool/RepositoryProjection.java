@@ -41,10 +41,12 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
  * projection instance gets a repository instance of its own. Neither needs to be thread-safe; DS
  * releases the repository with the projection instance.
  * <p>
- * Configuration required (PID {@value #PID}): {@code repository.target} names the repository.
+ * Configuration required (PID {@value #PID}): {@code repository.target} names the repository. The
+ * service carries {@code fennec.stream.projection=repository}; the core selects it with
+ * {@code projection.target=(fennec.stream.projection=repository)}.
  */
 @Component(name = RepositoryProjection.PID, service = Projection.class, scope = ServiceScope.PROTOTYPE,
-		configurationPolicy = ConfigurationPolicy.REQUIRE)
+		configurationPolicy = ConfigurationPolicy.REQUIRE, property = "fennec.stream.projection=repository")
 @Designate(ocd = RepositoryProjection.Config.class)
 public class RepositoryProjection implements Projection {
 

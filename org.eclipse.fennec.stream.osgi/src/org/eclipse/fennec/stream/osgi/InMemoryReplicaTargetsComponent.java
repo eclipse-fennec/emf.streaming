@@ -16,13 +16,14 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.fennec.stream.ReplicaTargets;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 /**
- * Replica objects in memory, as a service. Configuration required (PID {@value #PID}, may be empty):
- * replicas that vanish with the process must be a decision.
+ * Replica objects in memory, the default targets of a subscriber: it runs without configuration and
+ * carries {@code fennec.stream.targets=memory}, which a subscriber selects unless its
+ * {@code targets.target} names other targets.
  */
-@Component(name = InMemoryReplicaTargetsComponent.PID, service = ReplicaTargets.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
+@Component(name = InMemoryReplicaTargetsComponent.PID, service = ReplicaTargets.class,
+		property = StreamCoreComponent.TARGETS_PROPERTY + "=" + StreamCoreComponent.MEMORY)
 public class InMemoryReplicaTargetsComponent implements ReplicaTargets {
 
 	/** The configuration PID and component name. */
