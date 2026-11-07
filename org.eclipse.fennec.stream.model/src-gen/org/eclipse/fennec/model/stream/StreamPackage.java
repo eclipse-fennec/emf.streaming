@@ -46,7 +46,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @ProviderType
-@EPackage(uri = StreamPackage.eNS_URI, fingerprint = "fp1:72863e2b858a9d9ecdebe5ef196642bd47e1f6718f8ca340a65adaf844afee41", genModel = "/model/stream.genmodel", genModelSourceLocations = {"model/stream.genmodel","org.eclipse.fennec.stream.model/model/stream.genmodel"}, ecore = "/model/stream.ecore", ecoreSourceLocations = "/model/stream.ecore")
+@EPackage(uri = StreamPackage.eNS_URI, fingerprint = "fp1:61ce90e5eee741f89ff6620a07cac41b9ae5bd7495e82063b65ec6cf8074f756", genModel = "/model/stream.genmodel", genModelSourceLocations = {"model/stream.genmodel","org.eclipse.fennec.stream.model/model/stream.genmodel"}, ecore = "/model/stream.ecore", ecoreSourceLocations = "/model/stream.ecore")
 public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	/**
 	 * The package name.
@@ -272,13 +272,22 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	int CHANGE_ENTRY__FEATURE_URI = 5;
 
 	/**
+	 * The feature id for the '<em><b>Recording</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int CHANGE_ENTRY__RECORDING = 6;
+
+	/**
 	 * The feature id for the '<em><b>Timestamp</b></em>' attribute.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__TIMESTAMP = 6;
+	int CHANGE_ENTRY__TIMESTAMP = 7;
 
 	/**
 	 * The feature id for the '<em><b>Index</b></em>' attribute.
@@ -287,7 +296,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__INDEX = 7;
+	int CHANGE_ENTRY__INDEX = 8;
 
 	/**
 	 * The feature id for the '<em><b>To Index</b></em>' attribute.
@@ -296,7 +305,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__TO_INDEX = 8;
+	int CHANGE_ENTRY__TO_INDEX = 9;
 
 	/**
 	 * The feature id for the '<em><b>Map Key</b></em>' attribute.
@@ -305,7 +314,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__MAP_KEY = 9;
+	int CHANGE_ENTRY__MAP_KEY = 10;
 
 	/**
 	 * The feature id for the '<em><b>Coords</b></em>' attribute list.
@@ -314,7 +323,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__COORDS = 10;
+	int CHANGE_ENTRY__COORDS = 11;
 
 	/**
 	 * The feature id for the '<em><b>Value Old</b></em>' attribute.
@@ -323,7 +332,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__VALUE_OLD = 11;
+	int CHANGE_ENTRY__VALUE_OLD = 12;
 
 	/**
 	 * The feature id for the '<em><b>Value New</b></em>' attribute.
@@ -332,7 +341,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__VALUE_NEW = 12;
+	int CHANGE_ENTRY__VALUE_NEW = 13;
 
 	/**
 	 * The feature id for the '<em><b>State</b></em>' containment reference list.
@@ -341,7 +350,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY__STATE = 13;
+	int CHANGE_ENTRY__STATE = 14;
 
 	/**
 	 * The number of structural features of the '<em>Change Entry</em>' class.
@@ -350,7 +359,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 * @ordered
 	 */
-	int CHANGE_ENTRY_FEATURE_COUNT = 14;
+	int CHANGE_ENTRY_FEATURE_COUNT = 15;
 
 	/**
 	 * The number of operations of the '<em>Change Entry</em>' class.
@@ -645,6 +654,16 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	int PACKAGE_FINGERPRINT_OPERATION_COUNT = 0;
 
 	/**
+	 * The meta object id for the '{@link org.eclipse.fennec.model.stream.Recording <em>Recording</em>}' enum.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.fennec.model.stream.Recording
+	 * @see org.eclipse.fennec.model.stream.impl.StreamPackageImpl#getRecording()
+	 * @generated
+	 */
+	int RECORDING = 6;
+
+	/**
 	 * The meta object id for the '{@link org.eclipse.fennec.model.stream.DeltaKind <em>Delta Kind</em>}' enum.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -652,7 +671,7 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @see org.eclipse.fennec.model.stream.impl.StreamPackageImpl#getDeltaKind()
 	 * @generated
 	 */
-	int DELTA_KIND = 6;
+	int DELTA_KIND = 7;
 
 
 	/**
@@ -861,6 +880,17 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 */
 	EAttribute getChangeEntry_FeatureUri();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.ChangeEntry#getRecording <em>Recording</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Recording</em>'.
+	 * @see org.eclipse.fennec.model.stream.ChangeEntry#getRecording()
+	 * @see #getChangeEntry()
+	 * @generated
+	 */
+	EAttribute getChangeEntry_Recording();
 
 	/**
 	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.stream.ChangeEntry#getTimestamp <em>Timestamp</em>}'.
@@ -1200,6 +1230,16 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 	EAttribute getPackageFingerprint_PackageFingerprint();
 
 	/**
+	 * Returns the meta object for enum '{@link org.eclipse.fennec.model.stream.Recording <em>Recording</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for enum '<em>Recording</em>'.
+	 * @see org.eclipse.fennec.model.stream.Recording
+	 * @generated
+	 */
+	EEnum getRecording();
+
+	/**
 	 * Returns the meta object for enum '{@link org.eclipse.fennec.model.stream.DeltaKind <em>Delta Kind</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -1387,6 +1427,14 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 		 * @generated
 		 */
 		EAttribute CHANGE_ENTRY__FEATURE_URI = eINSTANCE.getChangeEntry_FeatureUri();
+
+		/**
+		 * The meta object literal for the '<em><b>Recording</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute CHANGE_ENTRY__RECORDING = eINSTANCE.getChangeEntry_Recording();
 
 		/**
 		 * The meta object literal for the '<em><b>Timestamp</b></em>' attribute feature.
@@ -1643,6 +1691,16 @@ public interface StreamPackage extends org.eclipse.emf.ecore.EPackage {
 		 * @generated
 		 */
 		EAttribute PACKAGE_FINGERPRINT__PACKAGE_FINGERPRINT = eINSTANCE.getPackageFingerprint_PackageFingerprint();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.fennec.model.stream.Recording <em>Recording</em>}' enum.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.fennec.model.stream.Recording
+		 * @see org.eclipse.fennec.model.stream.impl.StreamPackageImpl#getRecording()
+		 * @generated
+		 */
+		EEnum RECORDING = eINSTANCE.getRecording();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.fennec.model.stream.DeltaKind <em>Delta Kind</em>}' enum.

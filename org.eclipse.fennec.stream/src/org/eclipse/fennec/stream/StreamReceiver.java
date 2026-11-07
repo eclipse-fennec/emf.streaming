@@ -39,6 +39,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.fennec.model.stream.ChangeEntry;
 import org.eclipse.fennec.model.stream.ChangeSet;
 import org.eclipse.fennec.model.stream.DeltaKind;
+import org.eclipse.fennec.model.stream.Recording;
 import org.eclipse.fennec.model.stream.SlotValue;
 import org.eclipse.fennec.model.stream.support.ChangeSetValidator;
 import org.eclipse.fennec.model.stream.support.StreamAddresses;
@@ -51,9 +52,11 @@ import org.eclipse.fennec.model.streammapping.GuardPolicy;
  * <p>
  * Per stream it keeps the last applied sequence: a sequence seen before is a duplicate; a sequence
  * further ahead than the next is held for the gap buffer (default 5 s) in case the missing one still
- * arrives. A gap that stays makes the object {@link State#STALE} (no deltas applied until the next
- * keyframe), or, under {@link GapPolicy#SKIP_AND_MARK}, is counted and skipped. The first change
- * set of a stream is never a gap - a receiver may join a stream at any point.
+ * arrives. A gap that stays is counted, and until the next keyframe each entry is judged by its
+ * {@link Recording}: a {@code CHANGELOG} entry builds on the value before it and is skipped, a
+ * {@code TIMESERIES} entry is an absolute sample and is applied. An entry without a recording falls
+ * back to the {@link GapPolicy} of the receiver. The first change set of a stream is never a gap - a
+ * receiver may join a stream at any point.
  * <p>
  * A change set under a model version the receiver does not know is refused. An object the receiver
  * does not hold is introduced by a {@code KEYFRAME} or {@code CREATE}; under
@@ -73,11 +76,14 @@ public final class StreamReceiver {
 		CREATE_FROM_DELTAS
 	}
 
-	/** What a receiver does with a gap that the buffer did not close. */
+	/**
+	 * What a receiver does after a gap that the buffer did not close, for entries that carry no
+	 * {@link Recording}. Entries that carry one decide by it.
+	 */
 	public enum GapPolicy {
-		/** The object becomes STALE until the next keyframe. */
+		/** The object becomes STALE: such entries are skipped until the next keyframe. */
 		STALE,
-		/** The gap is counted and skipped; the object stays as it is. */
+		/** The gap is counted and skipped; such entries are applied as before. */
 		SKIP_AND_MARK
 	}
 
@@ -89,7 +95,10 @@ public final class StreamReceiver {
 		INCOMPLETE,
 		/** Built from a keyframe and every delta since. */
 		COMPLETE,
-		/** A gap or a refused change set: no deltas are applied until the next keyframe. */
+		/**
+		 * A gap: changelog entries are not applied until the next keyframe, samples still are. Or a
+		 * refused change set: nothing is applied until the next keyframe.
+		 */
 		STALE
 	}
 
@@ -105,7 +114,7 @@ public final class StreamReceiver {
 		REJECTED,
 		/** Not applied because the object is unknown here (EXPECT_KEYFRAME). */
 		DROPPED,
-		/** Not applied because the object is STALE. */
+		/** Not applied because the object is STALE (after a gap: every entry was a changelog entry). */
 		SKIPPED_STALE
 	}
 
@@ -124,6 +133,8 @@ public final class StreamReceiver {
 		final TreeMap<Long, Held> held = new TreeMap<>();
 		boolean gapTimer;
 		long gaps;
+		/** A gap since the last keyframe: changelog entries are skipped. */
+		boolean gapped;
 		final Map<String, Long> featureTimes = new HashMap<>();
 	}
 
@@ -188,7 +199,7 @@ public final class StreamReceiver {
 
 	/**
 	 * @param streamId a stream
-	 * @return how many gaps were skipped under {@link GapPolicy#SKIP_AND_MARK}
+	 * @return how many gaps the buffer did not close
 	 */
 	public long gaps(String streamId) {
 		ReceiverStream stream = streams.get(streamId);
@@ -229,10 +240,10 @@ public final class StreamReceiver {
 		if (stream.held.isEmpty()) {
 			return;
 		}
+		stream.gaps++;
+		stream.gapped = true;
 		if (gapPolicy == GapPolicy.STALE) {
 			stream.state = State.STALE;
-		} else {
-			stream.gaps++;
 		}
 		stream.lastApplied = stream.held.firstKey() - 1;
 		drain(stream);
@@ -248,14 +259,14 @@ public final class StreamReceiver {
 		stream.lastApplied = changeSet.getSequence();
 		EPackage.Registry registry = modelVersions.apply(changeSet.getContextFingerprint());
 		if (registry == null) {
-			stream.state = State.STALE;
+			refuse(stream);
 			return new Result(Outcome.REJECTED,
 					error("Unknown model version " + changeSet.getContextFingerprint() + " - change set refused"));
 		}
 		Optional<StreamId> parsed = StreamId.parse(changeSet.getStreamId());
 		Optional<EClass> resolved = parsed.flatMap(p -> StreamAddresses.resolveClass(registry, p.classUri()));
 		if (resolved.isEmpty()) {
-			stream.state = State.STALE;
+			refuse(stream);
 			return new Result(Outcome.REJECTED, error("Stream " + changeSet.getStreamId() + " names no known class"));
 		}
 		EClass eClass = resolved.get();
@@ -263,8 +274,12 @@ public final class StreamReceiver {
 		boolean introduces = changeSet.getEntries().stream()
 				.anyMatch(e -> e.getKind() == DeltaKind.KEYFRAME || e.getKind() == DeltaKind.CREATE);
 		boolean keyframe = changeSet.getEntries().stream().anyMatch(e -> e.getKind() == DeltaKind.KEYFRAME);
-		if (stream.state == State.STALE && !keyframe) {
+		if (stream.state == State.STALE && !stream.gapped && !keyframe) {
 			return new Result(Outcome.SKIPPED_STALE, ok("Object is stale until its next keyframe"));
+		}
+		boolean afterGap = stream.gapped && !keyframe;
+		if (afterGap && changeSet.getEntries().stream().allMatch(this::buildsOnBefore)) {
+			return new Result(Outcome.SKIPPED_STALE, ok("Gap before: changelog entries wait for the next keyframe"));
 		}
 		EObject object = targets.find(eClass, id);
 		boolean created = false;
@@ -280,9 +295,14 @@ public final class StreamReceiver {
 		BasicDiagnostic diagnostic = new BasicDiagnostic(SOURCE, 0, "ChangeSet " + changeSet.getId(), null);
 		List<ChangeEntry> deltas = new ArrayList<>();
 		for (ChangeEntry entry : changeSet.getEntries()) {
-			if (entry.getKind() != DeltaKind.CREATE && entry.getKind() != DeltaKind.KEYFRAME) {
-				deltas.add(entry);
+			if (entry.getKind() == DeltaKind.CREATE || entry.getKind() == DeltaKind.KEYFRAME) {
+				continue;
 			}
+			if (afterGap && buildsOnBefore(entry)) {
+				warn(diagnostic, "Entry for " + entry.getFeatureUri() + " skipped: changelog entry after a gap");
+				continue;
+			}
+			deltas.add(entry);
 		}
 		// guard before anything is changed, so FAIL leaves the object untouched
 		List<ChangeEntry> mismatched = new ArrayList<>();
@@ -295,7 +315,7 @@ public final class StreamReceiver {
 			}
 		}
 		if (!mismatched.isEmpty() && guard == GuardPolicy.FAIL) {
-			stream.state = State.STALE;
+			refuse(stream);
 			return new Result(Outcome.REJECTED, error(mismatched.size() + " entries do not match the replica (guard FAIL)"));
 		}
 		EObject target = object;
@@ -308,6 +328,7 @@ public final class StreamReceiver {
 									() -> warn(diagnostic, "Keyframe slot " + slot.getFeatureUri() + " is no feature of " + eClass.getName()));
 				}
 				stream.state = State.COMPLETE;
+				stream.gapped = false;
 			}
 		}
 		if (created && !keyframe) {
@@ -336,6 +357,26 @@ public final class StreamReceiver {
 		core.store().append(changeSet);
 		core.publish(changeSet);
 		return new Result(Outcome.APPLIED, diagnostic);
+	}
+
+	/** A refused change set: nothing is applied until the next keyframe. */
+	private static void refuse(ReceiverStream stream) {
+		stream.state = State.STALE;
+		stream.gapped = false;
+	}
+
+	/**
+	 * @param entry an entry received after a gap
+	 * @return whether it builds on the value before it and so waits for the next keyframe
+	 */
+	private boolean buildsOnBefore(ChangeEntry entry) {
+		if (entry.getKind() != DeltaKind.SET && entry.getKind() != DeltaKind.UNSET) {
+			return false;
+		}
+		if (entry.isSetRecording()) {
+			return entry.getRecording() == Recording.CHANGELOG;
+		}
+		return gapPolicy == GapPolicy.STALE;
 	}
 
 	private void applyFeature(ReceiverStream stream, EObject object, EClass eClass, ChangeEntry entry, long setTime,

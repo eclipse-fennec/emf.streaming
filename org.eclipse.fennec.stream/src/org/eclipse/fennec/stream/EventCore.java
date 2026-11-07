@@ -51,6 +51,7 @@ import org.eclipse.fennec.model.mapping.Mapping;
 import org.eclipse.fennec.model.stream.ChangeEntry;
 import org.eclipse.fennec.model.stream.ChangeSet;
 import org.eclipse.fennec.model.stream.DeltaKind;
+import org.eclipse.fennec.model.stream.Recording;
 import org.eclipse.fennec.model.stream.SlotValue;
 import org.eclipse.fennec.model.stream.StreamFactory;
 import org.eclipse.fennec.model.streammapping.BatchKind;
@@ -404,6 +405,7 @@ public final class EventCore implements StreamCore, AutoCloseable {
 		inverse.setObjectId(entry.getObjectId());
 		inverse.setFeatureId(entry.getFeatureId());
 		inverse.setFeatureUri(entry.getFeatureUri());
+		inverse.setRecording(Recording.CHANGELOG);
 		inverse.setTimestamp(clock.millis());
 		if (entry.getKind() == DeltaKind.UNSET || entry.getValueOld() != null) {
 			inverse.setKind(DeltaKind.SET);
@@ -727,6 +729,7 @@ public final class EventCore implements StreamCore, AutoCloseable {
 				entry.setFeatureId(target.getFeatureID(feature));
 			}
 			entry.setFeatureUri(pending.address);
+			entry.setRecording(pending.recording == RecordingMode.CHANGELOG ? Recording.CHANGELOG : Recording.TIMESERIES);
 			entry.setValueOld(pending.valueOld);
 			entry.setValueNew(pending.valueNew);
 			entry.setTimestamp(pending.eventTime);

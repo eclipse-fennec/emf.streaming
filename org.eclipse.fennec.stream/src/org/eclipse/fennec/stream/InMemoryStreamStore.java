@@ -25,6 +25,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.eclipse.fennec.model.stream.ChangeEntry;
 import org.eclipse.fennec.model.stream.ChangeSet;
 import org.eclipse.fennec.model.stream.DeltaKind;
+import org.eclipse.fennec.model.stream.Recording;
 import org.eclipse.fennec.model.stream.SlotValue;
 import org.eclipse.fennec.model.stream.StreamFactory;
 import org.eclipse.fennec.model.streammapping.DeletionRule;
@@ -50,8 +51,8 @@ public final class InMemoryStreamStore implements StreamStore {
 
 	/** One stored entry. */
 	private record Row(DeltaKind kind, String objectId, String classUri, int classId, int featureId, String featureUri,
-			int index, int toIndex, String mapKey, int[] coords, String valueOld, String valueNew, Long timestamp,
-			List<Slot> state) {
+			Recording recording, int index, int toIndex, String mapKey, int[] coords, String valueOld, String valueNew,
+			Long timestamp, List<Slot> state) {
 	}
 
 	/** A stored change set: header and rows. */
@@ -180,8 +181,9 @@ public final class InMemoryStreamStore implements StreamStore {
 					ints(slot.getCoords()), slot.getValue()));
 		}
 		return new Row(entry.getKind(), entry.getObjectId(), entry.getClassUri(), entry.getClassId(), entry.getFeatureId(),
-				entry.getFeatureUri(), entry.getIndex(), entry.getToIndex(), entry.getMapKey(), ints(entry.getCoords()),
-				entry.getValueOld(), entry.getValueNew(), entry.getTimestamp(), List.copyOf(state));
+				entry.getFeatureUri(), entry.isSetRecording() ? entry.getRecording() : null, entry.getIndex(), entry.getToIndex(),
+				entry.getMapKey(), ints(entry.getCoords()), entry.getValueOld(), entry.getValueNew(), entry.getTimestamp(),
+				List.copyOf(state));
 	}
 
 	private static ChangeSet changeSet(String streamId, Batch batch) {
@@ -205,6 +207,9 @@ public final class InMemoryStreamStore implements StreamStore {
 			entry.setClassId(row.classId());
 			entry.setFeatureId(row.featureId());
 			entry.setFeatureUri(row.featureUri());
+			if (row.recording() != null) {
+				entry.setRecording(row.recording());
+			}
 			entry.setIndex(row.index());
 			entry.setToIndex(row.toIndex());
 			entry.setMapKey(row.mapKey());

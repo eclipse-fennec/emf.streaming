@@ -102,6 +102,11 @@
         <details key="documentation" value="Alternative feature address: URI of the EStructuralFeature (nsURI#//Class/feature). Wins over featureId when set."/>
       </eAnnotations>
     </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="recording" unsettable="true" eType="#//Recording">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="How the slot of this entry is recorded (SET/UNSET). Lets a receiver decide per entry after a gap: a CHANGELOG entry builds on the value before it and is not applied until the next keyframe; a TIMESERIES entry is an absolute sample and is applied. Unset = the receiver's default."/>
+      </eAnnotations>
+    </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="timestamp" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELongObject">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value="Event time of this entry (epoch millis), e.g. the measurement time of a sample (SensorThings phenomenonTime). Unset (null) = the batch time ChangeSet.timestamp applies. Lets one batch carry samples with different event times."/>
@@ -257,6 +262,21 @@
         <details key="documentation" value="Fingerprint of the package's ContextSnapshot in effect."/>
       </eAnnotations>
     </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EEnum" name="Recording">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="How a slot is recorded in the stream; the same literals as the recording mode of a stream mapping."/>
+    </eAnnotations>
+    <eLiterals name="TIMESERIES">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Absolute samples without old value."/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals name="CHANGELOG" value="1">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Deltas with the old value; each builds on the one before."/>
+      </eAnnotations>
+    </eLiterals>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="DeltaKind">
     <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">

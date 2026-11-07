@@ -25,6 +25,7 @@ import org.eclipse.emf.ecore.impl.EPackageRegistryImpl;
 import org.eclipse.fennec.model.stream.ChangeEntry;
 import org.eclipse.fennec.model.stream.ChangeSet;
 import org.eclipse.fennec.model.stream.DeltaKind;
+import org.eclipse.fennec.model.stream.Recording;
 import org.eclipse.fennec.model.stream.SlotValue;
 import org.eclipse.fennec.model.stream.StreamFactory;
 import org.eclipse.fennec.model.streammapping.GuardPolicy;
@@ -152,6 +153,59 @@ class StreamReceiverTest {
 		assertThat(outcome(receiver.receive(set(3, sample("currentTemperature", "22.0", null))))).isEqualTo(Outcome.APPLIED);
 		assertThat(receiver.gaps(stream)).isEqualTo(1);
 		assertThat(receiver.state(stream)).isEqualTo(State.COMPLETE);
+	}
+
+	@Test
+	void afterAGapSamplesAreAppliedAndChangelogEntriesWaitForTheKeyframe() throws Exception {
+		StreamReceiver receiver = receiver().gapBuffer(Duration.ofMillis(50)).build();
+		String stream = fx.stream("pool-1");
+		receiver.receive(set(1, keyframe("currentTemperature", "20.0", "name", "Becken"))).get(10, TimeUnit.SECONDS);
+
+		ChangeEntry sample = recorded(sample("currentTemperature", "22.0", null), Recording.TIMESERIES);
+		ChangeEntry renamed = recorded(changelog("pool-1", "name", "Becken", "Wellenbecken"), Recording.CHANGELOG);
+		StreamReceiver.Result result = receiver.receive(set(3, sample, renamed)).get(10, TimeUnit.SECONDS);
+
+		assertThat(result.outcome()).isEqualTo(Outcome.APPLIED);
+		assertThat(result.diagnostic().getChildren()).singleElement()
+				.satisfies(d -> assertThat(d.getMessage()).contains("changelog entry after a gap"));
+		assertThat(receiver.gaps(stream)).isEqualTo(1);
+		assertThat(receiver.state(stream)).isEqualTo(State.STALE);
+		EObject pool = targets.find(fx.pool, "pool-1");
+		assertThat(pool.eGet(fx.currentTemperature)).isEqualTo(22.0);
+		assertThat(pool.eGet(fx.poolName)).isEqualTo("Becken");
+
+		ChangeEntry renamedAgain = recorded(changelog("pool-1", "name", "Wellenbecken", "Sportbecken"), Recording.CHANGELOG);
+		assertThat(outcome(receiver.receive(set(4, renamedAgain)))).isEqualTo(Outcome.SKIPPED_STALE);
+
+		assertThat(outcome(receiver.receive(set(5, keyframe("currentTemperature", "23.0", "name", "Sportbecken")))))
+				.isEqualTo(Outcome.APPLIED);
+		assertThat(receiver.state(stream)).isEqualTo(State.COMPLETE);
+		ChangeEntry renamedLater = recorded(changelog("pool-1", "name", "Sportbecken", "Kinderland"), Recording.CHANGELOG);
+		assertThat(outcome(receiver.receive(set(6, renamedLater)))).isEqualTo(Outcome.APPLIED);
+		assertThat(pool.eGet(fx.poolName)).isEqualTo("Kinderland");
+	}
+
+	@Test
+	void underSkipAndMarkAChangelogEntryStillWaitsForTheKeyframe() throws Exception {
+		StreamReceiver receiver = receiver().gapBuffer(Duration.ofMillis(50)).gapPolicy(GapPolicy.SKIP_AND_MARK).build();
+		receiver.receive(set(1, keyframe("name", "Becken"))).get(10, TimeUnit.SECONDS);
+
+		ChangeEntry renamed = recorded(changelog("pool-1", "name", "Becken", "Wellenbecken"), Recording.CHANGELOG);
+		assertThat(outcome(receiver.receive(set(3, renamed)))).isEqualTo(Outcome.SKIPPED_STALE);
+		assertThat(targets.find(fx.pool, "pool-1").eGet(fx.poolName)).isEqualTo("Becken");
+	}
+
+	@Test
+	void theStoreKeepsTheRecordingOfEachEntry() throws Exception {
+		ChangeEntry entry = recorded(sample("currentTemperature", "1.0", null), Recording.TIMESERIES);
+		InMemoryStreamStore store = new InMemoryStreamStore();
+		store.append(set(1, entry, sample("currentPh", "7.0", null)));
+
+		List<ChangeEntry> read = store.read(fx.stream("pool-1"), 1, 1).get(0).getEntries();
+
+		assertThat(read.get(0).isSetRecording()).isTrue();
+		assertThat(read.get(0).getRecording()).isEqualTo(Recording.TIMESERIES);
+		assertThat(read.get(1).isSetRecording()).isFalse();
 	}
 
 	@Test
@@ -304,6 +358,11 @@ class StreamReceiverTest {
 			slot.setValue(featureValuePairs[i + 1]);
 			entry.getState().add(slot);
 		}
+		return entry;
+	}
+
+	private static ChangeEntry recorded(ChangeEntry entry, Recording recording) {
+		entry.setRecording(recording);
 		return entry;
 	}
 
