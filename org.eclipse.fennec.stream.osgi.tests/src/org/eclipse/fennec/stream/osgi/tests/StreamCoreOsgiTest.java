@@ -148,7 +148,8 @@ class StreamCoreOsgiTest {
 
 			store.delete(); // the core loses its store and stops
 			deadline = System.currentTimeMillis() + 10_000;
-			while (cores.getService() != null && System.currentTimeMillis() < deadline) {
+			// DS unregisters the service before deactivate() closes the core: wait for the releases themselves
+			while (ungets.get() < gets.get() && System.currentTimeMillis() < deadline) {
 				Thread.sleep(10);
 			}
 			assertThat(ungets.get()).as("every instance is given back when the core stops").isEqualTo(gets.get());
