@@ -86,40 +86,40 @@ public class RegistryMappings implements MappingRegistry, EObjectRegistryListene
 	private final Map<String, String> idsByKey = new ConcurrentHashMap<>();
 
 	/**
+	 * Starts listening; the registry replays its current content.
+	 *
 	 * @param registry the EObject registry holding the mappings
 	 * @param metadata names the fingerprint of a model version
 	 */
 	@Activate
 	public RegistryMappings(@Reference(name = "registry", target = DEFAULT_TARGET) EObjectRegistry registry,
 			@Reference(name = "metadata") MetadataService metadata) {
-		this(registry, ePackage -> metadata.getPackageMetadata(ePackage).map(PackageMetadata::getModelFingerprint)
-				.orElse(null));
+		this(registry, (Function<EPackage, String>) ePackage -> metadata.getPackageMetadata(ePackage)
+				.map(PackageMetadata::getModelFingerprint).orElse(null));
+	}
+
+	private RegistryMappings(EObjectRegistry registry, Function<EPackage, String> fingerprints) {
+		this.registry = requireNonNull(registry, "EObjectRegistry is required");
+		this.fingerprints = requireNonNull(fingerprints, "Fingerprint function is required");
+		registry.addListener(this);
 	}
 
 	/**
-	 * Plain-Java constructor.
+	 * Plain-Java factory: the result listens from now on; {@link #deactivate()} stops it.
 	 *
 	 * @param registry the EObject registry holding the mappings
 	 * @param fingerprints the fingerprint of a package, {@code null} when it is unknown
+	 * @return the mapping registry
 	 */
-	public RegistryMappings(EObjectRegistry registry, Function<EPackage, String> fingerprints) {
-		this.registry = requireNonNull(registry, "EObjectRegistry is required");
-		this.fingerprints = requireNonNull(fingerprints, "Fingerprint function is required");
-	}
-
-	/**
-	 * Starts listening; the registry replays its current content.
-	 */
-	@Activate
-	void activate() {
-		registry.addListener(this);
+	public static RegistryMappings create(EObjectRegistry registry, Function<EPackage, String> fingerprints) {
+		return new RegistryMappings(registry, fingerprints);
 	}
 
 	/**
 	 * Stops listening.
 	 */
 	@Deactivate
-	void deactivate() {
+	public void deactivate() {
 		registry.removeListener(this);
 	}
 

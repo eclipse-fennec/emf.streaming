@@ -71,14 +71,13 @@ class OsgiComponentsTest {
 		writer.put("files", "pool", model.mapping("pool-mapping"), Map.of());
 		writer.put("files", "not-a-mapping", model.target, Map.of());
 
-		RegistryMappings mappings = new RegistryMappings(writer.getRegistry(), p -> "fp-live");
+		RegistryMappings mappings = RegistryMappings.create(writer.getRegistry(), p -> "fp-live");
 		List<String> events = new ArrayList<>();
 		mappings.addListener((previous, current) -> events.add(current == null ? "-" + previous.getId() : "+" + current.getId()));
-		mappings.activate();
 
-		assertThat(mappings.all()).extracting(Mapping::getId).containsExactly("pool-mapping");
+		assertThat(mappings.all()).as("the current content is replayed on creation").extracting(Mapping::getId)
+				.containsExactly("pool-mapping");
 		assertThat(mappings.forTarget(model.target)).hasSize(1);
-		assertThat(events).containsExactly("+pool-mapping");
 
 		Mapping broken = model.mapping("broken");
 		broken.getSlots().get(0).setTargetFeature(null);
@@ -87,7 +86,7 @@ class OsgiComponentsTest {
 
 		writer.remove("files", "pool");
 		assertThat(mappings.all()).isEmpty();
-		assertThat(events).containsExactly("+pool-mapping", "-pool-mapping");
+		assertThat(events).containsExactly("-pool-mapping");
 
 		writer.put("files", "old", model.mapping("old-version"), Map.of("emf.fingerprint", "fp-old"));
 		writer.put("files", "live", model.mapping("live-version"), Map.of("emf.fingerprint", "fp-live"));
