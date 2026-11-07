@@ -13,6 +13,8 @@
 package org.eclipse.fennec.stream.messaging.impl;
 
 import org.eclipse.fennec.emf.osgi.ResourceSetFactory;
+import org.eclipse.fennec.emf.osgi.constants.EMFNamespaces;
+import org.eclipse.fennec.model.stream.StreamPackage;
 import org.eclipse.fennec.stream.StreamCore;
 import org.eclipse.fennec.stream.messaging.ChangeSetCodec;
 import org.eclipse.fennec.stream.messaging.StreamChannels;
@@ -31,7 +33,8 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
  * Publishes everything the {@link StreamCore} writes on one Gecko Messaging instance. Factory
  * configuration required (PID {@value #PID}): there is no sensible default instance, so
  * {@code publisher.target} has to name one, e.g. {@code (osgi.messaging.name=broker)}. All references
- * are mandatory and static.
+ * are mandatory and static. The resource set factory must have the stream model and the models of
+ * the target classes registered ({@code resourceSets.target}).
  */
 @Component(name = StreamPublisherComponent.PID, configurationPolicy = ConfigurationPolicy.REQUIRE)
 @Designate(ocd = StreamPublisherComponent.Config.class, factory = true)
@@ -69,7 +72,17 @@ public class StreamPublisherComponent {
 		 */
 		@AttributeDefinition(description = "Publish change sets holding a keyframe retained (only for instances with the retain feature)")
 		boolean retainKeyframes() default false;
+
+		/**
+		 * @return the filter selecting the resource set factory
+		 */
+		@AttributeDefinition(description = "Filter selecting the ResourceSetFactory whose package registry resolves the stream classes; "
+				+ "name the target models too, e.g. (&(emf.name=stream)(emf.name=bath))")
+		String resourceSets_target() default RESOURCE_SETS_TARGET;
 	}
+
+	/** The default resource set factory: one that has the stream model registered. */
+	static final String RESOURCE_SETS_TARGET = "(" + EMFNamespaces.EMF_NAME + "=" + StreamPackage.eNAME + ")";
 
 	private final AutoCloseable attachment;
 
@@ -83,7 +96,7 @@ public class StreamPublisherComponent {
 	@Activate
 	public StreamPublisherComponent(@Reference(name = "core") StreamCore core,
 			@Reference(name = "publisher") MessagePublisher publisher, @Reference(name = "codec") ChangeSetCodec codec,
-			@Reference(name = "resourceSets") ResourceSetFactory resourceSets, Config config) {
+			@Reference(name = "resourceSets", target = RESOURCE_SETS_TARGET) ResourceSetFactory resourceSets, Config config) {
 		StreamPublisher streamPublisher = new StreamPublisher(publisher, codec, new StreamChannels(config.root()),
 				resourceSets.createResourceSet().getPackageRegistry(), config.retainKeyframes());
 		this.attachment = streamPublisher.attach(core);
