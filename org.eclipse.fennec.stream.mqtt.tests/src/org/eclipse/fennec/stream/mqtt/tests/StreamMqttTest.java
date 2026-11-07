@@ -64,6 +64,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.component.runtime.ServiceComponentRuntime;
+import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
 import org.osgi.test.common.annotation.InjectService;
 import org.osgi.test.common.service.ServiceAware;
 import org.osgi.util.pushstream.PushStream;
@@ -88,6 +90,9 @@ class StreamMqttTest {
 	@InjectService(cardinality = 0)
 	ServiceAware<MessageServiceRuntime> runtimes;
 
+	@InjectService(timeout = 5000)
+	ServiceComponentRuntime scr;
+
 	@TempDir
 	Path dir;
 
@@ -109,14 +114,22 @@ class StreamMqttTest {
 				"(emf.eobject.provider.name=mapping-files)");
 		for (String name : new String[] { "origin", "replica" }) {
 			// one factory configuration per instance: the alias tells them apart
+			// publishes wait for the (re)connect instead of failing (gecko#20)
 			factoryAs("org.gecko.messaging.mqtt", name, "osgi.messaging.name", name, "uri", uri, "cloudEvents", "binary",
-					"connectTimeout", 3000L);
+					"connectTimeout", 3000L, "publishAwaitConnection", 10_000L);
 		}
 		single("FennecInMemoryStreamStore");
 		single("FennecNoProjection");
 		single("FennecInMemoryReplicaTargets");
-		awaitConnected("origin");
+		// only the subscribing side has to be on the broker before a test publishes
 		awaitConnected("replica");
+	}
+
+	/** Waits until a configuration of the named component is active - its work starts only then. */
+	private void awaitActive(String component) throws InterruptedException {
+		await(() -> scr.getComponentDescriptionDTOs().stream().filter(d -> component.equals(d.name))
+				.flatMap(d -> scr.getComponentConfigurationDTOs(d).stream())
+				.anyMatch(c -> c.state == ComponentConfigurationDTO.ACTIVE));
 	}
 
 	/** Waits until the named instance reports CONNECTED, so its subscriptions are on the broker at once. */
@@ -137,6 +150,7 @@ class StreamMqttTest {
 			@InjectService(cardinality = 0, filter = "(osgi.messaging.name=replica)") ServiceAware<MessageSubscription> replicas)
 			throws Exception {
 		factory("FennecStreamPublisher", "publisher.target", "(osgi.messaging.name=origin)", "root", root);
+		awaitActive("FennecStreamPublisher");
 		List<Message> received = collect(replicas.waitForService(10_000), root + "/ecore/EClass/+");
 		StreamCore core = cores.waitForService(10_000);
 
@@ -157,6 +171,7 @@ class StreamMqttTest {
 			throws Exception {
 		factory("FennecStreamPublisher", "publisher.target", "(osgi.messaging.name=origin)", "root", root,
 				"retainKeyframes", Boolean.TRUE);
+		awaitActive("FennecStreamPublisher");
 		StreamCore core = cores.waitForService(10_000);
 		core.offer(eClass("River"), 1_000, "test"); // a value, then the stream's first keyframe
 		String stream = EventCore.streamId(EcorePackage.Literals.ECLASS, "River");

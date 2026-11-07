@@ -56,11 +56,12 @@ type; references are the id of the referenced object. The typing resolves from
 
 ## Publishing
 
-A messaging instance refuses publishing while it is not connected, and buffers nothing. The
-publisher therefore publishes the change sets of a core one after the other and retries a refused
-one with a growing pause until the instance takes it. During a long outage the core's output buffer
-drops its oldest change sets; receivers notice the gap, go stale and come back with the next
-keyframe.
+The publisher publishes the change sets of a core one after the other; one the instance refuses
+is logged and skipped. By default a Gecko Messaging instance refuses publishing while it is not
+connected. Configure it with `publishAwaitConnection` (milliseconds; bounded by
+`publishAwaitMessages`/`publishAwaitBytes`) so that a publish waits for the connect or reconnect
+instead (gecko#20). During a long outage the core's output buffer drops its oldest change sets;
+receivers notice the gap, go stale and come back with the next keyframe.
 
 ## Receiving
 
