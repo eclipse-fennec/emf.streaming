@@ -58,6 +58,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.component.runtime.ServiceComponentRuntime;
+import org.osgi.service.component.runtime.dto.ComponentConfigurationDTO;
 import org.osgi.test.common.annotation.InjectService;
 import org.osgi.test.common.service.ServiceAware;
 import org.osgi.util.pushstream.PushStream;
@@ -69,6 +71,9 @@ class StreamMessagingOsgiTest {
 
 	@InjectService(timeout = 5000)
 	ConfigurationAdmin configAdmin;
+
+	@InjectService(timeout = 5000)
+	ServiceComponentRuntime scr;
 
 	@InjectService(timeout = 5000)
 	ResourceSetFactory resourceSets;
@@ -104,6 +109,8 @@ class StreamMessagingOsgiTest {
 			@InjectService(cardinality = 0, filter = "(osgi.messaging.name=broker)") ServiceAware<MessageSubscription> subscriptions)
 			throws Exception {
 		factory("FennecStreamPublisher", "publisher.target", "(osgi.messaging.name=broker)");
+		// the publisher takes the core's change sets from the moment it is active, not before
+		awaitActive("FennecStreamPublisher");
 		MessageSubscription subscription = subscriptions.waitForService(10_000);
 		List<Message> received = new CopyOnWriteArrayList<>();
 		PushStream<Message> raw = subscription.subscribe("stream/ecore/EClass/+");
@@ -132,7 +139,7 @@ class StreamMessagingOsgiTest {
 		ReplicaTargets targets = targetsAware.waitForService(10_000);
 		MessagePublisher publisher = publishers.waitForService(10_000);
 		assertThat(cores.waitForService(10_000)).isNotNull();
-		Thread.sleep(300); // the subscriber component subscribes once it is active
+		awaitActive("FennecStreamSubscriber"); // it subscribes when it activates
 
 		String fingerprint = metadata.getPackageMetadata(EcorePackage.eINSTANCE).map(PackageMetadata::getModelFingerprint)
 				.orElseThrow();
@@ -207,6 +214,12 @@ class StreamMessagingOsgiTest {
 			dictionary.put((String) keyValues[i], keyValues[i + 1]);
 		}
 		return dictionary;
+	}
+
+	private void awaitActive(String component) throws InterruptedException {
+		await(() -> scr.getComponentDescriptionDTOs().stream().filter(d -> component.equals(d.name))
+				.flatMap(d -> scr.getComponentConfigurationDTOs(d).stream())
+				.anyMatch(c -> c.state == ComponentConfigurationDTO.ACTIVE));
 	}
 
 	private static void await(BooleanSupplier condition) throws InterruptedException {
