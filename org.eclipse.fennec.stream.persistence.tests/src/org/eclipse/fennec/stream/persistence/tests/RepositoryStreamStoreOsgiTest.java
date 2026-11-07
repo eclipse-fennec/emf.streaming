@@ -47,6 +47,7 @@ import org.eclipse.fennec.stream.StreamStore;
 import org.eclipse.fennec.stream.StreamStore.StoredValue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -57,6 +58,7 @@ import org.osgi.test.common.service.ServiceAware;
  * The repository stream store on JPA (EclipseLink, H2): change sets are saved as ordinary models of
  * the stream model and read back by stream and sequence.
  */
+@Disabled("Blocked by emf.persistence-jpa#399: column 'value' of SlotValue is a reserved word in H2 (#39)")
 class RepositoryStreamStoreOsgiTest {
 
 	private static final String STREAM_NS_URI = "https://org.eclipse/fennec/stream/1.0.0";

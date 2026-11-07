@@ -85,25 +85,7 @@
     "name": "fennec-mappings",
     "initialProvider.target": "(emf.eobject.provider.name=mapping-files)"
   },
-  "fennec.jpa.EORMMappingService~streams": {
-    "fennec.jpa.eorm.mappingName": "streams",
-    "fennec.jpa.eorm.model.target": "(emf.nsURI=https://org.eclipse/fennec/stream/1.0.0)"
-  },
-  "fennec.jpa.EMPersistenceUnit~streams": {
-    "fennec.jpa.persistenceUnitName": "streams",
-    "fennec.jpa.mapping.target": "(fennec.jpa.eorm.mapping=streams)",
-    "fennec.jpa.ext.eclipselink.ddl-generation": "create-tables",
-    "fennec.jpa.dataSource.target": "(subprotocol=*)"
-  },
-  "fennec.repository.jpa~streams": {
-    "repositoryId": "streams",
-    "unit.target": "(osgi.unit.name=streams)"
-  },
-  "FennecRepositoryStreamStore": {
-    "repository.target": "(persistence.repository.id=streams)"
-  },
   "FennecStreamCore": {
-    "store.target": "(fennec.stream.store=repository)",
     "projection.target": "(fennec.stream.projection=repository)"
   },
   "FennecRepositoryProjection": {
