@@ -1,0 +1,25 @@
+Bundle-Name: Eclipse Fennec Stream TCK
+Bundle-Description: The contract every StreamStore must meet, as JUnit 5 tests to extend: append and \
+	read by sequence, idempotent append, last value by event time, round trip of every field, retention.
+
+-workingset: streaming
+
+-library: enableEMF
+
+-buildpath: \
+	org.osgi.util.pushstream;version=latest,\
+	org.osgi.util.promise;version=latest,\
+	junit-jupiter-api;version=latest,\
+	org.opentest4j;version=latest,\
+	org.apiguardian.api;version=latest,\
+	assertj-core;version=latest,\
+	org.eclipse.fennec.atlas.configuration.model;version=latest,\
+	org.eclipse.fennec.mapping.model;version=snapshot,\
+	org.eclipse.fennec.stream.model;version=snapshot,\
+	org.eclipse.fennec.stream.mapping.model;version=snapshot,\
+	org.eclipse.fennec.stream;version=snapshot
+
+-testpath: \
+	junit-jupiter-engine;version=latest,\
+	junit-platform-engine;version=latest,\
+	junit-platform-commons;version=latest

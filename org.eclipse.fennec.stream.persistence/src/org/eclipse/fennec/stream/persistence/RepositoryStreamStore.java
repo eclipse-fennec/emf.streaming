@@ -46,8 +46,11 @@ import org.eclipse.fennec.stream.StreamStore;
  * sequence. The repository needs the stream model ({@code stream.ecore}) in its unit or database.
  * <p>
  * A copy is saved, so the change set the core hands on to its consumers stays untouched.
- * {@link #lastValue} walks the stream backwards in pages and stops at the first entry or keyframe
- * slot of the address - at the latest at the stream's last keyframe.
+ * Appending a change set whose id is stored already changes nothing.
+ * <p>
+ * {@link #lastValue} is the value with the newest event time. It walks the stream backwards in pages
+ * down to the newest keyframe that holds the address; a late sample (older event time, higher
+ * sequence) does not win over the value before it.
  * <p>
  * {@link #retain} has the semantics of the in-memory store: it removes the entries of one slot that
  * are beyond the rule's count or older than its horizon (keyframes stay), saves the change sets it
@@ -74,7 +77,14 @@ public final class RepositoryStreamStore implements StreamStore {
 	public void append(ChangeSet changeSet) {
 		requireNonNull(changeSet, "ChangeSet is required");
 		ChangeSet copy = EcoreUtil.copy(changeSet);
+		Query stored = QueryBuilder.from(STREAM.getChangeSet()).where(path(STREAM.getChangeSet_Id()).eq(changeSet.getId()))
+				.top(1).build();
 		call(repository -> {
+			try (QueryResult result = repository.find(stored)) {
+				if (changeSets(result.objects()).findAny().isPresent()) {
+					return null; // stored before: appending is idempotent on the id
+				}
+			}
 			repository.save(copy);
 			return null;
 		});
@@ -110,6 +120,7 @@ public final class RepositoryStreamStore implements StreamStore {
 	@Override
 	public Optional<StoredValue> lastValue(String streamId, String slotAddress) {
 		requireNonNull(slotAddress, "Slot address is required");
+		StoredValue newest = null;
 		for (int skip = 0;; skip += PAGE) {
 			Query page = stream(streamId).orderByDesc(STREAM.getChangeSet_Sequence()).skip(skip).top(PAGE).build();
 			List<ChangeSet> newestFirst = call(repository -> {
@@ -118,13 +129,23 @@ public final class RepositoryStreamStore implements StreamStore {
 				}
 			});
 			for (ChangeSet changeSet : newestFirst) {
-				Optional<StoredValue> value = valueIn(changeSet, slotAddress);
-				if (value.isPresent()) {
-					return value;
+				List<ChangeEntry> entries = changeSet.getEntries();
+				for (int i = entries.size() - 1; i >= 0; i--) {
+					ChangeEntry entry = entries.get(i);
+					if (!holds(entry, slotAddress)) {
+						continue;
+					}
+					long time = entry.getTimestamp() != null ? entry.getTimestamp() : changeSet.getTimestamp();
+					if (newest == null || time > newest.eventTime()) {
+						newest = new StoredValue(valueOf(entry, slotAddress), time);
+					}
+					if (entry.getKind() == DeltaKind.KEYFRAME) {
+						return Optional.of(newest); // nothing before the keyframe is newer than its state
+					}
 				}
 			}
 			if (newestFirst.size() < PAGE) {
-				return Optional.empty();
+				return Optional.ofNullable(newest);
 			}
 		}
 	}
@@ -194,23 +215,21 @@ public final class RepositoryStreamStore implements StreamStore {
 		}
 	}
 
-	/** The newest value of the address in one change set: the last entry or keyframe slot naming it. */
-	private static Optional<StoredValue> valueIn(ChangeSet changeSet, String slotAddress) {
-		List<ChangeEntry> entries = changeSet.getEntries();
-		for (int i = entries.size() - 1; i >= 0; i--) {
-			ChangeEntry entry = entries.get(i);
-			long time = entry.getTimestamp() != null ? entry.getTimestamp() : changeSet.getTimestamp();
-			if (entry.getKind() == DeltaKind.KEYFRAME) {
-				for (SlotValue slot : entry.getState()) {
-					if (slotAddress.equals(slot.getFeatureUri())) {
-						return Optional.of(new StoredValue(slot.getValue(), time));
-					}
-				}
-			} else if (slotAddress.equals(entry.getFeatureUri())) {
-				return Optional.of(new StoredValue(entry.getValueNew(), time));
-			}
+	/** Whether an entry gives the address a value: an entry on it, or a keyframe with a slot for it. */
+	private static boolean holds(ChangeEntry entry, String slotAddress) {
+		if (entry.getKind() == DeltaKind.KEYFRAME) {
+			return entry.getState().stream().anyMatch(slot -> slotAddress.equals(slot.getFeatureUri()));
 		}
-		return Optional.empty();
+		return slotAddress.equals(entry.getFeatureUri());
+	}
+
+	/** The value an entry gives the address: its new value, or the address's slot in a keyframe. */
+	private static String valueOf(ChangeEntry entry, String slotAddress) {
+		if (entry.getKind() == DeltaKind.KEYFRAME) {
+			return entry.getState().stream().filter(slot -> slotAddress.equals(slot.getFeatureUri())).findFirst()
+					.map(SlotValue::getValue).orElse(null);
+		}
+		return entry.getValueNew();
 	}
 
 	private static QueryBuilder stream(String streamId) {

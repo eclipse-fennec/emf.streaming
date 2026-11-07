@@ -46,6 +46,7 @@ import org.eclipse.fennec.model.streammapping.StreamSlot;
 import org.eclipse.fennec.stream.EventCore;
 import org.eclipse.fennec.stream.StreamCore;
 import org.eclipse.fennec.stream.StreamStore;
+import org.eclipse.fennec.stream.tck.StreamStoreContract;
 import org.eclipse.fennec.stream.StreamStore.RetentionOutcome;
 import org.eclipse.fennec.stream.StreamStore.StoredValue;
 import org.junit.jupiter.api.AfterEach;
@@ -58,13 +59,12 @@ import org.osgi.test.common.annotation.InjectService;
 import org.osgi.test.common.service.ServiceAware;
 
 /**
- * The repository stream store on JPA (EclipseLink, H2): change sets are saved as ordinary models of
- * the stream model and read back by stream and sequence.
+ * The repository stream store on JPA (EclipseLink, H2) meets the store contract; the core writes into
+ * it when selected.
  */
-class RepositoryStreamStoreOsgiTest {
+class RepositoryStreamStoreOsgiTest extends StreamStoreContract {
 
 	private static final String STREAM_NS_URI = "https://org.eclipse/fennec/stream/1.0.0";
-	private static final StreamFactory STREAM = StreamFactory.eINSTANCE;
 
 	@InjectService(timeout = 5000)
 	ConfigurationAdmin configAdmin;
@@ -89,79 +89,44 @@ class RepositoryStreamStoreOsgiTest {
 		single("FennecRepositoryStreamStore", "repository.target", "(persistence.repository.id=streams)");
 	}
 
+	@Override
+	protected StreamStore store() {
+		try {
+			StreamStore store = stores.waitForService(20_000);
+			assertThat(store).as("the repository store appears once its repository is there").isNotNull();
+			return store;
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			throw new AssertionError(e);
+		}
+	}
+
+	@Override
+	@Test
+	@Disabled("emf.persistence-jpa#404: an unset unsettable attribute is read back as set")
+	protected void anUnsetRecordingIsReadBackUnset() {
+		super.anUnsetRecordingIsReadBackUnset();
+	}
+
+	@Override
+	@Test
+	@Disabled("Blocked by emf.persistence-jpa#403: deleting a change set fails on the synthetic PK of its entries (#42)")
+	protected void retentionKeepsTheNewestEntriesOfASlotUpToTheCount() {
+		super.retentionKeepsTheNewestEntriesOfASlotUpToTheCount();
+	}
+
+	@Override
+	@Test
+	@Disabled("Blocked by emf.persistence-jpa#403: deleting a change set fails on the synthetic PK of its entries (#42)")
+	protected void retentionRemovesTheEntriesOfASlotOlderThanTheHorizon() {
+		super.retentionRemovesTheEntriesOfASlotOlderThanTheHorizon();
+	}
+
 	@AfterEach
 	void cleanUp() throws Exception {
 		for (Configuration configuration : configurations) {
 			configuration.delete();
 		}
-	}
-
-	@Test
-	void changeSetsAreStoredAndReadBackByStreamAndSequence() throws Exception {
-		StreamStore store = stores.waitForService(20_000);
-		assertThat(store).as("the repository store appears once its repository is there").isNotNull();
-		String pool = "https://eclipse.org/bath#Pool/wellenbecken";
-		String other = "https://eclipse.org/bath#Pool/sportbecken";
-		String temperature = "https://eclipse.org/bath#//Pool/waterTemperature";
-		String ph = "https://eclipse.org/bath#//Pool/ph";
-
-		store.append(changeSet(pool, 1, 1_000, set(temperature, "27.0", 1_000L)));
-		store.append(changeSet(pool, 2, 2_000, keyframe(2_000L, slot(temperature, "27.5"), slot(ph, "7.2"))));
-		store.append(changeSet(pool, 3, 3_000, set(temperature, "28.1", 3_000L)));
-		store.append(changeSet(other, 1, 1_500, set(temperature, "24.0", 1_500L)));
-
-		assertThat(store.lastSequence(pool)).isEqualTo(3);
-		assertThat(store.lastSequence(other)).isEqualTo(1);
-		assertThat(store.lastSequence("unknown")).isZero();
-
-		List<ChangeSet> all = store.read(pool, 1, 3);
-		assertThat(all).extracting(ChangeSet::getSequence).containsExactly(1L, 2L, 3L);
-		assertThat(all).extracting(ChangeSet::getAuthor).containsOnly("test");
-		ChangeEntry keyframe = all.get(1).getEntries().get(0);
-		assertThat(keyframe.getKind()).isEqualTo(DeltaKind.KEYFRAME);
-		assertThat(keyframe.getState()).extracting(SlotValue::getFeatureUri, SlotValue::getValue)
-				.containsExactlyInAnyOrder(tuple(temperature, "27.5"),
-						tuple(ph, "7.2"));
-		assertThat(store.read(pool, 2, 2)).extracting(ChangeSet::getSequence).containsExactly(2L);
-		assertThat(store.read(pool, 3, 1)).isEmpty();
-
-		assertThat(store.lastValue(pool, temperature)).contains(new StoredValue("28.1", 3_000L));
-		assertThat(store.lastValue(pool, ph)).as("from the keyframe").contains(new StoredValue("7.2", 2_000L));
-		assertThat(store.lastValue(other, ph)).isEmpty();
-	}
-
-	@Test
-	@Disabled("Blocked by emf.persistence-jpa#403: deleting a change set fails on the synthetic PK of its entries (#42)")
-	void retentionRemovesTheEntriesOfASlotBeyondCountAndHorizon() throws Exception {
-		StreamStore store = stores.waitForService(20_000);
-		assertThat(store).isNotNull();
-		String pool = "https://eclipse.org/bath#Pool/kinderland";
-		String temperature = "https://eclipse.org/bath#//Pool/waterTemperature";
-		String ph = "https://eclipse.org/bath#//Pool/ph";
-		store.append(changeSet(pool, 1, 1_000, set(temperature, "27.0", 1_000L)));
-		store.append(changeSet(pool, 2, 2_000, set(temperature, "27.5", 2_000L), set(ph, "7.1", 2_000L)));
-		store.append(changeSet(pool, 3, 3_000, keyframe(3_000L, slot(temperature, "27.5"), slot(ph, "7.1"))));
-		store.append(changeSet(pool, 4, 4_000, set(temperature, "28.0", 4_000L)));
-		store.append(changeSet(pool, 5, 5_000, set(temperature, "28.5", 5_000L)));
-
-		DeletionRule keepTwo = StreamMappingFactory.eINSTANCE.createDeletionRule();
-		keepTwo.setMaxCount(2);
-		assertThat(store.retain(pool, temperature, keepTwo, 6_000)).isEqualTo(RetentionOutcome.APPLIED);
-
-		List<ChangeSet> kept = store.read(pool, 1, 5);
-		assertThat(kept).as("the set holding only the dropped value goes").extracting(ChangeSet::getSequence)
-				.containsExactly(2L, 3L, 4L, 5L);
-		assertThat(kept.get(0).getEntries()).extracting(ChangeEntry::getFeatureUri).containsExactly(ph);
-		assertThat(kept.get(1).getEntries()).as("keyframes stay").singleElement()
-				.satisfies(e -> assertThat(e.getKind()).isEqualTo(DeltaKind.KEYFRAME));
-		assertThat(store.lastValue(pool, temperature)).contains(new StoredValue("28.5", 5_000L));
-
-		DeletionRule horizon = StreamMappingFactory.eINSTANCE.createDeletionRule();
-		horizon.setRetention(1);
-		horizon.setRetentionUnit(DurationUnit.SECONDS);
-		store.retain(pool, temperature, horizon, 6_000);
-
-		assertThat(store.read(pool, 1, 5)).extracting(ChangeSet::getSequence).containsExactly(2L, 3L, 5L);
 	}
 
 	@Test
@@ -204,45 +169,6 @@ class RepositoryStreamStoreOsgiTest {
 			Thread.sleep(20);
 		}
 		throw new AssertionError("no core on the repository store");
-	}
-
-	private static ChangeSet changeSet(String streamId, long sequence, long time, ChangeEntry... entries) {
-		ChangeSet changeSet = STREAM.createChangeSet();
-		changeSet.setId(streamId + "@" + sequence);
-		changeSet.setStreamId(streamId);
-		changeSet.setSequence(sequence);
-		changeSet.setTimestamp(time);
-		changeSet.setCommitTime(time + 5);
-		changeSet.setContextFingerprint("fp");
-		changeSet.setAuthor("test");
-		changeSet.getEntries().addAll(List.of(entries));
-		return changeSet;
-	}
-
-	private static ChangeEntry set(String featureUri, String value, Long time) {
-		ChangeEntry entry = STREAM.createChangeEntry();
-		entry.setKind(DeltaKind.SET);
-		entry.setObjectId("o");
-		entry.setFeatureUri(featureUri);
-		entry.setValueNew(value);
-		entry.setTimestamp(time);
-		return entry;
-	}
-
-	private static ChangeEntry keyframe(Long time, SlotValue... slots) {
-		ChangeEntry entry = STREAM.createChangeEntry();
-		entry.setKind(DeltaKind.KEYFRAME);
-		entry.setObjectId("o");
-		entry.setTimestamp(time);
-		entry.getState().addAll(List.of(slots));
-		return entry;
-	}
-
-	private static SlotValue slot(String featureUri, String value) {
-		SlotValue slot = STREAM.createSlotValue();
-		slot.setFeatureUri(featureUri);
-		slot.setValue(value);
-		return slot;
 	}
 
 	/** EClass names stream into ENamedElement.name; an EClass finds its stream by its name. */
