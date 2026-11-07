@@ -151,8 +151,7 @@ releases them when it stops. A store is selected the same way as a projection:
 }
 ```
 
-> On JPA the store does not work yet: the column `value` of `SlotValue` is a reserved word in H2
-> (emf.persistence-jpa#399, #39). Retention is not supported by the repository store yet (#32).
+> Retention is not supported by the repository store yet (#32).
 
 ## Transport
 
