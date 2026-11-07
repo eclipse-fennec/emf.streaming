@@ -21,8 +21,6 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,9 +33,7 @@ import org.eclipse.fennec.stream.StreamCore;
 import org.eclipse.fennec.stream.StreamId;
 import org.gecko.messaging.api.Message;
 import org.gecko.messaging.api.MessageContextBuilder;
-import org.gecko.messaging.api.FeatureNotSupportedException;
 import org.gecko.messaging.api.MessagePublisher;
-import org.gecko.messaging.api.MessagingException;
 import org.gecko.messaging.api.MessagingConstants;
 import org.gecko.messaging.api.cloudevents.CloudEventMessageContextBuilder;
 import org.osgi.util.promise.Promise;
@@ -61,8 +57,6 @@ public final class StreamPublisher {
 	public static final String SEQUENCE_EXTENSION = "sequence";
 
 	private static final Logger LOGGER = Logger.getLogger(StreamPublisher.class.getName());
-	private static final long MIN_RETRY_PAUSE = 50;
-	private static final long MAX_RETRY_PAUSE = 5_000;
 
 	private final MessagePublisher publisher;
 	private final ChangeSetCodec codec;
@@ -102,51 +96,28 @@ public final class StreamPublisher {
 	}
 
 	/**
-	 * Publishes every change set the core writes from now on.
+	 * Publishes every change set the core writes from now on, one after the other. A change set the
+	 * instance refuses is logged and skipped. To ride out a connect or reconnect, configure the
+	 * instance with {@code publishAwaitConnection} (Gecko Messaging): the publish then waits for the
+	 * connection instead of failing. During a long outage the core's output buffer drops its oldest
+	 * change sets - receivers then go stale and come back with the next keyframe.
 	 *
 	 * @param core the core
 	 * @return closing it stops publishing
 	 */
 	public AutoCloseable attach(StreamCore core) {
 		PushStream<ChangeSet> changes = core.changes();
-		AtomicBoolean closed = new AtomicBoolean();
-		changes.forEach(changeSet -> publishUntilTaken(changeSet, closed));
-		return () -> {
-			closed.set(true);
-			changes.close();
-		};
+		changes.forEach(this::publishOrLog);
+		return changes::close;
 	}
 
-	/**
-	 * Publishes one change set of an attached core, in order: while the instance is not connected
-	 * (Gecko Messaging refuses publishing then, and nothing is buffered), it retries with a growing
-	 * pause; a change set that cannot be published at all (no codec result, unknown class) is
-	 * logged and skipped. During a long outage the core's output buffer drops its oldest change sets
-	 * - receivers then go stale and come back with the next keyframe.
-	 */
-	private void publishUntilTaken(ChangeSet changeSet, AtomicBoolean closed) {
-		long pause = MIN_RETRY_PAUSE;
-		while (!closed.get()) {
-			try {
-				publish(changeSet).getValue();
-				return;
-			} catch (InvocationTargetException e) {
-				if (!(e.getCause() instanceof MessagingException) || e.getCause() instanceof FeatureNotSupportedException) {
-					LOGGER.log(Level.WARNING, e.getCause(), () -> "Change set " + changeSet.getId() + " cannot be published - skipped");
-					return;
-				}
-				LOGGER.fine(() -> "Messaging instance not ready, change set " + changeSet.getId() + " waits: " + e.getCause().getMessage());
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				return;
-			}
-			try {
-				TimeUnit.MILLISECONDS.sleep(pause);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				return;
-			}
-			pause = Math.min(pause * 2, MAX_RETRY_PAUSE);
+	private void publishOrLog(ChangeSet changeSet) {
+		try {
+			publish(changeSet).getValue();
+		} catch (InvocationTargetException e) {
+			LOGGER.log(Level.WARNING, e.getCause(), () -> "Change set " + changeSet.getId() + " was not published - skipped");
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
 		}
 	}
 
