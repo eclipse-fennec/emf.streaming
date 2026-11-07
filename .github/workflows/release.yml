@@ -52,6 +52,6 @@ jobs:
     # same XML as a job summary with inline annotations; this job adds the one
     # check run per JDK leg, which needs `checks: write` — granted on this job
     # alone, so verify itself keeps running with `contents: read`.
-    uses: eclipse-fennec/.github/.github/workflows/reusable-test-report.yml@2a98ad6e2459556b858e1273bff2f8d87fc11a06 # v1.3.0
+    uses: eclipse-fennec/.github/.github/workflows/reusable-test-report.yml@5b25efac2c99c0f88252d1a45302b8a1ae5876ce # v1.4.0
     # java-versions deliberately unset: it defaults to the same '["21","25"]' as
     # reusable-verify, so the two stay in step.
