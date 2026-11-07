@@ -10,18 +10,15 @@
  * Contributors:
  *   Data In Motion Consulting - initial implementation
  ********************************************************************/
-package org.eclipse.fennec.stream.example.pool;
+package org.eclipse.fennec.stream.persistence.impl;
 
-import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.fennec.persistence.repository.api.Repository;
 import org.eclipse.fennec.stream.Projection;
+import org.eclipse.fennec.stream.persistence.RepositoryProjection;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
@@ -33,27 +30,21 @@ import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 
 /**
- * Projects slot values into a Fennec persistence repository by update commands: the values of one
- * batch become one {@code UpdateCommand} on the target object, one template entry per feature, and
- * the object is never loaded (JPA turns it into one {@code UPDATE ... SET}).
- * <p>
- * Prototype-scoped, like the repository: the core takes one projection per lane thread, and every
- * projection instance gets a repository instance of its own. Neither needs to be thread-safe; DS
- * releases the repository with the projection instance.
+ * The {@link RepositoryProjection} as a service. Prototype-scoped, like the repository: the core
+ * takes one projection per lane thread, and every projection instance gets a repository instance of
+ * its own; DS releases the repository with the projection instance.
  * <p>
  * Configuration required (PID {@value #PID}): {@code repository.target} names the repository. The
  * service carries {@code fennec.stream.projection=repository}; the core selects it with
  * {@code projection.target=(fennec.stream.projection=repository)}.
  */
-@Component(name = RepositoryProjection.PID, service = Projection.class, scope = ServiceScope.PROTOTYPE,
+@Component(name = RepositoryProjectionComponent.PID, scope = ServiceScope.PROTOTYPE,
 		configurationPolicy = ConfigurationPolicy.REQUIRE, property = "fennec.stream.projection=repository")
-@Designate(ocd = RepositoryProjection.Config.class)
-public class RepositoryProjection implements Projection {
+@Designate(ocd = RepositoryProjectionComponent.Config.class)
+public class RepositoryProjectionComponent implements Projection {
 
 	/** The configuration PID and component name. */
 	public static final String PID = "FennecRepositoryProjection";
-
-	private static final Logger LOGGER = Logger.getLogger(RepositoryProjection.class.getName());
 
 	/**
 	 * Configuration.
@@ -68,31 +59,24 @@ public class RepositoryProjection implements Projection {
 		String repository_target();
 	}
 
-	private final Repository repository;
+	private final RepositoryProjection projection;
 
 	/**
 	 * @param repository the repository holding the target objects, an instance for this projection only
 	 */
 	@Activate
-	public RepositoryProjection(
+	public RepositoryProjectionComponent(
 			@Reference(name = "repository", scope = ReferenceScope.PROTOTYPE_REQUIRED) Repository repository) {
-		this.repository = repository;
+		this.projection = new RepositoryProjection(repository);
 	}
 
 	@Override
 	public boolean project(EClass targetClass, String targetId, EStructuralFeature feature, Object value) {
-		Map<EStructuralFeature, Object> values = new LinkedHashMap<>();
-		values.put(feature, value);
-		return project(targetClass, targetId, values);
+		return projection.project(targetClass, targetId, feature, value);
 	}
 
 	@Override
 	public boolean project(EClass targetClass, String targetId, Map<EStructuralFeature, Object> values) {
-		try {
-			return repository.execute(PoolUpdates.update(targetClass, targetId, values)) > 0;
-		} catch (IOException | RuntimeException e) {
-			LOGGER.log(Level.WARNING, e, () -> "Update of " + targetClass.getName() + " " + targetId + " failed");
-			return false;
-		}
+		return projection.project(targetClass, targetId, values);
 	}
 }

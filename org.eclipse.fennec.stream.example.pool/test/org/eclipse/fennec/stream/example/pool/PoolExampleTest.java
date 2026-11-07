@@ -18,7 +18,6 @@ import java.lang.annotation.Annotation;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,9 +31,6 @@ import org.eclipse.fennec.mapping.InMemoryMappingRegistry;
 import org.eclipse.fennec.mapping.Mapper;
 import org.eclipse.fennec.mapping.MappingValidator;
 import org.eclipse.fennec.mapping.ValueExtractor;
-import org.eclipse.fennec.model.command.UpdateCommand;
-import org.eclipse.fennec.model.stream.ChangeEntry;
-import org.eclipse.fennec.model.stream.DeltaKind;
 import org.eclipse.fennec.ogc.features.example.bath.BathPackage;
 import org.eclipse.fennec.stream.EventCore;
 import org.eclipse.fennec.stream.InMemoryStreamStore;
@@ -54,22 +50,6 @@ class PoolExampleTest {
 	void theMappingIsValid() {
 		Diagnostic diagnostic = new MappingValidator().validate(PoolStreamMapping.create());
 		assertThat(diagnostic.getChildren()).isEmpty();
-	}
-
-	@Test
-	void theUpdateSelectsThePoolByIdAndSetsBothFeatures() {
-		Map<EStructuralFeature, Object> values = new LinkedHashMap<>();
-		values.put(BathPackage.Literals.POOL__WATER_TEMPERATURE, 28.4);
-		values.put(BathPackage.Literals.POOL__PH, 7.15);
-
-		UpdateCommand update = PoolUpdates.update(BathPackage.Literals.POOL, "wellenbecken", values);
-
-		assertThat(update.getSelector()).isNotNull();
-		assertThat(update.getTemplate().getEntries()).extracting(ChangeEntry::getKind).containsExactly(DeltaKind.SET, DeltaKind.SET);
-		assertThat(update.getTemplate().getEntries()).extracting(ChangeEntry::getFeatureId).containsExactly(
-				BathPackage.Literals.POOL.getFeatureID(BathPackage.Literals.POOL__WATER_TEMPERATURE),
-				BathPackage.Literals.POOL.getFeatureID(BathPackage.Literals.POOL__PH));
-		assertThat(update.getTemplate().getEntries()).extracting(ChangeEntry::getValueNew).containsExactly("28.4", "7.15");
 	}
 
 	@Test
