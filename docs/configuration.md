@@ -58,8 +58,7 @@ The projection is prototype-scoped. The core takes one instance per lane thread 
 when the thread ends or the core stops. Every projection instance gets a repository instance of its
 own, so neither has to be thread-safe.
 
-> The repository projection (`FennecRepositoryProjection`) is part of the pool example
-> (`org.eclipse.fennec.stream.example.pool`) for now.
+Store and projection on a repository come with the bundle `org.eclipse.fennec.stream.persistence`.
 
 ### JPA (EclipseLink)
 
@@ -124,15 +123,36 @@ The update becomes one `$set` per target and batch.
 
 ## Store
 
-The change sets of a stream go to the in-memory store by default. A persistent store, which saves
-change sets as ordinary models through a repository (JPA or Mongo), is in preparation (#4, #33).
-A store is selected the same way as a projection:
+The change sets of a stream go to the in-memory store by default. The repository store
+(`FennecRepositoryStreamStore`) saves change sets as ordinary models of the stream model through a
+repository (JPA or Mongo). It uses up to `repositories` repository instances at once (default 4) and
+releases them when it stops. A store is selected the same way as a projection:
 
 ```json
+"fennec.jpa.EORMMappingService~streams": {
+  "fennec.jpa.eorm.mappingName": "streams",
+  "fennec.jpa.eorm.model.target": "(emf.nsURI=https://org.eclipse/fennec/stream/1.0.0)"
+},
+"fennec.jpa.EMPersistenceUnit~streams": {
+  "fennec.jpa.persistenceUnitName": "streams",
+  "fennec.jpa.mapping.target": "(fennec.jpa.eorm.mapping=streams)",
+  "fennec.jpa.ext.eclipselink.ddl-generation": "create-tables",
+  "fennec.jpa.dataSource.target": "(subprotocol=*)"
+},
+"fennec.repository.jpa~streams": {
+  "repositoryId": "streams",
+  "unit.target": "(osgi.unit.name=streams)"
+},
+"FennecRepositoryStreamStore": {
+  "repository.target": "(persistence.repository.id=streams)"
+},
 "FennecStreamCore": {
-  "store.target": "(fennec.stream.store=<name>)"
+  "store.target": "(fennec.stream.store=repository)"
 }
 ```
+
+> On JPA the store does not work yet: the column `value` of `SlotValue` is a reserved word in H2
+> (emf.persistence-jpa#399, #39). Retention is not supported by the repository store yet (#32).
 
 ## Transport
 
