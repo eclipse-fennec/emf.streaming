@@ -27,3 +27,6 @@ Bundle-Description: OSGi integration tests of the stream core: the StreamCore se
 
 -testpath: \
 	assertj-core
+
+# Bundles the test run requires without compiling against them: build them first.
+-dependson: org.eclipse.fennec.stream.osgi,org.eclipse.fennec.stream.messaging,org.eclipse.fennec.stream.codec.json,org.eclipse.fennec.stream.mapping.model,org.eclipse.fennec.mapping.osgi,org.eclipse.fennec.mapping.ocl
