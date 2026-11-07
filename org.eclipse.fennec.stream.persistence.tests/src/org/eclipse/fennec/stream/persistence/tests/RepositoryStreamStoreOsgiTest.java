@@ -38,15 +38,19 @@ import org.eclipse.fennec.model.stream.ChangeSet;
 import org.eclipse.fennec.model.stream.DeltaKind;
 import org.eclipse.fennec.model.stream.SlotValue;
 import org.eclipse.fennec.model.stream.StreamFactory;
+import org.eclipse.fennec.model.streammapping.DeletionRule;
+import org.eclipse.fennec.model.streammapping.DurationUnit;
 import org.eclipse.fennec.model.streammapping.StreamMapping;
 import org.eclipse.fennec.model.streammapping.StreamMappingFactory;
 import org.eclipse.fennec.model.streammapping.StreamSlot;
 import org.eclipse.fennec.stream.EventCore;
 import org.eclipse.fennec.stream.StreamCore;
 import org.eclipse.fennec.stream.StreamStore;
+import org.eclipse.fennec.stream.StreamStore.RetentionOutcome;
 import org.eclipse.fennec.stream.StreamStore.StoredValue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -124,6 +128,40 @@ class RepositoryStreamStoreOsgiTest {
 		assertThat(store.lastValue(pool, temperature)).contains(new StoredValue("28.1", 3_000L));
 		assertThat(store.lastValue(pool, ph)).as("from the keyframe").contains(new StoredValue("7.2", 2_000L));
 		assertThat(store.lastValue(other, ph)).isEmpty();
+	}
+
+	@Test
+	@Disabled("Blocked by emf.persistence-jpa#403: deleting a change set fails on the synthetic PK of its entries (#42)")
+	void retentionRemovesTheEntriesOfASlotBeyondCountAndHorizon() throws Exception {
+		StreamStore store = stores.waitForService(20_000);
+		assertThat(store).isNotNull();
+		String pool = "https://eclipse.org/bath#Pool/kinderland";
+		String temperature = "https://eclipse.org/bath#//Pool/waterTemperature";
+		String ph = "https://eclipse.org/bath#//Pool/ph";
+		store.append(changeSet(pool, 1, 1_000, set(temperature, "27.0", 1_000L)));
+		store.append(changeSet(pool, 2, 2_000, set(temperature, "27.5", 2_000L), set(ph, "7.1", 2_000L)));
+		store.append(changeSet(pool, 3, 3_000, keyframe(3_000L, slot(temperature, "27.5"), slot(ph, "7.1"))));
+		store.append(changeSet(pool, 4, 4_000, set(temperature, "28.0", 4_000L)));
+		store.append(changeSet(pool, 5, 5_000, set(temperature, "28.5", 5_000L)));
+
+		DeletionRule keepTwo = StreamMappingFactory.eINSTANCE.createDeletionRule();
+		keepTwo.setMaxCount(2);
+		assertThat(store.retain(pool, temperature, keepTwo, 6_000)).isEqualTo(RetentionOutcome.APPLIED);
+
+		List<ChangeSet> kept = store.read(pool, 1, 5);
+		assertThat(kept).as("the set holding only the dropped value goes").extracting(ChangeSet::getSequence)
+				.containsExactly(2L, 3L, 4L, 5L);
+		assertThat(kept.get(0).getEntries()).extracting(ChangeEntry::getFeatureUri).containsExactly(ph);
+		assertThat(kept.get(1).getEntries()).as("keyframes stay").singleElement()
+				.satisfies(e -> assertThat(e.getKind()).isEqualTo(DeltaKind.KEYFRAME));
+		assertThat(store.lastValue(pool, temperature)).contains(new StoredValue("28.5", 5_000L));
+
+		DeletionRule horizon = StreamMappingFactory.eINSTANCE.createDeletionRule();
+		horizon.setRetention(1);
+		horizon.setRetentionUnit(DurationUnit.SECONDS);
+		store.retain(pool, temperature, horizon, 6_000);
+
+		assertThat(store.read(pool, 1, 5)).extracting(ChangeSet::getSequence).containsExactly(2L, 3L, 5L);
 	}
 
 	@Test
