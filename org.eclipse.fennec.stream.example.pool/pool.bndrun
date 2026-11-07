@@ -6,6 +6,7 @@
 -runrequires: \
 	bnd.identity;id='org.eclipse.fennec.stream.example.pool',\
 	bnd.identity;id='org.eclipse.fennec.stream.osgi',\
+	bnd.identity;id='org.eclipse.fennec.stream.persistence',\
 	bnd.identity;id='org.eclipse.fennec.mapping.osgi',\
 	bnd.identity;id='org.eclipse.fennec.mapping.ocl',\
 	bnd.identity;id='org.eclipse.fennec.emf.osgi.eobject.registry',\

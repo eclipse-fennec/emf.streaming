@@ -1,0 +1,27 @@
+Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
+Bundle-Name: Eclipse Fennec Stream Persistence Tests
+Bundle-Description: OSGi integration tests of the repository stream store on JPA with an in-memory \
+	H2 database: change sets saved as ordinary models, read back by stream and sequence.
+
+-workingset: streaming
+
+-library: \
+	enableEMF,\
+	enableOSGi-Test
+
+-buildpath: \
+	org.eclipse.fennec.emf.osgi.api;version=latest,\
+	org.osgi.service.cm;version=latest,\
+	org.osgi.util.pushstream;version=latest,\
+	org.osgi.util.promise;version=latest,\
+	org.eclipse.fennec.atlas.configuration.model;version=latest,\
+	org.eclipse.fennec.mapping.model;version=snapshot,\
+	org.eclipse.fennec.stream.model;version=snapshot,\
+	org.eclipse.fennec.stream.mapping.model;version=snapshot,\
+	org.eclipse.fennec.stream;version=snapshot
+
+-testpath: \
+	assertj-core
+
+# Bundles the test run requires without compiling against them: build them first.
+-dependson: org.eclipse.fennec.stream.persistence,org.eclipse.fennec.stream.osgi,org.eclipse.fennec.mapping.osgi,org.eclipse.fennec.mapping.ocl,org.eclipse.fennec.stream.mapping.model

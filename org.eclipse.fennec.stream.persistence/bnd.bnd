@@ -1,0 +1,27 @@
+Bundle-Name: Eclipse Fennec Stream Persistence
+Bundle-Description: The change stream on a Fennec persistence repository (JPA or Mongo): a StreamStore \
+	that saves change sets as ordinary models, and a projection that writes slot values by update \
+	commands without loading the target objects.
+
+-workingset: streaming
+
+-library: enableEMF
+
+-buildpath: \
+	org.osgi.service.component;version=latest,\
+	org.osgi.service.component.annotations;version=latest,\
+	org.osgi.service.metatype.annotations;version=latest,\
+	org.osgi.util.pushstream;version=latest,\
+	org.osgi.util.promise;version=latest,\
+	org.eclipse.fennec.stream.model;version=snapshot,\
+	org.eclipse.fennec.stream.mapping.model;version=snapshot,\
+	org.eclipse.fennec.stream;version=snapshot,\
+	org.eclipse.fennec.persistence.repository;version=latest,\
+	org.eclipse.fennec.persistence.query;version=latest,\
+	org.eclipse.fennec.command.model;version=latest,\
+	org.eclipse.fennec.query.model;version=latest,\
+	org.eclipse.fennec.expression.model;version=latest
+
+-testpath: \
+	org.eclipse.fennec.persistence.capabilities;version=latest,\
+	assertj-core
