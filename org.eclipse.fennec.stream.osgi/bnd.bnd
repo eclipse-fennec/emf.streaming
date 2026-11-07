@@ -8,6 +8,7 @@ Bundle-Description: OSGi layer of the Fennec change stream: the StreamCore servi
 
 -buildpath: \
 	org.osgi.service.condition;version=latest,\
+	org.osgi.service.component;version=latest,\
 	org.osgi.service.component.annotations;version=latest,\
 	org.osgi.service.metatype.annotations;version=latest,\
 	org.osgi.util.pushstream;version=latest,\
