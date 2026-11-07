@@ -21,3 +21,6 @@ Bundle-Description: OSGi integration tests of the mapping: whiteboards, the mapp
 
 -testpath: \
 	assertj-core
+
+# Bundles the test run requires without compiling against them: build them first.
+-dependson: org.eclipse.fennec.mapping.osgi,org.eclipse.fennec.mapping.ocl,org.eclipse.fennec.mapping.model

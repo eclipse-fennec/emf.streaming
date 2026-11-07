@@ -1,10 +1,4 @@
-// The bundles the test run requires but does not compile against have no task dependency on
-// their jar; without it, resolve.test can run before they are built.
-def runRequired = (file("test.bndrun").text =~ /bnd\.identity;id='([^']+)'/).collect { it[1] }
-	.findAll { it != project.name && rootProject.findProject(":${it}") != null }
-
 def resolveTask = tasks.named("resolve.test") {
-	dependsOn(runRequired.collect { ":${it}:jar" })
 	outputBndrun = layout.buildDirectory.file("test.bndrun")
 }
 
