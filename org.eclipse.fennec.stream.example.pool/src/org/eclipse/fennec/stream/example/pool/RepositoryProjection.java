@@ -22,12 +22,12 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.fennec.persistence.repository.api.Repository;
 import org.eclipse.fennec.stream.Projection;
-import org.osgi.service.component.ComponentServiceObjects;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceScope;
+import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
@@ -37,12 +37,14 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
  * batch become one {@code UpdateCommand} on the target object, one template entry per feature, and
  * the object is never loaded (JPA turns it into one {@code UPDATE ... SET}).
  * <p>
- * A repository instance is not thread-safe and is offered with prototype scope: every lane thread
- * gets its own instance; DS releases them on deactivation.
+ * Prototype-scoped, like the repository: the core takes one projection per lane thread, and every
+ * projection instance gets a repository instance of its own. Neither needs to be thread-safe; DS
+ * releases the repository with the projection instance.
  * <p>
  * Configuration required (PID {@value #PID}): {@code repository.target} names the repository.
  */
-@Component(name = RepositoryProjection.PID, service = Projection.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
+@Component(name = RepositoryProjection.PID, service = Projection.class, scope = ServiceScope.PROTOTYPE,
+		configurationPolicy = ConfigurationPolicy.REQUIRE)
 @Designate(ocd = RepositoryProjection.Config.class)
 public class RepositoryProjection implements Projection {
 
@@ -64,15 +66,15 @@ public class RepositoryProjection implements Projection {
 		String repository_target();
 	}
 
-	private final ThreadLocal<Repository> perThread;
+	private final Repository repository;
 
 	/**
-	 * @param repositories the repository holding the target objects, one instance per thread
+	 * @param repository the repository holding the target objects, an instance for this projection only
 	 */
 	@Activate
 	public RepositoryProjection(
-			@Reference(name = "repository", scope = ReferenceScope.PROTOTYPE_REQUIRED) ComponentServiceObjects<Repository> repositories) {
-		this.perThread = ThreadLocal.withInitial(repositories::getService);
+			@Reference(name = "repository", scope = ReferenceScope.PROTOTYPE_REQUIRED) Repository repository) {
+		this.repository = repository;
 	}
 
 	@Override
@@ -85,7 +87,7 @@ public class RepositoryProjection implements Projection {
 	@Override
 	public boolean project(EClass targetClass, String targetId, Map<EStructuralFeature, Object> values) {
 		try {
-			return perThread.get().execute(PoolUpdates.update(targetClass, targetId, values)) > 0;
+			return repository.execute(PoolUpdates.update(targetClass, targetId, values)) > 0;
 		} catch (IOException | RuntimeException e) {
 			LOGGER.log(Level.WARNING, e, () -> "Update of " + targetClass.getName() + " " + targetId + " failed");
 			return false;

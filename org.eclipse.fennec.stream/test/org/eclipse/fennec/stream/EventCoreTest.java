@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -263,6 +264,49 @@ class EventCoreTest {
 		assertThat(calls).singleElement().satisfies(values -> {
 			assertThat(values).containsEntry(fx.currentTemperature, 24.5).containsEntry(fx.currentPh, 7.2);
 		});
+	}
+
+	@Test
+	void everyLaneThreadProjectsWithItsOwnInstanceAndGivesItBack() throws Exception {
+		fx.registry.register(fx.mapping());
+		Map<Projection, Thread> owners = new ConcurrentHashMap<>();
+		List<String> conflicts = Collections.synchronizedList(new ArrayList<>());
+		List<Projection> acquired = Collections.synchronizedList(new ArrayList<>());
+		List<Projection> released = Collections.synchronizedList(new ArrayList<>());
+		core = fx.core(store).projections(new ProjectionSource() {
+			@Override
+			public Projection acquire() {
+				Projection checked = new Projection() {
+					@Override
+					public boolean project(EClass targetClass, String targetId, EStructuralFeature feature, Object value) {
+						Thread owner = owners.putIfAbsent(this, Thread.currentThread());
+						if (owner != null && owner != Thread.currentThread()) {
+							conflicts.add(owner.getName() + " / " + Thread.currentThread().getName());
+						}
+						return true;
+					}
+				};
+				acquired.add(checked);
+				return checked;
+			}
+
+			@Override
+			public void release(Projection projection) {
+				released.add(projection);
+			}
+		}).build();
+
+		for (int i = 0; i < 40; i++) {
+			core.offer(fx.temp("t" + i, "pool-" + i, 20.0 + i), i, null);
+		}
+		assertThat(core.awaitIdle(WAIT)).isTrue();
+		assertThat(acquired).as("one projection per lane thread at most").isNotEmpty().hasSizeLessThanOrEqualTo(6);
+		assertThat(conflicts).as("an instance is used by one thread only").isEmpty();
+
+		core.close();
+		core = null;
+		assertThat(released).as("every acquired projection is released exactly once")
+				.containsExactlyInAnyOrderElementsOf(acquired);
 	}
 
 	@Test

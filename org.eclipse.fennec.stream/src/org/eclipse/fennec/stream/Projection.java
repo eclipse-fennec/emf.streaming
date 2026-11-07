@@ -23,7 +23,8 @@ import org.osgi.annotation.versioning.ConsumerType;
  * partial update of the store without loading it (JPA column update, Mongo {@code $set}; those
  * implementations live in emf.persistence).
  * <p>
- * Called from the lane of the target object only. The value is already converted and coerced to
+ * Called from the lane of the target object only; an instance need not be thread-safe when it comes
+ * from a {@link ProjectionSource} (one per lane thread). The value is already converted and coerced to
  * the feature's type.
  */
 @ConsumerType

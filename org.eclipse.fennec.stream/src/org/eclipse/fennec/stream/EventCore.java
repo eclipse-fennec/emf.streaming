@@ -36,6 +36,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.emf.ecore.EClass;
@@ -138,12 +139,14 @@ public final class EventCore implements StreamCore, AutoCloseable {
 	private static final Logger LOGGER = Logger.getLogger(EventCore.class.getName());
 	private static final StreamFactory STREAM = StreamFactory.eINSTANCE;
 	private static final int OUTPUT_BUFFER = 1024;
+	private static final long CLOSE_TIMEOUT_SECONDS = 5;
 
 	private final MappingRegistry mappings;
 	private final Mapper mapper;
 	private final ChangeRules rules;
 	private final StreamStore store;
-	private final Projection projection;
+	private final ProjectionSource projections;
+	private final Map<Thread, Projection> leased = new ConcurrentHashMap<>();
 	private final Function<EPackage, String> fingerprints;
 	private final Clock clock;
 	private final List<ExecutionGroup> groups;
@@ -169,13 +172,13 @@ public final class EventCore implements StreamCore, AutoCloseable {
 		this.mapper = requireNonNull(builder.mapper, "Mapper is required");
 		this.rules = builder.rules != null ? builder.rules : new ChangeRules(null);
 		this.store = builder.store != null ? builder.store : new InMemoryStreamStore();
-		this.projection = builder.projection != null ? builder.projection : Projection.NONE;
+		this.projections = builder.projections != null ? builder.projections : ProjectionSource.shared(Projection.NONE);
 		this.fingerprints = builder.fingerprints;
 		this.clock = builder.clock;
 		this.groups = List.copyOf(builder.groups());
 		this.blockTimeout = builder.blockTimeout.toMillis();
 		for (ExecutionGroup group : groups) {
-			pools.put(group.name(), Executors.newFixedThreadPool(group.threads(), threads("fennec-stream-" + group.name())));
+			pools.put(group.name(), Executors.newFixedThreadPool(group.threads(), laneThreads("fennec-stream-" + group.name())));
 		}
 		this.timer = Executors.newSingleThreadScheduledExecutor(threads("fennec-stream-timer"));
 		this.output = pushStreams.createSimpleEventSource(ChangeSet.class);
@@ -420,7 +423,7 @@ public final class EventCore implements StreamCore, AutoCloseable {
 		if (entry.getKind() == DeltaKind.UNSET) {
 			stream.states.put(entry.getFeatureUri(), SlotState.empty());
 			if (feature != null && StreamSlots.mode(slot) == ProjectionMode.PROJECT) {
-				projection.project(stream.mapping.getTarget(), stream.targetId, feature, null);
+				projection().project(stream.mapping.getTarget(), stream.targetId, feature, null);
 			}
 			return;
 		}
@@ -428,7 +431,7 @@ public final class EventCore implements StreamCore, AutoCloseable {
 		stream.states.put(entry.getFeatureUri(), SlotState.of(value, now));
 		if (feature != null && StreamSlots.mode(slot) == ProjectionMode.PROJECT) {
 			mapper.extractor().toTarget(slot, value)
-					.ifPresent(v -> projection.project(stream.mapping.getTarget(), stream.targetId, feature, v));
+					.ifPresent(v -> projection().project(stream.mapping.getTarget(), stream.targetId, feature, v));
 		}
 		stream.projectedTimes.put(entry.getFeatureUri(), now);
 	}
@@ -468,11 +471,57 @@ public final class EventCore implements StreamCore, AutoCloseable {
 				retentionRuns.get(), droppedOffers.get());
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * <p>
+	 * Lets the lanes finish their queued work (at most {@value #CLOSE_TIMEOUT_SECONDS} s) and
+	 * releases every projection the lane threads acquired.
+	 */
 	@Override
 	public void close() {
 		timer.shutdownNow();
 		pools.values().forEach(ExecutorService::shutdown);
+		try {
+			for (ExecutorService pool : pools.values()) {
+				if (!pool.awaitTermination(CLOSE_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+					pool.shutdownNow();
+				}
+			}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			pools.values().forEach(ExecutorService::shutdownNow);
+		}
+		// threads still running after the timeout lose their projection here
+		leased.keySet().forEach(this::releaseProjection);
 		output.close();
+	}
+
+	/** The projection of the calling lane thread, acquired on first use. */
+	private Projection projection() {
+		return leased.computeIfAbsent(Thread.currentThread(), thread -> projections.acquire());
+	}
+
+	private void releaseProjection(Thread thread) {
+		Projection projection = leased.remove(thread);
+		if (projection != null) {
+			try {
+				projections.release(projection);
+			} catch (RuntimeException e) {
+				LOGGER.log(Level.WARNING, "Releasing the projection of " + thread.getName() + " failed", e);
+			}
+		}
+	}
+
+	/** Lane threads give their projection back when they end. */
+	private ThreadFactory laneThreads(String prefix) {
+		ThreadFactory threads = threads(prefix);
+		return runnable -> threads.newThread(() -> {
+			try {
+				runnable.run();
+			} finally {
+				releaseProjection(Thread.currentThread());
+			}
+		});
 	}
 
 	private void route(List<EObject> sources, long eventTime, String author, boolean unitOfWork) {
@@ -719,7 +768,7 @@ public final class EventCore implements StreamCore, AutoCloseable {
 				times.put(pending.address, pending.eventTime);
 			}
 		}
-		if (!values.isEmpty() && projection.project(stream.mapping.getTarget(), stream.targetId, values)) {
+		if (!values.isEmpty() && projection().project(stream.mapping.getTarget(), stream.targetId, values)) {
 			stream.projectedTimes.putAll(times);
 		}
 	}
@@ -845,7 +894,7 @@ public final class EventCore implements StreamCore, AutoCloseable {
 		private Mapper mapper;
 		private ChangeRules rules;
 		private StreamStore store;
-		private Projection projection;
+		private ProjectionSource projections;
 		private Function<EPackage, String> fingerprints = ePackage -> String.valueOf(ePackage.getNsURI());
 		private Clock clock = Clock.systemUTC();
 		private Duration retentionInterval = Duration.ofHours(1);
@@ -892,11 +941,22 @@ public final class EventCore implements StreamCore, AutoCloseable {
 		}
 
 		/**
-		 * @param projection writes values into target objects; default {@link Projection#NONE}
+		 * @param projection writes values into target objects, shared by all lanes - it must be
+		 *        thread-safe; default {@link Projection#NONE}
 		 * @return this
 		 */
 		public Builder projection(Projection projection) {
-			this.projection = projection;
+			this.projections = ProjectionSource.shared(projection);
+			return this;
+		}
+
+		/**
+		 * @param projections hands every lane thread a projection of its own, released when the
+		 *        thread ends or the core closes
+		 * @return this
+		 */
+		public Builder projections(ProjectionSource projections) {
+			this.projections = projections;
 			return this;
 		}
 

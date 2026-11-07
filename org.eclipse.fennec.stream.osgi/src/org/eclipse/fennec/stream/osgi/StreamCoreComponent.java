@@ -33,13 +33,16 @@ import org.eclipse.fennec.model.stream.ChangeSet;
 import org.eclipse.fennec.stream.ChangeRules;
 import org.eclipse.fennec.stream.EventCore;
 import org.eclipse.fennec.stream.Projection;
+import org.eclipse.fennec.stream.ProjectionSource;
 import org.eclipse.fennec.stream.StreamCore;
 import org.eclipse.fennec.stream.StreamReceiver;
 import org.eclipse.fennec.stream.StreamStore;
+import org.osgi.service.component.ComponentServiceObjects;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
@@ -50,7 +53,8 @@ import org.osgi.util.pushstream.PushStream;
  * <p>
  * All references are mandatory and static: the mappings and the function/converter whiteboards, the
  * OCL evaluator, the store, the projection (an audit-only runtime configures
- * {@code FennecNoProjection}), and the metadata service, which names the fingerprint stamped on
+ * {@code FennecNoProjection}; a prototype-scoped projection gives every lane thread an instance of
+ * its own, given back when the thread ends or the core stops), and the metadata service, which names the fingerprint stamped on
  * every change set. The configuration (PID {@value #PID}) is optional - without one the core runs
  * with the groups high/default/low, an hourly retention sweep and a 30 s block timeout.
  */
@@ -94,7 +98,7 @@ public class StreamCoreComponent implements StreamCore {
 	 * @param converters the converter whiteboard
 	 * @param expressions the expression language
 	 * @param store the store
-	 * @param projection the projection
+	 * @param projections the projection service objects, one instance per lane thread
 	 * @param metadata names model fingerprints
 	 * @param config the configuration
 	 */
@@ -103,12 +107,12 @@ public class StreamCoreComponent implements StreamCore {
 			@Reference(name = "functions") FunctionRegistry functions,
 			@Reference(name = "converters") ConverterRegistry converters,
 			@Reference(name = "expressions") ExpressionEvaluator expressions,
-			@Reference(name = "store") StreamStore store, @Reference(name = "projection") Projection projection,
+			@Reference(name = "store") StreamStore store, @Reference(name = "projection", scope = ReferenceScope.PROTOTYPE) ComponentServiceObjects<Projection> projections,
 			@Reference(name = "metadata") MetadataService metadata, Config config) {
 		ValueExtractor extractor = new ValueExtractor(functions, converters, expressions);
 		EventCore.Builder builder = EventCore.builder().mappings(mappings)
 				.mapper(new Mapper(extractor, new IdentityResolver(extractor))).rules(new ChangeRules(expressions))
-				.store(store).projection(projection).fingerprints(ePackage -> fingerprint(metadata, ePackage))
+				.store(store).projections(projections(projections)).fingerprints(ePackage -> fingerprint(metadata, ePackage))
 				.retentionInterval(Duration.ofSeconds(config.retentionIntervalSeconds()))
 				.blockTimeout(Duration.ofMillis(config.blockTimeoutMillis()));
 		for (String group : config.groups()) {
@@ -117,8 +121,24 @@ public class StreamCoreComponent implements StreamCore {
 		this.core = builder.build();
 	}
 
+	/** Pairs every service object taken with exactly one release. */
+	static ProjectionSource projections(ComponentServiceObjects<Projection> projections) {
+		return new ProjectionSource() {
+
+			@Override
+			public Projection acquire() {
+				return projections.getService();
+			}
+
+			@Override
+			public void release(Projection projection) {
+				projections.ungetService(projection);
+			}
+		};
+	}
+
 	/**
-	 * Stops the lanes.
+	 * Stops the lanes; they give their projections back.
 	 */
 	@Deactivate
 	void deactivate() {

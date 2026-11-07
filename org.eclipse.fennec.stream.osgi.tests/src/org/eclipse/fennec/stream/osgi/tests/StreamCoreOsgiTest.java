@@ -19,6 +19,9 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EClass;
@@ -36,11 +39,17 @@ import org.eclipse.fennec.model.streammapping.StreamMapping;
 import org.eclipse.fennec.model.streammapping.StreamMappingFactory;
 import org.eclipse.fennec.model.streammapping.StreamSlot;
 import org.eclipse.fennec.stream.EventCore;
+import org.eclipse.fennec.stream.Projection;
 import org.eclipse.fennec.stream.StreamCore;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.PrototypeServiceFactory;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.test.common.annotation.InjectBundleContext;
 import org.osgi.test.common.annotation.InjectService;
 import org.osgi.test.common.service.ServiceAware;
 
@@ -88,6 +97,66 @@ class StreamCoreOsgiTest {
 			for (Configuration configuration : configurations) {
 				configuration.delete();
 			}
+		}
+	}
+
+	@Test
+	void everyLaneThreadGetsItsOwnProjectionAndGivesItBack(@InjectBundleContext BundleContext context,
+			@InjectService(timeout = 5000) ConfigurationAdmin configAdmin,
+			@InjectService(timeout = 5000) ResourceSetFactory resourceSets,
+			@InjectService(cardinality = 0) ServiceAware<StreamCore> cores, @TempDir Path dir) throws Exception {
+		Path file = dir.resolve("names.xmi");
+		Resource resource = resourceSets.createResourceSet().createResource(URI.createFileURI(file.toString()));
+		resource.getContents().add(mapping());
+		resource.save(Map.of());
+		AtomicInteger gets = new AtomicInteger();
+		AtomicInteger ungets = new AtomicInteger();
+		Set<String> projected = ConcurrentHashMap.newKeySet();
+		ServiceRegistration<Projection> registration = context.registerService(Projection.class,
+				new PrototypeServiceFactory<Projection>() {
+					@Override
+					public Projection getService(Bundle bundle, ServiceRegistration<Projection> reg) {
+						gets.incrementAndGet();
+						return (targetClass, targetId, feature, value) -> projected.add(targetId);
+					}
+
+					@Override
+					public void ungetService(Bundle bundle, ServiceRegistration<Projection> reg, Projection service) {
+						ungets.incrementAndGet();
+					}
+				}, null);
+		Configuration store = single(configAdmin, "FennecInMemoryStreamStore");
+		List<Configuration> configurations = List.of(
+				factory(configAdmin, "FileEObjectProvider", dictionary("emf.eobject.provider.name", "mapping-files",
+						"locations", new String[] { file.toString() }, "key.feature", "id")),
+				factory(configAdmin, "EObjectRegistry",
+						dictionary("name", "fennec-mappings", "initialProvider.target", "(emf.eobject.provider.name=mapping-files)")));
+		try {
+			StreamCore core = cores.waitForService(10_000);
+			for (int i = 0; i < 20; i++) {
+				EClass eClass = EcoreFactory.eINSTANCE.createEClass();
+				eClass.setName("C" + i);
+				core.offer(eClass, 1_000, "test");
+			}
+			long deadline = System.currentTimeMillis() + 10_000;
+			while (projected.size() < 20 && System.currentTimeMillis() < deadline) {
+				Thread.sleep(10);
+			}
+			assertThat(projected).hasSize(20);
+			assertThat(gets.get()).as("one instance per lane thread of the default group, not per call")
+					.isBetween(1, Runtime.getRuntime().availableProcessors());
+
+			store.delete(); // the core loses its store and stops
+			deadline = System.currentTimeMillis() + 10_000;
+			while (cores.getService() != null && System.currentTimeMillis() < deadline) {
+				Thread.sleep(10);
+			}
+			assertThat(ungets.get()).as("every instance is given back when the core stops").isEqualTo(gets.get());
+		} finally {
+			for (Configuration configuration : configurations) {
+				configuration.delete();
+			}
+			registration.unregister();
 		}
 	}
 
