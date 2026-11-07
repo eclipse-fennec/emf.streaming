@@ -24,6 +24,8 @@ The concept and the first metamodel come from the *unified persistence* work in
 | `org.eclipse.fennec.stream.mapping.model` | Streaming policies: `StreamMapping`, `StreamSlot`, change rules, batching, retention |
 | `org.eclipse.fennec.stream` | Plain-Java core: change rules, event core (lanes per object, batching, keyframes, backpressure, retention), store and projection SPIs, receiver, undo/redo, as-of |
 | `org.eclipse.fennec.stream.osgi` | The core as OSGi service; in-memory store, no-op projection and replica targets as defaults without configuration ([docs/configuration.md](docs/configuration.md): JPA/Mongo projection, transport) |
+| `org.eclipse.fennec.stream.persistence` | Store and projection on a Fennec persistence repository (JPA or Mongo): change sets as ordinary models, slot values by update commands |
+| `org.eclipse.fennec.stream.tck` | The store contract as JUnit 5 tests to extend; the in-memory and the repository store run it |
 | `org.eclipse.fennec.stream.messaging` | Transport over Gecko Messaging: channels per object, CloudEvents, payload codec SPI, retained keyframes ([docs/transport.md](docs/transport.md)) |
 | `org.eclipse.fennec.stream.codec.json` | JSON payload through the Fennec EMF codec |
 

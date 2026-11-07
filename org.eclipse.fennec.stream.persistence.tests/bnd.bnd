@@ -1,7 +1,7 @@
 Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
 Bundle-Name: Eclipse Fennec Stream Persistence Tests
 Bundle-Description: OSGi integration tests of the repository stream store on JPA with an in-memory \
-	H2 database: change sets saved as ordinary models, read back by stream and sequence.
+	H2 database against the store contract of the TCK.
 
 -workingset: streaming
 
@@ -18,7 +18,8 @@ Bundle-Description: OSGi integration tests of the repository stream store on JPA
 	org.eclipse.fennec.mapping.model;version=snapshot,\
 	org.eclipse.fennec.stream.model;version=snapshot,\
 	org.eclipse.fennec.stream.mapping.model;version=snapshot,\
-	org.eclipse.fennec.stream;version=snapshot
+	org.eclipse.fennec.stream;version=snapshot,\
+	org.eclipse.fennec.stream.tck;version=snapshot
 
 -testpath: \
 	assertj-core
