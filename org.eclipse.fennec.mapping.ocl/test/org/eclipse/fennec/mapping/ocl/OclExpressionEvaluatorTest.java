@@ -17,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
@@ -29,6 +28,7 @@ import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.EcorePackage;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.fennec.m2x.ocl.engine.OclEngines;
+import org.eclipse.fennec.m2x.ocl.engine.OclLruExpressionCache;
 import org.eclipse.fennec.m2x.ocl.parser.OclParserSupport;
 import org.eclipse.fennec.mapping.ConverterRegistry;
 import org.eclipse.fennec.mapping.FunctionRegistry;
@@ -61,12 +61,9 @@ class OclExpressionEvaluatorTest {
 	private final EAttribute value = attribute(reading, "value", EcorePackage.Literals.EDOUBLE);
 	private final EReference readings = EcoreFactory.eINSTANCE.createEReference();
 
-	private final AtomicInteger versionLookups = new AtomicInteger();
+	private final OclLruExpressionCache cache = OclLruExpressionCache.ofSize(64);
 	private final OclExpressionEvaluator evaluator = new OclExpressionEvaluator(
-			OclEngines.create(new OclParserSupport()), p -> {
-				versionLookups.incrementAndGet();
-				return "fp-1";
-			});
+			OclEngines.create(new OclParserSupport(), cache));
 
 	{
 		ePackage.setName("pool");
@@ -114,14 +111,16 @@ class OclExpressionEvaluatorTest {
 	}
 
 	@Test
-	void anUnparseableExpressionIsRememberedPerModelVersion() {
+	void anUnparseableExpressionIsParsedOnceByTheEngine() {
 		EObject s = station("s1", "pool-1");
-		evaluator.evaluate("self.readings->select(", s);
-		int afterFirst = versionLookups.get();
-		evaluator.evaluate("self.readings->select(", s);
-
-		assertThat(versionLookups.get()).isEqualTo(afterFirst + 1);
 		assertThat(evaluator.evaluate("self.readings->select(", s)).isEmpty();
+		long misses = cache.missCount();
+
+		assertThat(evaluator.evaluate("self.readings->select(", s)).isEmpty();
+		assertThat(evaluator.evaluate("self.readings->select(", s)).isEmpty();
+
+		assertThat(cache.missCount()).isEqualTo(misses);
+		assertThat(cache.hitCount()).isGreaterThanOrEqualTo(2);
 	}
 
 	@Test

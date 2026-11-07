@@ -49,6 +49,19 @@ Optional settings of the core:
 }
 ```
 
+### OCL expressions
+
+Expressions of a mapping run on the M2X OCL engine (`DefaultOclEngine`). The engine parses an
+expression once and also remembers a parse failure, in its expression cache. The default cache
+(`DefaultOclExpressionCache`) keys by nsURI. With the bundle `org.eclipse.fennec.m2x.ocl.fingerprint`
+the cache can key by model fingerprint, so a changed model is parsed again:
+
+```json
+"DefaultOclEngine": {
+  "expressionCache.target": "(cache.name=fingerprint)"
+}
+```
+
 ## Projection into a persistence repository
 
 A projection writes slot values into the stored target objects. It does not load them: each batch

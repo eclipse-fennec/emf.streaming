@@ -16,16 +16,14 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import java.util.Optional;
-import java.util.TreeSet;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.fennec.m2x.ocl.api.OclContext;
@@ -40,40 +38,26 @@ import org.eclipse.fennec.mapping.ExpressionEvaluator;
  * {@code if self.battery < 10 then 'low' else 'ok' endif}.
  * <p>
  * Nothing here throws at the mapping: an expression that does not parse, fails, or yields OCL
- * {@code null} or {@code invalid} produces no value. A parse failure is remembered per model
- * version and expression, so it costs one log line, not one per value; an evaluation failure can
- * depend on the value and stays in use, logged once.
+ * {@code null} or {@code invalid} produces no value, and each such expression is logged once.
  * <p>
- * Ported from the event atlas mapping ({@code OclExpressionEvaluator}). The model version that keys
- * the parse verdicts is a function here, so the class runs without OSGi; in OSGi it is the model
- * fingerprint of the metadata service.
+ * Parsing is the engine's business: an engine with an expression cache parses an expression once
+ * and remembers a parse failure as well (emf.m2x#420), keyed by the model fingerprint when it uses
+ * the fingerprint cache. An engine without a cache parses on every value.
+ * <p>
+ * Ported from the event atlas mapping ({@code OclExpressionEvaluator}).
  */
 public final class OclExpressionEvaluator implements ExpressionEvaluator {
-
-	/** Keys parse verdicts by nsURI - weaker than a fingerprint, never wrong. */
-	public static final Function<EPackage, String> NS_URI = ePackage -> String.valueOf(ePackage.getNsURI());
 
 	private static final Logger LOGGER = Logger.getLogger(OclExpressionEvaluator.class.getName());
 
 	private final OclEngine engine;
-	private final Function<EPackage, String> modelVersion;
-	private final Set<String> unparseable = ConcurrentHashMap.newKeySet();
 	private final Set<String> reported = ConcurrentHashMap.newKeySet();
 
 	/**
-	 * @param engine the OCL engine
-	 * @param modelVersion names the version of a package (its fingerprint), so a changed model is parsed again
-	 */
-	public OclExpressionEvaluator(OclEngine engine, Function<EPackage, String> modelVersion) {
-		this.engine = requireNonNull(engine, "OclEngine is required");
-		this.modelVersion = requireNonNull(modelVersion, "Model version function is required");
-	}
-
-	/**
-	 * @param engine the OCL engine; parse verdicts are keyed by nsURI
+	 * @param engine the OCL engine; with an expression cache, so an expression is not parsed per value
 	 */
 	public OclExpressionEvaluator(OclEngine engine) {
-		this(engine, NS_URI);
+		this.engine = requireNonNull(engine, "OclEngine is required");
 	}
 
 	@Override
@@ -92,9 +76,6 @@ public final class OclExpressionEvaluator implements ExpressionEvaluator {
 			return Optional.empty();
 		}
 		String key = key(expression, self.eClass(), variables);
-		if (unparseable.contains(key)) {
-			return Optional.empty();
-		}
 		try {
 			Object result = engine.evaluate(expression, context(self, variables));
 			if (result == null) {
@@ -106,9 +87,8 @@ public final class OclExpressionEvaluator implements ExpressionEvaluator {
 			}
 			return Optional.of(result);
 		} catch (OclParseException e) {
-			unparseable.add(key);
-			LOGGER.warning(() -> "Expression '" + expression + "' does not parse against " + self.eClass().getName()
-					+ ": " + e.getMessage() + " - it produces no value until the mapping or the model is corrected");
+			report(key, Level.WARNING, "Expression '" + expression + "' does not parse against " + self.eClass().getName()
+					+ ": " + e.getMessage() + " - it produces no value until the mapping or the model is corrected", null);
 			return Optional.empty();
 		} catch (RuntimeException e) {
 			report(key, Level.WARNING, "Expression '" + expression + "' failed on a " + self.eClass().getName(), e);
@@ -122,18 +102,10 @@ public final class OclExpressionEvaluator implements ExpressionEvaluator {
 		return new OclContext(self, null, variables, resourceSet);
 	}
 
-	/** Whether a text parses depends on the model version, the context type and the names of the variables. */
-	private String key(String expression, EClass contextType, Map<String, Object> variables) {
-		EPackage ePackage = contextType.getEPackage();
-		String version = "";
-		if (ePackage != null) {
-			try {
-				version = modelVersion.apply(ePackage);
-			} catch (RuntimeException e) {
-				version = NS_URI.apply(ePackage);
-			}
-		}
-		return version + '#' + contextType.getName() + new TreeSet<>(variables.keySet()) + '\u0000' + expression;
+	/** Names an expression on a context type with the names of its variables, to log it once. */
+	private static String key(String expression, EClass contextType, Map<String, Object> variables) {
+		String nsURI = contextType.getEPackage() == null ? "" : contextType.getEPackage().getNsURI();
+		return nsURI + '#' + contextType.getName() + new TreeSet<>(variables.keySet()) + '\u0000' + expression;
 	}
 
 	private void report(String key, Level level, String message, Exception cause) {
