@@ -31,6 +31,7 @@ import org.eclipse.emf.ecore.util.InternalEList;
 
 import org.eclipse.fennec.model.stream.ChangeEntry;
 import org.eclipse.fennec.model.stream.DeltaKind;
+import org.eclipse.fennec.model.stream.Recording;
 import org.eclipse.fennec.model.stream.SlotValue;
 import org.eclipse.fennec.model.stream.StreamPackage;
 
@@ -48,6 +49,7 @@ import org.eclipse.fennec.model.stream.StreamPackage;
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getKind <em>Kind</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getFeatureId <em>Feature Id</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getFeatureUri <em>Feature Uri</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getRecording <em>Recording</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getTimestamp <em>Timestamp</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getIndex <em>Index</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.impl.ChangeEntryImpl#getToIndex <em>To Index</em>}</li>
@@ -180,6 +182,35 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 	 * @ordered
 	 */
 	protected String featureUri = FEATURE_URI_EDEFAULT;
+
+	/**
+	 * The default value of the '{@link #getRecording() <em>Recording</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getRecording()
+	 * @generated
+	 * @ordered
+	 */
+	protected static final Recording RECORDING_EDEFAULT = Recording.TIMESERIES;
+
+	/**
+	 * The cached value of the '{@link #getRecording() <em>Recording</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getRecording()
+	 * @generated
+	 * @ordered
+	 */
+	protected Recording recording = RECORDING_EDEFAULT;
+
+	/**
+	 * This is true if the Recording attribute has been set.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	protected boolean recordingESet;
 
 	/**
 	 * The default value of the '{@link #getTimestamp() <em>Timestamp</em>}' attribute.
@@ -484,6 +515,56 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 	 * @generated
 	 */
 	@Override
+	public Recording getRecording() {
+		return recording;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void setRecording(Recording newRecording) {
+		Recording oldRecording = recording;
+		recording = newRecording == null ? RECORDING_EDEFAULT : newRecording;
+		boolean oldRecordingESet = recordingESet;
+		recordingESet = true;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.SET, StreamPackage.CHANGE_ENTRY__RECORDING, oldRecording, recording, !oldRecordingESet));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public void unsetRecording() {
+		Recording oldRecording = recording;
+		boolean oldRecordingESet = recordingESet;
+		recording = RECORDING_EDEFAULT;
+		recordingESet = false;
+		if (eNotificationRequired())
+			eNotify(new ENotificationImpl(this, Notification.UNSET, StreamPackage.CHANGE_ENTRY__RECORDING, oldRecording, RECORDING_EDEFAULT, oldRecordingESet));
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public boolean isSetRecording() {
+		return recordingESet;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public Long getTimestamp() {
 		return timestamp;
 	}
@@ -676,6 +757,8 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 				return getFeatureId();
 			case StreamPackage.CHANGE_ENTRY__FEATURE_URI:
 				return getFeatureUri();
+			case StreamPackage.CHANGE_ENTRY__RECORDING:
+				return getRecording();
 			case StreamPackage.CHANGE_ENTRY__TIMESTAMP:
 				return getTimestamp();
 			case StreamPackage.CHANGE_ENTRY__INDEX:
@@ -722,6 +805,9 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 				return;
 			case StreamPackage.CHANGE_ENTRY__FEATURE_URI:
 				setFeatureUri((String)newValue);
+				return;
+			case StreamPackage.CHANGE_ENTRY__RECORDING:
+				setRecording((Recording)newValue);
 				return;
 			case StreamPackage.CHANGE_ENTRY__TIMESTAMP:
 				setTimestamp((Long)newValue);
@@ -779,6 +865,9 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 			case StreamPackage.CHANGE_ENTRY__FEATURE_URI:
 				setFeatureUri(FEATURE_URI_EDEFAULT);
 				return;
+			case StreamPackage.CHANGE_ENTRY__RECORDING:
+				unsetRecording();
+				return;
 			case StreamPackage.CHANGE_ENTRY__TIMESTAMP:
 				setTimestamp(TIMESTAMP_EDEFAULT);
 				return;
@@ -827,6 +916,8 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 				return featureId != FEATURE_ID_EDEFAULT;
 			case StreamPackage.CHANGE_ENTRY__FEATURE_URI:
 				return FEATURE_URI_EDEFAULT == null ? featureUri != null : !FEATURE_URI_EDEFAULT.equals(featureUri);
+			case StreamPackage.CHANGE_ENTRY__RECORDING:
+				return isSetRecording();
 			case StreamPackage.CHANGE_ENTRY__TIMESTAMP:
 				return TIMESTAMP_EDEFAULT == null ? timestamp != null : !TIMESTAMP_EDEFAULT.equals(timestamp);
 			case StreamPackage.CHANGE_ENTRY__INDEX:
@@ -869,6 +960,8 @@ public class ChangeEntryImpl extends MinimalEObjectImpl.Container implements Cha
 		result.append(featureId);
 		result.append(", featureUri: ");
 		result.append(featureUri);
+		result.append(", recording: ");
+		if (recordingESet) result.append(recording); else result.append("<unset>");
 		result.append(", timestamp: ");
 		result.append(timestamp);
 		result.append(", index: ");

@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.fennec.model.stream.ChangeSet;
+import org.eclipse.fennec.model.stream.Recording;
 import org.eclipse.fennec.model.stream.DeltaKind;
 import org.eclipse.fennec.model.streammapping.RecordingMode;
 import org.eclipse.fennec.model.streammapping.StreamMapping;
@@ -65,6 +66,7 @@ class UndoAndHistoryTest {
 		assertThat(undo.getEntries()).singleElement().satisfies(e -> {
 			assertThat(e.getValueOld()).isEqualTo("21.0");
 			assertThat(e.getValueNew()).isEqualTo("20.0");
+			assertThat(e.getRecording()).isEqualTo(Recording.CHANGELOG);
 		});
 
 		core.undo(fx.pool, "pool-1").get(10, TimeUnit.SECONDS).orElseThrow();

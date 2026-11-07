@@ -28,6 +28,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/kind"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/featureId"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/featureUri"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/recording"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/timestamp"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/index"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//ChangeEntry/toIndex"/>
@@ -64,6 +65,10 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//PackageFingerprint/packageUri"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute stream.ecore#//PackageFingerprint/packageFingerprint"/>
     </genClasses>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="stream.ecore#//Recording">
+      <genEnumLiterals ecoreEnumLiteral="stream.ecore#//Recording/TIMESERIES"/>
+      <genEnumLiterals ecoreEnumLiteral="stream.ecore#//Recording/CHANGELOG"/>
+    </genEnums>
     <genEnums typeSafeEnumCompatible="false" ecoreEnum="stream.ecore#//DeltaKind">
       <genEnumLiterals ecoreEnumLiteral="stream.ecore#//DeltaKind/CREATE"/>
       <genEnumLiterals ecoreEnumLiteral="stream.ecore#//DeltaKind/SET"/>

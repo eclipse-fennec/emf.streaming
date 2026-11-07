@@ -37,6 +37,7 @@ import org.osgi.annotation.versioning.ProviderType;
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getKind <em>Kind</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getFeatureId <em>Feature Id</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getFeatureUri <em>Feature Uri</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getRecording <em>Recording</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getTimestamp <em>Timestamp</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getIndex <em>Index</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.stream.ChangeEntry#getToIndex <em>To Index</em>}</li>
@@ -207,6 +208,61 @@ public interface ChangeEntry extends EObject {
 	 * @generated
 	 */
 	void setFeatureUri(String value);
+
+	/**
+	 * Returns the value of the '<em><b>Recording</b></em>' attribute.
+	 * The literals are from the enumeration {@link org.eclipse.fennec.model.stream.Recording}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * <!-- begin-model-doc -->
+	 * How the slot of this entry is recorded (SET/UNSET). Lets a receiver decide per entry after a gap: a CHANGELOG entry builds on the value before it and is not applied until the next keyframe; a TIMESERIES entry is an absolute sample and is applied. Unset = the receiver's default.
+	 * <!-- end-model-doc -->
+	 * @return the value of the '<em>Recording</em>' attribute.
+	 * @see org.eclipse.fennec.model.stream.Recording
+	 * @see #isSetRecording()
+	 * @see #unsetRecording()
+	 * @see #setRecording(Recording)
+	 * @see org.eclipse.fennec.model.stream.StreamPackage#getChangeEntry_Recording()
+	 * @model unsettable="true"
+	 * @generated
+	 */
+	Recording getRecording();
+
+	/**
+	 * Sets the value of the '{@link org.eclipse.fennec.model.stream.ChangeEntry#getRecording <em>Recording</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @param value the new value of the '<em>Recording</em>' attribute.
+	 * @see org.eclipse.fennec.model.stream.Recording
+	 * @see #isSetRecording()
+	 * @see #unsetRecording()
+	 * @see #getRecording()
+	 * @generated
+	 */
+	void setRecording(Recording value);
+
+	/**
+	 * Unsets the value of the '{@link org.eclipse.fennec.model.stream.ChangeEntry#getRecording <em>Recording</em>}' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #isSetRecording()
+	 * @see #getRecording()
+	 * @see #setRecording(Recording)
+	 * @generated
+	 */
+	void unsetRecording();
+
+	/**
+	 * Returns whether the value of the '{@link org.eclipse.fennec.model.stream.ChangeEntry#getRecording <em>Recording</em>}' attribute is set.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return whether the value of the '<em>Recording</em>' attribute is set.
+	 * @see #unsetRecording()
+	 * @see #getRecording()
+	 * @see #setRecording(Recording)
+	 * @generated
+	 */
+	boolean isSetRecording();
 
 	/**
 	 * Returns the value of the '<em><b>Timestamp</b></em>' attribute.

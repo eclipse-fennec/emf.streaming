@@ -26,6 +26,7 @@ import org.eclipse.fennec.model.stream.CompositeSnapshot;
 import org.eclipse.fennec.model.stream.ContextSnapshot;
 import org.eclipse.fennec.model.stream.DeltaKind;
 import org.eclipse.fennec.model.stream.PackageFingerprint;
+import org.eclipse.fennec.model.stream.Recording;
 import org.eclipse.fennec.model.stream.SlotValue;
 import org.eclipse.fennec.model.stream.StreamFactory;
 import org.eclipse.fennec.model.stream.StreamPackage;
@@ -78,6 +79,13 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	private EClass packageFingerprintEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EEnum recordingEEnum = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -342,7 +350,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_Timestamp() {
+	public EAttribute getChangeEntry_Recording() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(6);
 	}
 
@@ -352,7 +360,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_Index() {
+	public EAttribute getChangeEntry_Timestamp() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(7);
 	}
 
@@ -362,7 +370,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_ToIndex() {
+	public EAttribute getChangeEntry_Index() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(8);
 	}
 
@@ -372,7 +380,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_MapKey() {
+	public EAttribute getChangeEntry_ToIndex() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(9);
 	}
 
@@ -382,7 +390,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_Coords() {
+	public EAttribute getChangeEntry_MapKey() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(10);
 	}
 
@@ -392,7 +400,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_ValueOld() {
+	public EAttribute getChangeEntry_Coords() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(11);
 	}
 
@@ -402,7 +410,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
-	public EAttribute getChangeEntry_ValueNew() {
+	public EAttribute getChangeEntry_ValueOld() {
 		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(12);
 	}
 
@@ -412,8 +420,18 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
+	public EAttribute getChangeEntry_ValueNew() {
+		return (EAttribute)changeEntryEClass.getEStructuralFeatures().get(13);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public EReference getChangeEntry_State() {
-		return (EReference)changeEntryEClass.getEStructuralFeatures().get(13);
+		return (EReference)changeEntryEClass.getEStructuralFeatures().get(14);
 	}
 
 	/**
@@ -652,6 +670,16 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 	 * @generated
 	 */
 	@Override
+	public EEnum getRecording() {
+		return recordingEEnum;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public EEnum getDeltaKind() {
 		return deltaKindEEnum;
 	}
@@ -705,6 +733,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__KIND);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__FEATURE_ID);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__FEATURE_URI);
+		createEAttribute(changeEntryEClass, CHANGE_ENTRY__RECORDING);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__TIMESTAMP);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__INDEX);
 		createEAttribute(changeEntryEClass, CHANGE_ENTRY__TO_INDEX);
@@ -742,6 +771,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 		createEAttribute(packageFingerprintEClass, PACKAGE_FINGERPRINT__PACKAGE_FINGERPRINT);
 
 		// Create enums
+		recordingEEnum = createEEnum(RECORDING);
 		deltaKindEEnum = createEEnum(DELTA_KIND);
 	}
 
@@ -795,6 +825,7 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 		initEAttribute(getChangeEntry_Kind(), this.getDeltaKind(), "kind", null, 1, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_FeatureId(), ecorePackage.getEInt(), "featureId", "-1", 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_FeatureUri(), ecorePackage.getEString(), "featureUri", null, 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEAttribute(getChangeEntry_Recording(), this.getRecording(), "recording", null, 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_Timestamp(), ecorePackage.getELongObject(), "timestamp", null, 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_Index(), ecorePackage.getEInt(), "index", "-1", 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getChangeEntry_ToIndex(), ecorePackage.getEInt(), "toIndex", "-1", 0, 1, ChangeEntry.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -832,6 +863,10 @@ public class StreamPackageImpl extends EPackageImpl implements StreamPackage {
 		initEAttribute(getPackageFingerprint_PackageFingerprint(), ecorePackage.getEString(), "packageFingerprint", null, 1, 1, PackageFingerprint.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		// Initialize enums and add enum literals
+		initEEnum(recordingEEnum, Recording.class, "Recording");
+		addEEnumLiteral(recordingEEnum, Recording.TIMESERIES);
+		addEEnumLiteral(recordingEEnum, Recording.CHANGELOG);
+
 		initEEnum(deltaKindEEnum, DeltaKind.class, "DeltaKind");
 		addEEnumLiteral(deltaKindEEnum, DeltaKind.CREATE);
 		addEEnumLiteral(deltaKindEEnum, DeltaKind.SET);

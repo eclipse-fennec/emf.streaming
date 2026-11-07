@@ -86,6 +86,8 @@ public class StreamFactoryImpl extends EFactoryImpl implements StreamFactory {
 	@Override
 	public Object createFromString(EDataType eDataType, String initialValue) {
 		switch (eDataType.getClassifierID()) {
+			case StreamPackage.RECORDING:
+				return createRecordingFromString(eDataType, initialValue);
 			case StreamPackage.DELTA_KIND:
 				return createDeltaKindFromString(eDataType, initialValue);
 			default:
@@ -101,6 +103,8 @@ public class StreamFactoryImpl extends EFactoryImpl implements StreamFactory {
 	@Override
 	public String convertToString(EDataType eDataType, Object instanceValue) {
 		switch (eDataType.getClassifierID()) {
+			case StreamPackage.RECORDING:
+				return convertRecordingToString(eDataType, instanceValue);
 			case StreamPackage.DELTA_KIND:
 				return convertDeltaKindToString(eDataType, instanceValue);
 			default:
@@ -172,6 +176,26 @@ public class StreamFactoryImpl extends EFactoryImpl implements StreamFactory {
 	public PackageFingerprint createPackageFingerprint() {
 		PackageFingerprintImpl packageFingerprint = new PackageFingerprintImpl();
 		return packageFingerprint;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public Recording createRecordingFromString(EDataType eDataType, String initialValue) {
+		Recording result = Recording.get(initialValue);
+		if (result == null) throw new IllegalArgumentException("The value '" + initialValue + "' is not a valid enumerator of '" + eDataType.getName() + "'");
+		return result;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	public String convertRecordingToString(EDataType eDataType, Object instanceValue) {
+		return instanceValue == null ? null : instanceValue.toString();
 	}
 
 	/**

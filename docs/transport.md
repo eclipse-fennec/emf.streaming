@@ -67,8 +67,10 @@ receivers notice the gap, go stale and come back with the next keyframe.
 
 - A sequence seen before is a duplicate and ignored.
 - A sequence further ahead than the next one is held for a gap buffer (default 5 s). If the missing
-  change set does not arrive, the object is stale until its next keyframe (or the gap is counted
-  and skipped, by configuration).
+  change set does not arrive, the gap is counted and each entry decides by its `recording` until
+  the object's next keyframe: a `CHANGELOG` entry builds on the value before it and is skipped, a
+  `TIMESERIES` entry is an absolute sample and is applied. Entries without a recording follow the
+  receiver's gap policy: `STALE` (default, skipped) or `SKIP_AND_MARK` (applied).
 - An object the receiver does not hold enters with its next `KEYFRAME`; senders write one on a
   stream's first change set and then every 100 change sets or 15 minutes (configurable).
   Publishers may retain change sets holding a keyframe (option of `StreamPublisher`, only for

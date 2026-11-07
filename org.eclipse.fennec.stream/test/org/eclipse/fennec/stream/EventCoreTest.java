@@ -29,6 +29,7 @@ import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.fennec.model.stream.ChangeEntry;
 import org.eclipse.fennec.model.stream.ChangeSet;
 import org.eclipse.fennec.model.stream.DeltaKind;
+import org.eclipse.fennec.model.stream.Recording;
 import org.eclipse.fennec.model.stream.support.ChangeSetValidator;
 import org.eclipse.fennec.model.streammapping.AbsoluteChange;
 import org.eclipse.fennec.model.streammapping.BatchKind;
@@ -93,6 +94,7 @@ class EventCoreTest {
 		assertThat(temperature.getFeatureId()).isEqualTo(fx.pool.getFeatureID(fx.currentTemperature));
 		assertThat(temperature.getValueNew()).isEqualTo("24.5");
 		assertThat(temperature.getValueOld()).isNull();
+		assertThat(temperature.getRecording()).isEqualTo(Recording.TIMESERIES);
 		assertThat(temperature.getTimestamp()).isEqualTo(1_000L);
 		assertThat(sets.get(0).getAuthor()).isEqualTo("mapping:pool-streams");
 		assertThat(sets.get(0).getContextFingerprint()).isEqualTo("https://example.org/pool");
