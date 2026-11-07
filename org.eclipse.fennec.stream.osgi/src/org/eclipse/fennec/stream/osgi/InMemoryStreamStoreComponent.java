@@ -20,13 +20,14 @@ import org.eclipse.fennec.model.streammapping.DeletionRule;
 import org.eclipse.fennec.stream.InMemoryStreamStore;
 import org.eclipse.fennec.stream.StreamStore;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 /**
- * An in-memory {@link StreamStore} service. Configuration required (PID {@value #PID}, may be empty):
- * keeping a stream in memory must be a decision, not what a runtime falls back to.
+ * An in-memory {@link StreamStore} service, the default store of the core: it runs without
+ * configuration and carries {@code fennec.stream.store=memory}, which the core selects unless its
+ * {@code store.target} names another store.
  */
-@Component(name = InMemoryStreamStoreComponent.PID, service = StreamStore.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
+@Component(name = InMemoryStreamStoreComponent.PID, service = StreamStore.class,
+		property = StreamCoreComponent.STORE_PROPERTY + "=" + StreamCoreComponent.MEMORY)
 public class InMemoryStreamStoreComponent implements StreamStore {
 
 	/** The configuration PID and component name. */

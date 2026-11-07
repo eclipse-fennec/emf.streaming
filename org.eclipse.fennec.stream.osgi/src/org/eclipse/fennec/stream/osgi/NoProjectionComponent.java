@@ -16,13 +16,14 @@ import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.fennec.stream.Projection;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.ConfigurationPolicy;
 
 /**
- * A {@link Projection} that writes nothing, for audit-only runtimes. Configuration required (PID
- * {@value #PID}, may be empty), so it never stands in for a real projection by accident.
+ * A {@link Projection} that writes nothing, the default projection of the core (audit only): it runs
+ * without configuration and carries {@code fennec.stream.projection=none}, which the core selects
+ * unless its {@code projection.target} names another projection.
  */
-@Component(name = NoProjectionComponent.PID, service = Projection.class, configurationPolicy = ConfigurationPolicy.REQUIRE)
+@Component(name = NoProjectionComponent.PID, service = Projection.class,
+		property = StreamCoreComponent.PROJECTION_PROPERTY + "=" + StreamCoreComponent.NONE)
 public class NoProjectionComponent implements Projection {
 
 	/** The configuration PID and component name. */

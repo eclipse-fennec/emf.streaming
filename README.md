@@ -23,6 +23,7 @@ The concept and the first metamodel come from the *unified persistence* work in
 | `org.eclipse.fennec.mapping.osgi` | Function/converter whiteboards, mapping registry on an emf.osgi EObject registry |
 | `org.eclipse.fennec.stream.mapping.model` | Streaming policies: `StreamMapping`, `StreamSlot`, change rules, batching, retention |
 | `org.eclipse.fennec.stream` | Plain-Java core: change rules, event core (lanes per object, batching, keyframes, backpressure, retention), store and projection SPIs, receiver, undo/redo, as-of |
+| `org.eclipse.fennec.stream.osgi` | The core as OSGi service; in-memory store, no-op projection and replica targets as defaults without configuration ([docs/configuration.md](docs/configuration.md): JPA/Mongo projection, transport) |
 | `org.eclipse.fennec.stream.messaging` | Transport over Gecko Messaging: channels per object, CloudEvents, payload codec SPI, retained keyframes ([docs/transport.md](docs/transport.md)) |
 | `org.eclipse.fennec.stream.codec.json` | JSON payload through the Fennec EMF codec |
 

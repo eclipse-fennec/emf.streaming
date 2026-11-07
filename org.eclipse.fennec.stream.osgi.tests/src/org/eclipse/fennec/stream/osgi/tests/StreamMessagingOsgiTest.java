@@ -90,9 +90,6 @@ class StreamMessagingOsgiTest {
 				"(emf.eobject.provider.name=mapping-files)");
 		factory("org.gecko.messaging.memory", "osgi.messaging.name", "broker", "uri", "memory://stream-test", "cloudEvents",
 				"binary");
-		single("FennecInMemoryStreamStore");
-		single("FennecNoProjection");
-		single("FennecInMemoryReplicaTargets");
 	}
 
 	@AfterEach
@@ -201,12 +198,6 @@ class StreamMessagingOsgiTest {
 	private void factory(String pid, Object... keyValues) throws Exception {
 		Configuration configuration = configAdmin.getFactoryConfiguration(pid, "test", "?");
 		configuration.update(dictionary(keyValues));
-		configurations.add(configuration);
-	}
-
-	private void single(String pid) throws Exception {
-		Configuration configuration = configAdmin.getConfiguration(pid, "?");
-		configuration.update(new Hashtable<>());
 		configurations.add(configuration);
 	}
 

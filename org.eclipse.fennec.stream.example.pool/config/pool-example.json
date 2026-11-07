@@ -85,7 +85,9 @@
     "name": "fennec-mappings",
     "initialProvider.target": "(emf.eobject.provider.name=mapping-files)"
   },
-  "FennecInMemoryStreamStore": {},
+  "FennecStreamCore": {
+    "projection.target": "(fennec.stream.projection=repository)"
+  },
   "FennecRepositoryProjection": {
     "repository.target": "(persistence.repository.id=bath)"
   },

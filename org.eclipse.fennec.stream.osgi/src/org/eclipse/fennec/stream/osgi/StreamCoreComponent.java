@@ -52,11 +52,15 @@ import org.osgi.util.pushstream.PushStream;
  * The {@link StreamCore} service of a framework: an {@link EventCore} wired from services (#9).
  * <p>
  * All references are mandatory and static: the mappings and the function/converter whiteboards, the
- * OCL evaluator, the store, the projection (an audit-only runtime configures
- * {@code FennecNoProjection}; a prototype-scoped projection gives every lane thread an instance of
- * its own, given back when the thread ends or the core stops), and the metadata service, which names the fingerprint stamped on
- * every change set. The configuration (PID {@value #PID}) is optional - without one the core runs
- * with the groups high/default/low, an hourly retention sweep and a 30 s block timeout.
+ * OCL evaluator, the store, the projection and the metadata service, which names the fingerprint
+ * stamped on every change set. A prototype-scoped projection gives every lane thread an instance of
+ * its own, given back when the thread ends or the core stops.
+ * <p>
+ * The configuration (PID {@value #PID}) is optional. Without one the core runs with the in-memory
+ * store ({@code fennec.stream.store=memory}), the projection that writes nothing
+ * ({@code fennec.stream.projection=none}), both also without configuration, the groups
+ * high/default/low, an hourly retention sweep and a 30 s block timeout. {@code store.target} and
+ * {@code projection.target} select other services, e.g. a repository projection.
  */
 @Component(name = StreamCoreComponent.PID, service = StreamCore.class)
 @Designate(ocd = StreamCoreComponent.Config.class)
@@ -64,6 +68,24 @@ public class StreamCoreComponent implements StreamCore {
 
 	/** The configuration PID and component name. */
 	public static final String PID = "FennecStreamCore";
+
+	/** Service property naming a {@link StreamStore}. */
+	public static final String STORE_PROPERTY = "fennec.stream.store";
+
+	/** Service property naming a {@link Projection}. */
+	public static final String PROJECTION_PROPERTY = "fennec.stream.projection";
+
+	/** Service property naming the replica targets of a subscriber. */
+	public static final String TARGETS_PROPERTY = "fennec.stream.targets";
+
+	/** The name of the in-memory store and replica targets. */
+	public static final String MEMORY = "memory";
+
+	/** The name of the projection that writes nothing. */
+	public static final String NONE = "none";
+
+	static final String DEFAULT_STORE = "(" + STORE_PROPERTY + "=" + MEMORY + ")";
+	static final String DEFAULT_PROJECTION = "(" + PROJECTION_PROPERTY + "=" + NONE + ")";
 
 	/**
 	 * Optional configuration.
@@ -88,6 +110,18 @@ public class StreamCoreComponent implements StreamCore {
 		 */
 		@AttributeDefinition(description = "Milliseconds a producer waits for space in a full lane before enqueuing anyway")
 		long blockTimeoutMillis() default 30_000;
+
+		/**
+		 * @return the filter selecting the store
+		 */
+		@AttributeDefinition(description = "Filter selecting the StreamStore; default the in-memory store")
+		String store_target() default DEFAULT_STORE;
+
+		/**
+		 * @return the filter selecting the projection
+		 */
+		@AttributeDefinition(description = "Filter selecting the Projection, e.g. (fennec.stream.projection=repository); default none (audit only)")
+		String projection_target() default DEFAULT_PROJECTION;
 	}
 
 	private final EventCore core;
@@ -107,7 +141,7 @@ public class StreamCoreComponent implements StreamCore {
 			@Reference(name = "functions") FunctionRegistry functions,
 			@Reference(name = "converters") ConverterRegistry converters,
 			@Reference(name = "expressions") ExpressionEvaluator expressions,
-			@Reference(name = "store") StreamStore store, @Reference(name = "projection", scope = ReferenceScope.PROTOTYPE) ComponentServiceObjects<Projection> projections,
+			@Reference(name = "store", target = DEFAULT_STORE) StreamStore store, @Reference(name = "projection", target = DEFAULT_PROJECTION, scope = ReferenceScope.PROTOTYPE) ComponentServiceObjects<Projection> projections,
 			@Reference(name = "metadata") MetadataService metadata, Config config) {
 		ValueExtractor extractor = new ValueExtractor(functions, converters, expressions);
 		EventCore.Builder builder = EventCore.builder().mappings(mappings)
