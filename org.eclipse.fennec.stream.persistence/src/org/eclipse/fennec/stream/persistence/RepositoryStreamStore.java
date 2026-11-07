@@ -18,12 +18,15 @@ import static org.eclipse.fennec.model.query.builder.Expressions.path;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.fennec.model.command.CommandFactory;
+import org.eclipse.fennec.model.command.DeleteCommand;
 import org.eclipse.fennec.model.query.Query;
 import org.eclipse.fennec.model.query.builder.QueryBuilder;
 import org.eclipse.fennec.model.stream.ChangeEntry;
@@ -31,7 +34,10 @@ import org.eclipse.fennec.model.stream.ChangeSet;
 import org.eclipse.fennec.model.stream.DeltaKind;
 import org.eclipse.fennec.model.stream.SlotValue;
 import org.eclipse.fennec.model.stream.StreamPackage;
+import org.eclipse.fennec.model.streammapping.DeletionRule;
 import org.eclipse.fennec.persistence.query.api.QueryResult;
+import org.eclipse.fennec.persistence.repository.api.Repository;
+import org.eclipse.fennec.stream.ChangeRules;
 import org.eclipse.fennec.stream.StreamStore;
 
 /**
@@ -41,8 +47,12 @@ import org.eclipse.fennec.stream.StreamStore;
  * <p>
  * A copy is saved, so the change set the core hands on to its consumers stays untouched.
  * {@link #lastValue} walks the stream backwards in pages and stops at the first entry or keyframe
- * slot of the address - at the latest at the stream's last keyframe. Retention is not applied yet
- * ({@link RetentionOutcome#UNSUPPORTED}).
+ * slot of the address - at the latest at the stream's last keyframe.
+ * <p>
+ * {@link #retain} has the semantics of the in-memory store: it removes the entries of one slot that
+ * are beyond the rule's count or older than its horizon (keyframes stay), saves the change sets it
+ * changed and deletes those left without entries. It reads the whole stream in pages, so it is meant
+ * for the periodic sweep, not for every change set.
  * <p>
  * Thread-safe: every call borrows a repository instance of its own from the {@link RepositoryAccess}.
  */
@@ -115,6 +125,71 @@ public final class RepositoryStreamStore implements StreamStore {
 			}
 			if (newestFirst.size() < PAGE) {
 				return Optional.empty();
+			}
+		}
+	}
+
+	@Override
+	public RetentionOutcome retain(String streamId, String slotAddress, DeletionRule rule, long now) {
+		requireNonNull(slotAddress, "Slot address is required");
+		if (rule == null) {
+			return RetentionOutcome.APPLIED;
+		}
+		long horizon = rule.getRetention() > 0 ? now - ChangeRules.millis(rule.getRetention(), rule.getRetentionUnit())
+				: Long.MIN_VALUE;
+		if (rule.getMaxCount() <= 0 && horizon == Long.MIN_VALUE) {
+			return RetentionOutcome.APPLIED;
+		}
+		return call(repository -> {
+			List<ChangeSet> oldestFirst = readAll(repository, streamId);
+			int ofSlot = 0;
+			for (ChangeSet changeSet : oldestFirst) {
+				for (ChangeEntry entry : changeSet.getEntries()) {
+					if (slotAddress.equals(entry.getFeatureUri())) {
+						ofSlot++;
+					}
+				}
+			}
+			int toDrop = rule.getMaxCount() > 0 ? Math.max(0, ofSlot - rule.getMaxCount()) : 0;
+			for (ChangeSet changeSet : oldestFirst) {
+				List<ChangeEntry> dropped = new ArrayList<>();
+				for (ChangeEntry entry : changeSet.getEntries()) {
+					long time = entry.getTimestamp() != null ? entry.getTimestamp() : changeSet.getTimestamp();
+					if (slotAddress.equals(entry.getFeatureUri()) && (toDrop > 0 || time < horizon)) {
+						if (toDrop > 0) {
+							toDrop--;
+						}
+						dropped.add(entry);
+					}
+				}
+				if (dropped.size() == changeSet.getEntries().size()) {
+					repository.execute(delete(changeSet));
+				} else if (!dropped.isEmpty()) {
+					changeSet.getEntries().removeAll(dropped);
+					repository.save(changeSet);
+				}
+			}
+			return RetentionOutcome.APPLIED;
+		});
+	}
+
+	private static DeleteCommand delete(ChangeSet changeSet) {
+		DeleteCommand delete = CommandFactory.eINSTANCE.createDeleteCommand();
+		delete.setName("retain " + changeSet.getId());
+		delete.setSelector(QueryBuilder.from(STREAM.getChangeSet()).where(path(STREAM.getChangeSet_Id()).eq(changeSet.getId())).build());
+		return delete;
+	}
+
+	private static List<ChangeSet> readAll(Repository repository, String streamId) throws IOException {
+		List<ChangeSet> all = new ArrayList<>();
+		for (int skip = 0;; skip += PAGE) {
+			Query page = stream(streamId).orderByAsc(STREAM.getChangeSet_Sequence()).skip(skip).top(PAGE).build();
+			try (QueryResult result = repository.find(page)) {
+				List<ChangeSet> changeSets = changeSets(result.objects()).toList();
+				all.addAll(changeSets);
+				if (changeSets.size() < PAGE) {
+					return all;
+				}
 			}
 		}
 	}
