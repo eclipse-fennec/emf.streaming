@@ -55,6 +55,10 @@ tools/brokers.sh up    # Mosquitto 2 (podman or docker) for the MQTT OSGi tests;
 Project coordinates live in `gradle.properties`, the library selection in `cnf/ext/fennec.bnd`
 (see `cnf/SETUP.MD`).
 
+To test against an unpublished fix of another Fennec workspace, `tools/localbuilds.sh add <workspace>
+<bsn>` offers its locally built bundle next to the snapshots (git-ignored, never in CI);
+`tools/localbuilds.sh clear` goes back. Re-resolve the bndruns and stop the Gradle daemon after either.
+
 ## License
 
 [Eclipse Public License 2.0](LICENSE)
