@@ -36,12 +36,15 @@ import org.eclipse.fennec.stream.Projection;
 import org.eclipse.fennec.stream.ProjectionSource;
 import org.eclipse.fennec.stream.StreamCore;
 import org.eclipse.fennec.stream.StreamReceiver;
+import org.eclipse.fennec.stream.StreamSink;
 import org.eclipse.fennec.stream.StreamStore;
 import org.osgi.service.component.ComponentServiceObjects;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
@@ -60,7 +63,8 @@ import org.osgi.util.pushstream.PushStream;
  * store ({@code fennec.stream.store=memory}), the projection that writes nothing
  * ({@code fennec.stream.projection=none}), both also without configuration, the groups
  * high/default/low, an hourly retention sweep and a 30 s block timeout. {@code store.target} and
- * {@code projection.target} select other services, e.g. a repository projection.
+ * {@code projection.target} select other services, e.g. a repository projection. Every
+ * {@link StreamSink} service gets the change sets written while it is registered (whiteboard).
  */
 @Component(name = StreamCoreComponent.PID, service = StreamCore.class)
 @Designate(ocd = StreamCoreComponent.Config.class)
@@ -169,6 +173,20 @@ public class StreamCoreComponent implements StreamCore {
 				projections.ungetService(projection);
 			}
 		};
+	}
+
+	/**
+	 * Whiteboard: every {@link StreamSink} service sees the change sets written while it is there.
+	 *
+	 * @param sink the sink
+	 */
+	@Reference(name = "sinks", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
+	void addSink(StreamSink sink) {
+		core.addSink(sink);
+	}
+
+	void removeSink(StreamSink sink) {
+		core.removeSink(sink);
 	}
 
 	/**

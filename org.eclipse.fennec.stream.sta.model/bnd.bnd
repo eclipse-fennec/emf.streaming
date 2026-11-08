@@ -1,0 +1,22 @@
+Bundle-Name: Eclipse Fennec SensorThings Model
+Bundle-Description: The OGC SensorThings API 1.1 data model (Thing, Location, Datastream, Sensor, \
+	ObservedProperty, Observation, FeatureOfInterest) as a projection target of the Fennec change stream.
+
+src=src-gen
+
+-workingset: streaming
+
+-library: enableEMF
+
+-generate:\
+	model/sta.genmodel;\
+		generate=fennecEMF;\
+		lineEndings=lf;\
+		genmodel=model/sta.genmodel;\
+		output=src-gen
+
+-includeresource.model: model=model
+
+-buildpath: \
+	org.osgi.service.condition;version=latest
+
