@@ -1,0 +1,15 @@
+{
+  ":configurator:resource-version": 1,
+  ":configurator:symbolic-name": "org.eclipse.fennec.stream.example.pool.mqtt",
+  ":configurator:version": "0.1.0",
+  "org.gecko.messaging.mqtt~sta": {
+    "osgi.messaging.name": "sta",
+    "uri": "tcp://localhost:11893",
+    "connectTimeout:Long": 3000,
+    "publishAwaitConnection:Long": 10000
+  },
+  "FennecStaMqttPublisher": {
+    "publisher.target": "(osgi.messaging.name=sta)",
+    "serviceRoot": "http://localhost:8080/sta/v1.1"
+  }
+}
