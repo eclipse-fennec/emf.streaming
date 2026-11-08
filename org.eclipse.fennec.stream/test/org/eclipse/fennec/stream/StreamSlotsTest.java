@@ -14,6 +14,12 @@ package org.eclipse.fennec.stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.List;
+
+import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EcoreFactory;
+import org.eclipse.fennec.model.mapping.Slot;
 import org.eclipse.fennec.model.streammapping.BatchKind;
 import org.eclipse.fennec.model.streammapping.BatchStrategy;
 import org.eclipse.fennec.model.streammapping.Lateness;
@@ -112,5 +118,58 @@ class StreamSlotsTest {
 		assertThat(mapping.getKeyframeEveryMinutes()).isEqualTo(15);
 		assertThat(mapping.isUndoable()).isFalse();
 		assertThat(mapping.getGuard().getName()).isEqualTo("FAIL");
+	}
+
+	@Test
+	void includingUnmappedStreamsEveryOtherAttributeOfTheTargetAsIs() {
+		PoolStreams fx = new PoolStreams();
+		StreamMapping mapping = fx.mapping();
+		mapping.setRecording(RecordingMode.CHANGELOG);
+		mapping.setIncludeUnmapped(true);
+		mapping.getExcludedFeatures().add(fx.poolId);
+		fx.depth.setTransient(true);
+
+		StreamMapping expanded = StreamSlots.expand(mapping);
+
+		assertThat(mapping.getSlots()).as("the registered mapping stays as it is").hasSize(2);
+		assertThat(expanded.getSlots()).extracting(Slot::getTargetFeature)
+				.containsExactly(fx.currentTemperature, fx.currentPh, fx.poolName);
+		StreamSlot name = (StreamSlot) expanded.getSlots().get(2);
+		assertThat(name.getSourceClass()).as("read from the target itself").isNull();
+		assertThat(name.getValue().getFeaturePath()).containsExactly(fx.poolName);
+		assertThat(StreamSlots.recording(name)).as("the mapping's defaults").isEqualTo(RecordingMode.CHANGELOG);
+	}
+
+	@Test
+	void withoutIncludingUnmappedTheMappingIsStreamedAsDeclared() {
+		PoolStreams fx = new PoolStreams();
+		StreamMapping mapping = fx.mapping();
+		assertThat(StreamSlots.expand(mapping)).isSameAs(mapping);
+		mapping.setIncludeUnmapped(false);
+		assertThat(StreamSlots.expand(mapping)).isSameAs(mapping);
+	}
+
+	@Test
+	void aPathFollowingAReferenceOutOfTheAggregateIsReported() {
+		PoolStreams fx = new PoolStreams();
+		EReference probe = reference("probe", fx.tempSensor, true);
+		EReference station = reference("station", fx.tempSensor, false);
+		fx.pool.getEStructuralFeatures().addAll(List.of(probe, station));
+		StreamMapping mapping = F.createStreamMapping();
+		mapping.setId("pool-mirror");
+		mapping.setTarget(fx.pool);
+		mapping.getSlots().add(PoolStreams.slot(fx.currentTemperature, fx.pool, PoolStreams.path(probe, fx.tempSensorValue)));
+		mapping.getSlots().add(PoolStreams.slot(fx.currentPh, fx.pool, PoolStreams.path(station, fx.tempSensorValue)));
+
+		assertThat(StreamSlots.pathsLeavingTheAggregate(mapping)).singleElement().asString()
+				.contains("slot currentPh").contains("'station'");
+	}
+
+	private static EReference reference(String name, EClass type, boolean containment) {
+		EReference reference = EcoreFactory.eINSTANCE.createEReference();
+		reference.setName(name);
+		reference.setEType(type);
+		reference.setContainment(containment);
+		return reference;
 	}
 }

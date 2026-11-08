@@ -75,6 +75,7 @@ public class StreamMappingFactoryImpl extends EFactoryImpl implements StreamMapp
 			case StreamMappingPackage.TIME_THROTTLE: return createTimeThrottle();
 			case StreamMappingPackage.COMPOSITE_RULE: return createCompositeRule();
 			case StreamMappingPackage.EXPRESSION_RULE: return createExpressionRule();
+			case StreamMappingPackage.FUNCTION_RULE: return createFunctionRule();
 			case StreamMappingPackage.BATCH_STRATEGY: return createBatchStrategy();
 			case StreamMappingPackage.DELETION_RULE: return createDeletionRule();
 			default:
@@ -222,6 +223,17 @@ public class StreamMappingFactoryImpl extends EFactoryImpl implements StreamMapp
 	public ExpressionRule createExpressionRule() {
 		ExpressionRuleImpl expressionRule = new ExpressionRuleImpl();
 		return expressionRule;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public FunctionRule createFunctionRule() {
+		FunctionRuleImpl functionRule = new FunctionRuleImpl();
+		return functionRule;
 	}
 
 	/**

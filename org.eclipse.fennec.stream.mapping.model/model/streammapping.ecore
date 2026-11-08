@@ -57,6 +57,11 @@
         <details key="documentation" value="Whether the change stream of the target objects offers undo/redo (CHANGELOG slots only)."/>
       </eAnnotations>
     </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="excludedFeatures" upperBound="-1" eType="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EStructuralFeature">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="With includeUnmapped = true: the attributes of the target that are not streamed. Without it, ignored."/>
+      </eAnnotations>
+    </eStructuralFeatures>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="StreamSlot" eSuperTypes="https://eclipse.org/fennec/mapping/1.0.0#//Slot">
     <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
@@ -170,6 +175,16 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="expression" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value="Boolean OCL expression."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="FunctionRule" eSuperTypes="#//ChangeRule">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="A named function decides, for what an OCL guard cannot express or is too costly for. The function (a ValueFunction registered under the id) gets a ChangeCandidate (the source object, the new value, the last passed value) and answers a Boolean; an unknown id, a failure or a non-Boolean answer lets the value pass."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="functionId" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The id of the function (ValueFunction.FUNCTION_ID)."/>
       </eAnnotations>
     </eStructuralFeatures>
   </eClassifiers>

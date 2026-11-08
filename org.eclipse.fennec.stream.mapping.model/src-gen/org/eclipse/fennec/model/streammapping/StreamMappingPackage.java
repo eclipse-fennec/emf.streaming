@@ -46,7 +46,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @ProviderType
-@EPackage(uri = StreamMappingPackage.eNS_URI, fingerprint = "fp1:00a3e28be75cdc372fd7cc9a02a12e375bef5afb93b3a08cc8541c114b7b9c63", genModel = "/model/streammapping.genmodel", genModelSourceLocations = {"model/streammapping.genmodel","org.eclipse.fennec.stream.mapping.model/model/streammapping.genmodel"}, ecore = "/model/streammapping.ecore", ecoreSourceLocations = "/model/streammapping.ecore")
+@EPackage(uri = StreamMappingPackage.eNS_URI, fingerprint = "fp1:b3fc797499786d0282d54eaa07bb3b01162e27b15e114bc447087d3509006642", genModel = "/model/streammapping.genmodel", genModelSourceLocations = {"model/streammapping.genmodel","org.eclipse.fennec.stream.mapping.model/model/streammapping.genmodel"}, ecore = "/model/streammapping.ecore", ecoreSourceLocations = "/model/streammapping.ecore")
 public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 	/**
 	 * The package name.
@@ -253,13 +253,22 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 	int STREAM_MAPPING__UNDOABLE = MappingPackage.MAPPING_FEATURE_COUNT + 8;
 
 	/**
+	 * The feature id for the '<em><b>Excluded Features</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STREAM_MAPPING__EXCLUDED_FEATURES = MappingPackage.MAPPING_FEATURE_COUNT + 9;
+
+	/**
 	 * The number of structural features of the '<em>Stream Mapping</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int STREAM_MAPPING_FEATURE_COUNT = MappingPackage.MAPPING_FEATURE_COUNT + 9;
+	int STREAM_MAPPING_FEATURE_COUNT = MappingPackage.MAPPING_FEATURE_COUNT + 10;
 
 	/**
 	 * The number of operations of the '<em>Stream Mapping</em>' class.
@@ -675,6 +684,43 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 	int EXPRESSION_RULE_OPERATION_COUNT = CHANGE_RULE_OPERATION_COUNT + 0;
 
 	/**
+	 * The meta object id for the '{@link org.eclipse.fennec.model.streammapping.impl.FunctionRuleImpl <em>Function Rule</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.eclipse.fennec.model.streammapping.impl.FunctionRuleImpl
+	 * @see org.eclipse.fennec.model.streammapping.impl.StreamMappingPackageImpl#getFunctionRule()
+	 * @generated
+	 */
+	int FUNCTION_RULE = 9;
+
+	/**
+	 * The feature id for the '<em><b>Function Id</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FUNCTION_RULE__FUNCTION_ID = CHANGE_RULE_FEATURE_COUNT + 0;
+
+	/**
+	 * The number of structural features of the '<em>Function Rule</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FUNCTION_RULE_FEATURE_COUNT = CHANGE_RULE_FEATURE_COUNT + 1;
+
+	/**
+	 * The number of operations of the '<em>Function Rule</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int FUNCTION_RULE_OPERATION_COUNT = CHANGE_RULE_OPERATION_COUNT + 0;
+
+	/**
 	 * The meta object id for the '{@link org.eclipse.fennec.model.streammapping.impl.BatchStrategyImpl <em>Batch Strategy</em>}' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -682,7 +728,7 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @see org.eclipse.fennec.model.streammapping.impl.StreamMappingPackageImpl#getBatchStrategy()
 	 * @generated
 	 */
-	int BATCH_STRATEGY = 9;
+	int BATCH_STRATEGY = 10;
 
 	/**
 	 * The feature id for the '<em><b>Kind</b></em>' attribute.
@@ -746,7 +792,7 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @see org.eclipse.fennec.model.streammapping.impl.StreamMappingPackageImpl#getDeletionRule()
 	 * @generated
 	 */
-	int DELETION_RULE = 10;
+	int DELETION_RULE = 11;
 
 	/**
 	 * The feature id for the '<em><b>Retention</b></em>' attribute.
@@ -819,7 +865,7 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @see org.eclipse.fennec.model.streammapping.impl.StreamMappingPackageImpl#getProjectionMode()
 	 * @generated
 	 */
-	int PROJECTION_MODE = 11;
+	int PROJECTION_MODE = 12;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.fennec.model.streammapping.RecordingMode <em>Recording Mode</em>}' enum.
@@ -829,7 +875,7 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @see org.eclipse.fennec.model.streammapping.impl.StreamMappingPackageImpl#getRecordingMode()
 	 * @generated
 	 */
-	int RECORDING_MODE = 12;
+	int RECORDING_MODE = 13;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.fennec.model.streammapping.Lateness <em>Lateness</em>}' enum.
@@ -839,7 +885,7 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @see org.eclipse.fennec.model.streammapping.impl.StreamMappingPackageImpl#getLateness()
 	 * @generated
 	 */
-	int LATENESS = 13;
+	int LATENESS = 14;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.fennec.model.streammapping.GuardPolicy <em>Guard Policy</em>}' enum.
@@ -849,7 +895,7 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @see org.eclipse.fennec.model.streammapping.impl.StreamMappingPackageImpl#getGuardPolicy()
 	 * @generated
 	 */
-	int GUARD_POLICY = 14;
+	int GUARD_POLICY = 15;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.fennec.model.streammapping.BatchKind <em>Batch Kind</em>}' enum.
@@ -859,7 +905,7 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @see org.eclipse.fennec.model.streammapping.impl.StreamMappingPackageImpl#getBatchKind()
 	 * @generated
 	 */
-	int BATCH_KIND = 15;
+	int BATCH_KIND = 16;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.fennec.model.streammapping.RuleOperator <em>Rule Operator</em>}' enum.
@@ -869,7 +915,7 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @see org.eclipse.fennec.model.streammapping.impl.StreamMappingPackageImpl#getRuleOperator()
 	 * @generated
 	 */
-	int RULE_OPERATOR = 16;
+	int RULE_OPERATOR = 17;
 
 	/**
 	 * The meta object id for the '{@link org.eclipse.fennec.model.streammapping.DurationUnit <em>Duration Unit</em>}' enum.
@@ -879,7 +925,7 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @see org.eclipse.fennec.model.streammapping.impl.StreamMappingPackageImpl#getDurationUnit()
 	 * @generated
 	 */
-	int DURATION_UNIT = 17;
+	int DURATION_UNIT = 18;
 
 
 	/**
@@ -990,6 +1036,17 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 */
 	EAttribute getStreamMapping_Undoable();
+
+	/**
+	 * Returns the meta object for the reference list '{@link org.eclipse.fennec.model.streammapping.StreamMapping#getExcludedFeatures <em>Excluded Features</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Excluded Features</em>'.
+	 * @see org.eclipse.fennec.model.streammapping.StreamMapping#getExcludedFeatures()
+	 * @see #getStreamMapping()
+	 * @generated
+	 */
+	EReference getStreamMapping_ExcludedFeatures();
 
 	/**
 	 * Returns the meta object for class '{@link org.eclipse.fennec.model.streammapping.StreamSlot <em>Stream Slot</em>}'.
@@ -1235,6 +1292,27 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @generated
 	 */
 	EAttribute getExpressionRule_Expression();
+
+	/**
+	 * Returns the meta object for class '{@link org.eclipse.fennec.model.streammapping.FunctionRule <em>Function Rule</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Function Rule</em>'.
+	 * @see org.eclipse.fennec.model.streammapping.FunctionRule
+	 * @generated
+	 */
+	EClass getFunctionRule();
+
+	/**
+	 * Returns the meta object for the attribute '{@link org.eclipse.fennec.model.streammapping.FunctionRule#getFunctionId <em>Function Id</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the attribute '<em>Function Id</em>'.
+	 * @see org.eclipse.fennec.model.streammapping.FunctionRule#getFunctionId()
+	 * @see #getFunctionRule()
+	 * @generated
+	 */
+	EAttribute getFunctionRule_FunctionId();
 
 	/**
 	 * Returns the meta object for class '{@link org.eclipse.fennec.model.streammapping.BatchStrategy <em>Batch Strategy</em>}'.
@@ -1531,6 +1609,14 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 		EAttribute STREAM_MAPPING__UNDOABLE = eINSTANCE.getStreamMapping_Undoable();
 
 		/**
+		 * The meta object literal for the '<em><b>Excluded Features</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference STREAM_MAPPING__EXCLUDED_FEATURES = eINSTANCE.getStreamMapping_ExcludedFeatures();
+
+		/**
 		 * The meta object literal for the '{@link org.eclipse.fennec.model.streammapping.impl.StreamSlotImpl <em>Stream Slot</em>}' class.
 		 * <!-- begin-user-doc -->
 		 * <!-- end-user-doc -->
@@ -1729,6 +1815,24 @@ public interface StreamMappingPackage extends org.eclipse.emf.ecore.EPackage {
 		 * @generated
 		 */
 		EAttribute EXPRESSION_RULE__EXPRESSION = eINSTANCE.getExpressionRule_Expression();
+
+		/**
+		 * The meta object literal for the '{@link org.eclipse.fennec.model.streammapping.impl.FunctionRuleImpl <em>Function Rule</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.eclipse.fennec.model.streammapping.impl.FunctionRuleImpl
+		 * @see org.eclipse.fennec.model.streammapping.impl.StreamMappingPackageImpl#getFunctionRule()
+		 * @generated
+		 */
+		EClass FUNCTION_RULE = eINSTANCE.getFunctionRule();
+
+		/**
+		 * The meta object literal for the '<em><b>Function Id</b></em>' attribute feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EAttribute FUNCTION_RULE__FUNCTION_ID = eINSTANCE.getFunctionRule_FunctionId();
 
 		/**
 		 * The meta object literal for the '{@link org.eclipse.fennec.model.streammapping.impl.BatchStrategyImpl <em>Batch Strategy</em>}' class.

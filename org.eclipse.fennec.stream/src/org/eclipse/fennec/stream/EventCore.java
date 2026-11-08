@@ -18,6 +18,7 @@ import java.time.Clock;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.WeakHashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -143,6 +145,10 @@ public final class EventCore implements StreamCore, AutoCloseable {
 	private static final long CLOSE_TIMEOUT_SECONDS = 5;
 
 	private final MappingRegistry mappings;
+	/** Registered mapping → the mapping as streamed; weak, so a replaced mapping goes with its copy. */
+	private final Map<StreamMapping, StreamMapping> expanded = Collections.synchronizedMap(new WeakHashMap<>());
+	/** Registered mappings already checked for paths leaving the aggregate; weak like the copies. */
+	private final Map<StreamMapping, Boolean> checked = Collections.synchronizedMap(new WeakHashMap<>());
 	private final Mapper mapper;
 	private final ChangeRules rules;
 	private final StreamStore store;
@@ -531,9 +537,17 @@ public final class EventCore implements StreamCore, AutoCloseable {
 		Map<String, TargetKey> keys = new LinkedHashMap<>();
 		for (EObject source : sources) {
 			for (Mapping mapping : mappings.forSource(source.eClass())) {
-				if (!(mapping instanceof StreamMapping streamMapping) || streamMapping.getTarget() == null) {
+				if (!(mapping instanceof StreamMapping registered) || registered.getTarget() == null) {
 					continue;
 				}
+				checked.computeIfAbsent(registered, m -> {
+					StreamSlots.pathsLeavingTheAggregate(m).forEach(LOGGER::warning);
+					return Boolean.TRUE;
+				});
+				// only expanded copies are cached: a value that is its own key would never be collected
+				StreamMapping streamMapping = Boolean.TRUE.equals(registered.getIncludeUnmapped())
+						? expanded.computeIfAbsent(registered, StreamSlots::expand)
+						: registered;
 				Map<String, List<MappedValue>> byTarget = new LinkedHashMap<>();
 				for (MappedValue value : mapper.map(streamMapping, source)) {
 					byTarget.computeIfAbsent(value.targetId(), id -> new ArrayList<>()).add(value);

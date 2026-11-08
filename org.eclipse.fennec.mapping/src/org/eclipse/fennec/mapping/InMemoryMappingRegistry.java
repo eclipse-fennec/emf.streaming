@@ -117,6 +117,10 @@ public final class InMemoryMappingRegistry implements MappingRegistry {
 		requireNonNull(source, "Source class is required");
 		List<Mapping> result = new ArrayList<>();
 		for (Mapping mapping : mappings.values()) {
+			if (Boolean.TRUE.equals(mapping.getIncludeUnmapped()) && Mappings.applies(mapping.getTarget(), source)) {
+				result.add(mapping);
+				continue;
+			}
 			for (Slot slot : mapping.getSlots()) {
 				if (Mappings.applies(Mappings.sourceClassOf(mapping, slot), source)) {
 					result.add(mapping);

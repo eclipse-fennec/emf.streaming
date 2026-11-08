@@ -107,6 +107,15 @@ public interface StreamMappingFactory extends EFactory {
 	ExpressionRule createExpressionRule();
 
 	/**
+	 * Returns a new object of class '<em>Function Rule</em>'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return a new object of class '<em>Function Rule</em>'.
+	 * @generated
+	 */
+	FunctionRule createFunctionRule();
+
+	/**
 	 * Returns a new object of class '<em>Batch Strategy</em>'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->

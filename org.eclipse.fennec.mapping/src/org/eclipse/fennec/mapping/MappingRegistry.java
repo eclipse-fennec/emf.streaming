@@ -50,7 +50,9 @@ public interface MappingRegistry {
 
 	/**
 	 * @param source the class of a source object
-	 * @return the mappings with a slot reading objects of that class (or a superclass)
+	 * @return the mappings with a slot reading objects of that class (or a superclass), and those
+	 *         onto that class (or a superclass) that include unmapped features: their source is the
+	 *         target itself
 	 */
 	List<Mapping> forSource(EClass source);
 

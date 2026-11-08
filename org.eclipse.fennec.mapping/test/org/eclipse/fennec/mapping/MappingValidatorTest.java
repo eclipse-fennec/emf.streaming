@@ -125,6 +125,18 @@ class MappingValidatorTest {
 	}
 
 	@Test
+	void aMappingIncludingUnmappedFeaturesIsFoundForItsTargetAsSource() {
+		InMemoryMappingRegistry registry = new InMemoryMappingRegistry();
+		Mapping mapping = fx.poolMapping();
+		registry.register(mapping);
+		assertThat(registry.forSource(fx.pool)).isEmpty();
+
+		mapping.setIncludeUnmapped(true);
+		assertThat(registry.forSource(fx.pool)).containsExactly(mapping);
+		assertThat(registry.forSource(fx.phSensor)).containsExactly(mapping);
+	}
+
+	@Test
 	void theRegistryRefusesInvalidMappingsAndFindsByTargetAndSource() {
 		InMemoryMappingRegistry registry = new InMemoryMappingRegistry();
 		List<String> events = new ArrayList<>();

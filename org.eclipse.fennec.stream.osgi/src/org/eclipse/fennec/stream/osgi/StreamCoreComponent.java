@@ -145,7 +145,7 @@ public class StreamCoreComponent implements StreamCore {
 			@Reference(name = "metadata") MetadataService metadata, Config config) {
 		ValueExtractor extractor = new ValueExtractor(functions, converters, expressions);
 		EventCore.Builder builder = EventCore.builder().mappings(mappings)
-				.mapper(new Mapper(extractor, new IdentityResolver(extractor))).rules(new ChangeRules(expressions))
+				.mapper(new Mapper(extractor, new IdentityResolver(extractor))).rules(new ChangeRules(expressions, functions))
 				.store(store).projections(projections(projections)).fingerprints(ePackage -> fingerprint(metadata, ePackage))
 				.retentionInterval(Duration.ofSeconds(config.retentionIntervalSeconds()))
 				.blockTimeout(Duration.ofMillis(config.blockTimeoutMillis()));
