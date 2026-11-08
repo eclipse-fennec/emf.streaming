@@ -164,8 +164,7 @@ releases them when it stops. A store is selected the same way as a projection:
 }
 ```
 
-> Retention (the deletion rules of a mapping) removes entries and change sets through the repository;
-> on JPA deleting a change set fails until emf.persistence-jpa#403 is fixed (#42).
+> Retention (the deletion rules of a mapping) removes entries and change sets through the repository.
 
 ## Transport
 

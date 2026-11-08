@@ -13,7 +13,6 @@
 package org.eclipse.fennec.stream.persistence.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,13 +32,6 @@ import org.eclipse.fennec.emf.osgi.ResourceSetFactory;
 import org.eclipse.fennec.model.mapping.IdentityResolution;
 import org.eclipse.fennec.model.mapping.MappingFactory;
 import org.eclipse.fennec.model.mapping.ValueSource;
-import org.eclipse.fennec.model.stream.ChangeEntry;
-import org.eclipse.fennec.model.stream.ChangeSet;
-import org.eclipse.fennec.model.stream.DeltaKind;
-import org.eclipse.fennec.model.stream.SlotValue;
-import org.eclipse.fennec.model.stream.StreamFactory;
-import org.eclipse.fennec.model.streammapping.DeletionRule;
-import org.eclipse.fennec.model.streammapping.DurationUnit;
 import org.eclipse.fennec.model.streammapping.StreamMapping;
 import org.eclipse.fennec.model.streammapping.StreamMappingFactory;
 import org.eclipse.fennec.model.streammapping.StreamSlot;
@@ -47,11 +39,8 @@ import org.eclipse.fennec.stream.EventCore;
 import org.eclipse.fennec.stream.StreamCore;
 import org.eclipse.fennec.stream.StreamStore;
 import org.eclipse.fennec.stream.tck.StreamStoreContract;
-import org.eclipse.fennec.stream.StreamStore.RetentionOutcome;
-import org.eclipse.fennec.stream.StreamStore.StoredValue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -99,27 +88,6 @@ class RepositoryStreamStoreOsgiTest extends StreamStoreContract {
 			Thread.currentThread().interrupt();
 			throw new AssertionError(e);
 		}
-	}
-
-	@Override
-	@Test
-	@Disabled("emf.persistence-jpa#404: an unset unsettable attribute is read back as set")
-	protected void anUnsetRecordingIsReadBackUnset() {
-		super.anUnsetRecordingIsReadBackUnset();
-	}
-
-	@Override
-	@Test
-	@Disabled("Blocked by emf.persistence-jpa#403: deleting a change set fails on the synthetic PK of its entries (#42)")
-	protected void retentionKeepsTheNewestEntriesOfASlotUpToTheCount() {
-		super.retentionKeepsTheNewestEntriesOfASlotUpToTheCount();
-	}
-
-	@Override
-	@Test
-	@Disabled("Blocked by emf.persistence-jpa#403: deleting a change set fails on the synthetic PK of its entries (#42)")
-	protected void retentionRemovesTheEntriesOfASlotOlderThanTheHorizon() {
-		super.retentionRemovesTheEntriesOfASlotOlderThanTheHorizon();
 	}
 
 	@AfterEach
