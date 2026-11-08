@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EAttribute;
@@ -163,6 +164,20 @@ class StaMapperTest {
 		sink.written(mapping, changeSet(set(temperature, "28.5", 2_000L)));
 
 		assertThat(events).containsExactly("written", "heard 1", "written");
+	}
+
+	@Test
+	void aConfiguredUnitComesBeforeTheAnnotation() {
+		StaMapper withUnits = new StaMapper(TargetDescriber.IDS,
+				Map.ofEntries(StaMapper.Unit.parse(NS + "#//Pool/temperature=kelvin|K|http://qudt.org/vocab/unit/K"),
+						StaMapper.Unit.parse(NS + "#//Pool/open=flag")));
+
+		StaBatch batch = withUnits.map(mapping, changeSet(set(temperature, "300", 1_000L), set(open, "true", 1_000L)));
+
+		assertThat(batch.observations().get(0).getDatastream().getUnitOfMeasurement())
+				.extracting("name", "symbol", "definition").containsExactly("kelvin", "K", "http://qudt.org/vocab/unit/K");
+		assertThat(batch.observations().get(1).getDatastream().getUnitOfMeasurement())
+				.extracting("name", "symbol", "definition").containsExactly("flag", null, null);
 	}
 
 	private StreamMapping mapping() {

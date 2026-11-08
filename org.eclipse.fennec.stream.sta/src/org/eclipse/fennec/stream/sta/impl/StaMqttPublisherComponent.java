@@ -45,7 +45,7 @@ public class StaMqttPublisherComponent implements StaListener {
 		/**
 		 * @return the filter selecting the messaging instance
 		 */
-		@AttributeDefinition(description = "Filter selecting the Gecko Messaging instance, e.g. (messaging.name=mqtt)")
+		@AttributeDefinition(description = "Filter selecting the Gecko Messaging instance, e.g. (osgi.messaging.name=mqtt)")
 		String publisher_target();
 
 		/**

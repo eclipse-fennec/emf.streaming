@@ -168,6 +168,17 @@ org.eclipse.fennec.ogc:org.eclipse.fennec.ogc.features.example.city:0.1.0-SNAPSH
 org.eclipse.fennec.ogc:org.eclipse.fennec.codec.cql2:0.1.0-SNAPSHOT
 org.eclipse.fennec.ogc:net.opengis.cql2.model:0.1.0-SNAPSHOT
 org.eclipse.fennec.ogc:org.qgis.project.model:0.1.0-SNAPSHOT
+# OData server (emf.odata) - the SensorThings endpoint of the pool example (D-25)
+org.eclipse.fennec.odata:org.eclipse.fennec.odata.runtime:0.1.0-SNAPSHOT
+org.eclipse.fennec.odata:org.eclipse.fennec.odata.persistence:0.1.0-SNAPSHOT
+org.eclipse.fennec.odata:org.eclipse.fennec.odata.persistence.api:0.1.0-SNAPSHOT
+org.eclipse.fennec.odata:org.eclipse.fennec.odata.csdl:0.1.0-SNAPSHOT
+org.eclipse.fennec.odata:org.eclipse.fennec.odata.codec.json:0.1.0-SNAPSHOT
+org.eclipse.fennec.odata:org.eclipse.fennec.odata.query:0.1.0-SNAPSHOT
+org.eclipse.fennec.odata:org.eclipse.fennec.odata.metadata:0.1.0-SNAPSHOT
+org.eclipse.fennec.odata:org.eclipse.fennec.odata.vocabularies:0.1.0-SNAPSHOT
+org.eclipse.fennec.odata:org.eclipse.fennec.odata.ocl.evaluator:0.1.0-SNAPSHOT
+org.eclipse.fennec.odata:org.eclipse.fennec.odata.operation.api:0.1.0-SNAPSHOT
 org.locationtech.jts:jts-core:1.20.0
 org.apache.aries.spifly:org.apache.aries.spifly.dynamic.bundle:1.3.7
 org.ow2.asm:asm:9.9.1

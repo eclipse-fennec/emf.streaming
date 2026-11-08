@@ -1,12 +1,16 @@
 # Reference example of the change stream: the leisure pool demo of emf.ogc.features, its pools fed
 # with water temperature and pH by simulated sensors through a stream mapping and update commands.
-# OGC API Features on http://localhost:8080/ogc, the map on http://localhost:8080/ogc/viewer/.
+# OGC API Features on http://localhost:8080/ogc, the map on http://localhost:8080/ogc/viewer/,
+# SensorThings (OData-native until emf.odata#110) on http://localhost:8080/sta/v1.1/.
 #   ./gradlew :org.eclipse.fennec.stream.example.pool:run.pool
 
 -runrequires: \
 	bnd.identity;id='org.eclipse.fennec.stream.example.pool',\
 	bnd.identity;id='org.eclipse.fennec.stream.osgi',\
 	bnd.identity;id='org.eclipse.fennec.stream.persistence',\
+	bnd.identity;id='org.eclipse.fennec.stream.sta',\
+	bnd.identity;id='org.eclipse.fennec.odata.runtime',\
+	bnd.identity;id='org.eclipse.fennec.odata.persistence',\
 	bnd.identity;id='org.eclipse.fennec.mapping.osgi',\
 	bnd.identity;id='org.eclipse.fennec.mapping.ocl',\
 	bnd.identity;id='org.eclipse.fennec.emf.osgi.eobject.registry',\
@@ -146,4 +150,17 @@ demo.config = ${fileuri;${.}/config/pool-example.json},${fileuri;${.}/config/dat
 	slf4j.simple;version='[2.0.17,2.0.18)',\
 	tools.jackson.core.jackson-core;version='[3.2.2,3.2.3)',\
 	tools.jackson.core.jackson-databind;version='[3.2.2,3.2.3)',\
-	org.eclipse.fennec.stream.persistence;version=snapshot
+	org.eclipse.fennec.stream.persistence;version=snapshot,\
+	org.eclipse.fennec.expression.ocl;version='[0.1.0,0.1.1)',\
+	org.eclipse.fennec.odata.codec.json;version='[0.1.0,0.1.1)',\
+	org.eclipse.fennec.odata.csdl;version='[0.1.0,0.1.1)',\
+	org.eclipse.fennec.odata.ocl.evaluator;version='[0.1.0,0.1.1)',\
+	org.eclipse.fennec.odata.operation.api;version='[0.1.0,0.1.1)',\
+	org.eclipse.fennec.odata.persistence;version='[0.1.0,0.1.1)',\
+	org.eclipse.fennec.odata.persistence.api;version='[0.1.0,0.1.1)',\
+	org.eclipse.fennec.odata.query;version='[0.1.0,0.1.1)',\
+	org.eclipse.fennec.odata.runtime;version='[0.1.0,0.1.1)',\
+	org.eclipse.fennec.stream.sta;version=snapshot,\
+	org.eclipse.fennec.stream.sta.model;version=snapshot,\
+	org.gecko.messaging.api;version='[2.0.0,2.0.1)',\
+	org.odata.csdl.model;version='[4.0.1,4.0.2)'
