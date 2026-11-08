@@ -135,7 +135,7 @@
     ]
   },
   "org.eclipse.fennec.odata.persistence.repository~sta": {
-    "Repository.target": "(persistence.repository.id=sta)",
+    "repository.target": "(persistence.repository.id=sta)",
     "emf.nsURIs": [
       "https://eclipse.org/fennec/sta/1.1"
     ]
