@@ -31,17 +31,17 @@
         <details key="documentation" value="Free key/value pairs (a JSON object)."/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="locations" lowerBound="0" upperBound="-1" eType="#//Location" eOpposite="#//Location/things">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Locations" lowerBound="0" upperBound="-1" eType="#//Location" eOpposite="#//Location/Things">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value="Its current locations."/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="historicalLocations" lowerBound="0" upperBound="-1" eType="#//HistoricalLocation" eOpposite="#//HistoricalLocation/thing">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="HistoricalLocations" lowerBound="0" upperBound="-1" eType="#//HistoricalLocation" eOpposite="#//HistoricalLocation/Thing">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="datastreams" lowerBound="0" upperBound="-1" eType="#//Datastream" eOpposite="#//Datastream/thing">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Datastreams" lowerBound="0" upperBound="-1" eType="#//Datastream" eOpposite="#//Datastream/Thing">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
@@ -81,12 +81,12 @@
         <details key="documentation" value="Free key/value pairs (a JSON object)."/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="things" lowerBound="0" upperBound="-1" eType="#//Thing" eOpposite="#//Thing/locations">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Things" lowerBound="0" upperBound="-1" eType="#//Thing" eOpposite="#//Thing/Locations">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="historicalLocations" lowerBound="0" upperBound="-1" eType="#//HistoricalLocation" eOpposite="#//HistoricalLocation/locations">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="HistoricalLocations" lowerBound="0" upperBound="-1" eType="#//HistoricalLocation" eOpposite="#//HistoricalLocation/Locations">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
@@ -106,12 +106,12 @@
         <details key="documentation" value=""/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="thing" lowerBound="1" upperBound="1" eType="#//Thing" eOpposite="#//Thing/historicalLocations">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Thing" lowerBound="1" upperBound="1" eType="#//Thing" eOpposite="#//Thing/HistoricalLocations">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="locations" lowerBound="0" upperBound="-1" eType="#//Location" eOpposite="#//Location/historicalLocations">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Locations" lowerBound="0" upperBound="-1" eType="#//Location" eOpposite="#//Location/HistoricalLocations">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
@@ -192,22 +192,22 @@
         <details key="documentation" value="Free key/value pairs (a JSON object)."/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="thing" lowerBound="1" upperBound="1" eType="#//Thing" eOpposite="#//Thing/datastreams">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Thing" lowerBound="1" upperBound="1" eType="#//Thing" eOpposite="#//Thing/Datastreams">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="sensor" lowerBound="1" upperBound="1" eType="#//Sensor" eOpposite="#//Sensor/datastreams">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Sensor" lowerBound="1" upperBound="1" eType="#//Sensor" eOpposite="#//Sensor/Datastreams">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="observedProperty" lowerBound="1" upperBound="1" eType="#//ObservedProperty" eOpposite="#//ObservedProperty/datastreams">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="ObservedProperty" lowerBound="1" upperBound="1" eType="#//ObservedProperty" eOpposite="#//ObservedProperty/Datastreams">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="observations" lowerBound="0" upperBound="-1" eType="#//Observation" eOpposite="#//Observation/datastream">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Observations" lowerBound="0" upperBound="-1" eType="#//Observation" eOpposite="#//Observation/Datastream">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
@@ -267,7 +267,7 @@
         <details key="documentation" value="Free key/value pairs (a JSON object)."/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="datastreams" lowerBound="0" upperBound="-1" eType="#//Datastream" eOpposite="#//Datastream/sensor">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Datastreams" lowerBound="0" upperBound="-1" eType="#//Datastream" eOpposite="#//Datastream/Sensor">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
@@ -302,7 +302,7 @@
         <details key="documentation" value="Free key/value pairs (a JSON object)."/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="datastreams" lowerBound="0" upperBound="-1" eType="#//Datastream" eOpposite="#//Datastream/observedProperty">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Datastreams" lowerBound="0" upperBound="-1" eType="#//Datastream" eOpposite="#//Datastream/ObservedProperty">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
@@ -392,12 +392,12 @@
         <details key="documentation" value=""/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="datastream" lowerBound="1" upperBound="1" eType="#//Datastream" eOpposite="#//Datastream/observations">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Datastream" lowerBound="1" upperBound="1" eType="#//Datastream" eOpposite="#//Datastream/Observations">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="featureOfInterest" lowerBound="1" upperBound="1" eType="#//FeatureOfInterest" eOpposite="#//FeatureOfInterest/observations">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="FeatureOfInterest" lowerBound="1" upperBound="1" eType="#//FeatureOfInterest" eOpposite="#//FeatureOfInterest/Observations">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
@@ -437,7 +437,7 @@
         <details key="documentation" value="Free key/value pairs (a JSON object)."/>
       </eAnnotations>
     </eStructuralFeatures>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="observations" lowerBound="0" upperBound="-1" eType="#//Observation" eOpposite="#//Observation/featureOfInterest">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Observations" lowerBound="0" upperBound="-1" eType="#//Observation" eOpposite="#//Observation/FeatureOfInterest">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>

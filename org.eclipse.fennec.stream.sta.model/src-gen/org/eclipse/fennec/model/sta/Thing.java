@@ -158,7 +158,7 @@ public interface Thing extends EObject {
 	 * @return the value of the '<em>Locations</em>' reference list.
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getThing_Locations()
 	 * @see org.eclipse.fennec.model.sta.Location#getThings
-	 * @model opposite="things"
+	 * @model opposite="Things"
 	 * @generated
 	 */
 	EList<Location> getLocations();
@@ -175,7 +175,7 @@ public interface Thing extends EObject {
 	 * @return the value of the '<em>Historical Locations</em>' reference list.
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getThing_HistoricalLocations()
 	 * @see org.eclipse.fennec.model.sta.HistoricalLocation#getThing
-	 * @model opposite="thing"
+	 * @model opposite="Thing"
 	 * @generated
 	 */
 	EList<HistoricalLocation> getHistoricalLocations();
@@ -192,7 +192,7 @@ public interface Thing extends EObject {
 	 * @return the value of the '<em>Datastreams</em>' reference list.
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getThing_Datastreams()
 	 * @see org.eclipse.fennec.model.sta.Datastream#getThing
-	 * @model opposite="thing"
+	 * @model opposite="Thing"
 	 * @generated
 	 */
 	EList<Datastream> getDatastreams();

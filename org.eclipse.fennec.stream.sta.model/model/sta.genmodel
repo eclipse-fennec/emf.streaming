@@ -9,9 +9,9 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Thing/name"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Thing/description"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Thing/properties"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Thing/locations"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Thing/historicalLocations"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Thing/datastreams"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Thing/Locations"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Thing/HistoricalLocations"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Thing/Datastreams"/>
     </genClasses>
     <genClasses ecoreClass="sta.ecore#//Location">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Location/id"/>
@@ -20,14 +20,14 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Location/encodingType"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Location/location"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Location/properties"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Location/things"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Location/historicalLocations"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Location/Things"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Location/HistoricalLocations"/>
     </genClasses>
     <genClasses ecoreClass="sta.ecore#//HistoricalLocation">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//HistoricalLocation/id"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//HistoricalLocation/time"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//HistoricalLocation/thing"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//HistoricalLocation/locations"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//HistoricalLocation/Thing"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//HistoricalLocation/Locations"/>
     </genClasses>
     <genClasses ecoreClass="sta.ecore#//Datastream">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Datastream/id"/>
@@ -41,10 +41,10 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Datastream/resultTimeStart"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Datastream/resultTimeEnd"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Datastream/properties"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Datastream/thing"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Datastream/sensor"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Datastream/observedProperty"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Datastream/observations"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Datastream/Thing"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Datastream/Sensor"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Datastream/ObservedProperty"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Datastream/Observations"/>
     </genClasses>
     <genClasses ecoreClass="sta.ecore#//UnitOfMeasurement">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//UnitOfMeasurement/name"/>
@@ -58,7 +58,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Sensor/encodingType"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Sensor/metadata"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Sensor/properties"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Sensor/datastreams"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Sensor/Datastreams"/>
     </genClasses>
     <genClasses ecoreClass="sta.ecore#//ObservedProperty">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//ObservedProperty/id"/>
@@ -66,7 +66,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//ObservedProperty/definition"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//ObservedProperty/description"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//ObservedProperty/properties"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//ObservedProperty/datastreams"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//ObservedProperty/Datastreams"/>
     </genClasses>
     <genClasses ecoreClass="sta.ecore#//Observation">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/id"/>
@@ -80,8 +80,8 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/validTimeStart"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/validTimeEnd"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/parameters"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Observation/datastream"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Observation/featureOfInterest"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Observation/Datastream"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Observation/FeatureOfInterest"/>
     </genClasses>
     <genClasses ecoreClass="sta.ecore#//FeatureOfInterest">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//FeatureOfInterest/id"/>
@@ -90,7 +90,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//FeatureOfInterest/encodingType"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//FeatureOfInterest/feature"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//FeatureOfInterest/properties"/>
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//FeatureOfInterest/observations"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//FeatureOfInterest/Observations"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

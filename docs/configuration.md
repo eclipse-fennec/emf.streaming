@@ -221,9 +221,11 @@ emf.odata serves the repository, with the STA set names:
 }
 ```
 
-> Until emf.odata#110 is in place the endpoint answers in OData form (`@odata.*`, EMF names such as
-> `phenomenonTimeStart`, `resultNumber`, `thing`), which STA clients do not understand yet (#55).
-> `Repository.target` is spelled with a capital R until emf.odata#111 is fixed (#59).
+> The STA model carries the STA names, so paths and `$expand` already read as in STA
+> (`Datastreams('…')/Observations`, `$expand=Thing`). Until the wire profile SPI of emf.odata#110 is
+> in place and implemented here, the endpoint still answers in OData form (`@odata.*`, interval and
+> result split into `phenomenonTimeStart`/`resultNumber` …), which STA clients do not understand yet
+> (#55). `Repository.target` is spelled with a capital R until emf.odata#111 is fixed (#59).
 
 **MQTT extension**: `FennecStaMqttPublisher` publishes each stored observation as STA JSON on
 `v1.1/Observations`, `v1.1/Datastreams(<id>)/Observations` and

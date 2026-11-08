@@ -42,7 +42,7 @@ import org.osgi.annotation.versioning.ProviderType;
  * @generated
  */
 @ProviderType
-@EPackage(uri = StaPackage.eNS_URI, fingerprint = "fp1:582cf441d552d034039c1b9eeb0361fa3a50387bf2ab9726b35ef268494910e3", genModel = "/model/sta.genmodel", genModelSourceLocations = {"model/sta.genmodel","org.eclipse.fennec.stream.sta.model/model/sta.genmodel"}, ecore = "/model/sta.ecore", ecoreSourceLocations = "/model/sta.ecore")
+@EPackage(uri = StaPackage.eNS_URI, fingerprint = "fp1:f4e0e35b7a3cf68ef4fd24fd91d1e1b6e02fad7d6b7afaecac102751ecc3074b", genModel = "/model/sta.genmodel", genModelSourceLocations = {"model/sta.genmodel","org.eclipse.fennec.stream.sta.model/model/sta.genmodel"}, ecore = "/model/sta.ecore", ecoreSourceLocations = "/model/sta.ecore")
 public interface StaPackage extends org.eclipse.emf.ecore.EPackage {
 	/**
 	 * The package name.

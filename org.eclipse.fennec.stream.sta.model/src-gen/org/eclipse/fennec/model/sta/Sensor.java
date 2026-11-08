@@ -208,7 +208,7 @@ public interface Sensor extends EObject {
 	 * @return the value of the '<em>Datastreams</em>' reference list.
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getSensor_Datastreams()
 	 * @see org.eclipse.fennec.model.sta.Datastream#getSensor
-	 * @model opposite="sensor"
+	 * @model opposite="Sensor"
 	 * @generated
 	 */
 	EList<Datastream> getDatastreams();

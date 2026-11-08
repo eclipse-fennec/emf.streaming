@@ -340,7 +340,7 @@ public interface Observation extends EObject {
 	 * @see #setDatastream(Datastream)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getObservation_Datastream()
 	 * @see org.eclipse.fennec.model.sta.Datastream#getObservations
-	 * @model opposite="observations" required="true"
+	 * @model opposite="Observations" required="true"
 	 * @generated
 	 */
 	Datastream getDatastream();
@@ -367,7 +367,7 @@ public interface Observation extends EObject {
 	 * @see #setFeatureOfInterest(FeatureOfInterest)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getObservation_FeatureOfInterest()
 	 * @see org.eclipse.fennec.model.sta.FeatureOfInterest#getObservations
-	 * @model opposite="observations" required="true"
+	 * @model opposite="Observations" required="true"
 	 * @generated
 	 */
 	FeatureOfInterest getFeatureOfInterest();
