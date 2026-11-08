@@ -100,9 +100,13 @@ class StaMapperTest {
 		assertThat(truth.getPhenomenonTimeStart()).as("no own time: the change set's").isEqualTo(new Date(5_000));
 		assertThat(truth.getDatastream().getObservationType()).endsWith("OM_TruthObservation");
 
+		assertThat(thing.getHistoricalLocations()).singleElement().satisfies(history -> {
+			assertThat(history.getTime()).isEqualTo(new Date(5_000));
+			assertThat(history.getLocations()).containsExactlyElementsOf(thing.getLocations());
+		});
 		assertThat(batch.entities()).extracting(EcoreUtil::getID).as("each entity once, referenced ones first")
-				.containsExactly("Pool:kinderland", "Pool:kinderland", "Pool:kinderland", "Pool.temperature", "pool-sta:Probe",
-						"Pool:kinderland.temperature", "Pool.open", "Pool:kinderland.open");
+				.containsExactly("Pool:kinderland", "Pool:kinderland", "Pool:kinderland", "Pool:kinderland", "Pool.temperature",
+						"pool-sta:Probe", "Pool:kinderland.temperature", "Pool.open", "Pool:kinderland.open");
 	}
 
 	@Test
