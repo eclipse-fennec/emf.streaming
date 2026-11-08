@@ -236,6 +236,14 @@ emf.odata serves the repository, with the STA set names:
 }
 ```
 
+The pool example runs with it as `pool-mqtt.bndrun` against the broker of `tools/brokers.sh`:
+
+```bash
+tools/brokers.sh up
+./gradlew :org.eclipse.fennec.stream.example.pool:run.pool-mqtt
+mosquitto_sub -p 11893 -v -t 'v1.1/#'
+```
+
 ## Transport
 
 Publisher and subscriber are factory configurations; each names a Gecko Messaging instance. See

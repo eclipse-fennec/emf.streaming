@@ -42,7 +42,8 @@ import org.eclipse.fennec.stream.persistence.RepositoryAccess;
  * <li>their references, set on the stored instances;</li>
  * <li>the observations, referring to stored instances only.</li>
  * </ol>
- * Entities are remembered once stored. Thread-safe through the {@link RepositoryAccess}.
+ * Entities are remembered once stored; new ones are stored one lane at a time, observations in
+ * parallel. Thread-safe through the {@link RepositoryAccess}.
  */
 public final class RepositoryStaWriter implements StaWriter {
 
@@ -61,27 +62,8 @@ public final class RepositoryStaWriter implements StaWriter {
 		requireNonNull(batch, "StaBatch is required");
 		try {
 			repositories.call(repository -> {
-				Map<String, EObject> fresh = new LinkedHashMap<>();
-				for (EObject entity : batch.entities()) {
-					if (!stored.contains(key(entity)) && !repository.exist(entity.eClass(), EcoreUtil.getID(entity))) {
-						fresh.put(key(entity), entity);
-					}
-				}
-				if (!fresh.isEmpty()) {
-					List<EObject> bare = new ArrayList<>();
-					for (EObject entity : fresh.values()) {
-						bare.add(withoutReferences(entity));
-					}
-					repository.saveAll(bare);
-					Map<String, EObject> loaded = new HashMap<>();
-					List<EObject> linked = new ArrayList<>();
-					for (EObject entity : fresh.values()) {
-						linked.add(link(entity, repository, loaded));
-					}
-					repository.saveAll(linked);
-				}
-				for (EObject entity : batch.entities()) {
-					stored.add(key(entity));
+				if (!batch.entities().stream().allMatch(entity -> stored.contains(key(entity)))) {
+					store(batch.entities(), repository);
 				}
 				Map<String, EObject> loaded = new HashMap<>();
 				List<EObject> observations = new ArrayList<>();
@@ -95,6 +77,37 @@ public final class RepositoryStaWriter implements StaWriter {
 			});
 		} catch (IOException e) {
 			throw new UncheckedIOException("Writing " + batch.observations().size() + " observations failed", e);
+		}
+	}
+
+	/**
+	 * Stores the entities not stored yet. One lane at a time: lanes of different targets share
+	 * sensors and observed properties, and two of them inserting the same one would collide.
+	 */
+	private void store(List<EObject> entities, Repository repository) throws IOException {
+		synchronized (stored) {
+			Map<String, EObject> fresh = new LinkedHashMap<>();
+			for (EObject entity : entities) {
+				if (!stored.contains(key(entity)) && !repository.exist(entity.eClass(), EcoreUtil.getID(entity))) {
+					fresh.put(key(entity), entity);
+				}
+			}
+			if (!fresh.isEmpty()) {
+				List<EObject> bare = new ArrayList<>();
+				for (EObject entity : fresh.values()) {
+					bare.add(withoutReferences(entity));
+				}
+				repository.saveAll(bare);
+				Map<String, EObject> loaded = new HashMap<>();
+				List<EObject> linked = new ArrayList<>();
+				for (EObject entity : fresh.values()) {
+					linked.add(link(entity, repository, loaded));
+				}
+				repository.saveAll(linked);
+			}
+			for (EObject entity : entities) {
+				stored.add(key(entity));
+			}
 		}
 	}
 

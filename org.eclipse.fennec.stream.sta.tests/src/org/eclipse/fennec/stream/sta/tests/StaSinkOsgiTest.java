@@ -21,6 +21,10 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
@@ -124,6 +128,30 @@ class StaSinkOsgiTest {
 		assertThat(observation.getFeatureOfInterest().getId()).isEqualTo("Pool:kinderland");
 	}
 
+	@Test
+	void lanesOfDifferentTargetsCreateTheSharedEntitiesOnce() throws Exception {
+		StreamSink sink = sinks.waitForService(20_000);
+		assertThat(sink).isNotNull();
+		StreamMapping mapping = mapping();
+		int pools = 8;
+		ExecutorService lanes = Executors.newFixedThreadPool(pools);
+		List<Future<?>> written = new ArrayList<>();
+		for (int i = 0; i < pools; i++) {
+			String pool = "pool-" + i;
+			written.add(lanes.submit(() -> sink.written(mapping, changeSet("cs-" + pool, 1, set(pool, "27.5", 1_000L)))));
+		}
+		for (Future<?> future : written) {
+			future.get(30, TimeUnit.SECONDS);
+		}
+		lanes.shutdown();
+
+		Repository repository = repositories.waitForService(5_000);
+		assertThat(repository.count(StaPackage.Literals.THING)).isEqualTo(pools);
+		assertThat(repository.count(StaPackage.Literals.OBSERVED_PROPERTY)).isEqualTo(1);
+		assertThat(repository.count(StaPackage.Literals.SENSOR)).isEqualTo(1);
+		assertThat(repository.count(StaPackage.Literals.OBSERVATION)).isEqualTo(pools);
+	}
+
 	private StreamMapping mapping() {
 		StreamMapping mapping = StreamMappingFactory.eINSTANCE.createStreamMapping();
 		mapping.setId("pool-sta");
@@ -149,9 +177,13 @@ class StaSinkOsgiTest {
 	}
 
 	private static ChangeEntry set(String value, Long time) {
+		return set("kinderland", value, time);
+	}
+
+	private static ChangeEntry set(String pool, String value, Long time) {
 		ChangeEntry entry = StreamFactory.eINSTANCE.createChangeEntry();
 		entry.setKind(DeltaKind.SET);
-		entry.setObjectId("kinderland");
+		entry.setObjectId(pool);
 		entry.setFeatureUri("https://example.org/pool#//Pool/temperature");
 		entry.setValueNew(value);
 		entry.setTimestamp(time);
