@@ -109,6 +109,50 @@
   "FennecRepositoryProjection": {
     "repository.target": "(persistence.repository.id=bath)"
   },
+  "fennec.jpa.EORMMappingService~sta": {
+    "fennec.jpa.eorm.mappingName": "sta",
+    "fennec.jpa.eorm.model.target": "(emf.nsURI=https://eclipse.org/fennec/sta/1.1)"
+  },
+  "fennec.jpa.EMPersistenceUnit~sta": {
+    "fennec.jpa.persistenceUnitName": "sta",
+    "fennec.jpa.mapping.target": "(fennec.jpa.eorm.mapping=sta)",
+    "fennec.jpa.ext.eclipselink.ddl-generation": "create-tables",
+    "fennec.jpa.dataSource.target": "(subprotocol=*)"
+  },
+  "fennec.repository.jpa~sta": {
+    "repositoryId": "sta",
+    "unit.target": "(osgi.unit.name=sta)"
+  },
+  "FennecPoolTargetDescriber": {
+    "repository.target": "(persistence.repository.id=bath)"
+  },
+  "FennecStaSink": {
+    "repository.target": "(persistence.repository.id=sta)",
+    "describer.target": "(fennec.sta.describer=pool)",
+    "units": [
+      "https://eclipse.org/fennec/ogc/example/bath/1.0#//Pool/waterTemperature=degree Celsius|°C|http://unitsofmeasure.org/ucum.html#para-30",
+      "https://eclipse.org/fennec/ogc/example/bath/1.0#//Pool/ph=pH|pH|"
+    ]
+  },
+  "org.eclipse.fennec.odata.persistence.repository~sta": {
+    "Repository.target": "(persistence.repository.id=sta)",
+    "emf.nsURIs": [
+      "https://eclipse.org/fennec/sta/1.1"
+    ]
+  },
+  "org.eclipse.fennec.odata.servlet~sta": {
+    "osgi.http.whiteboard.servlet.pattern": "/sta/v1.1/*",
+    "odata.model.entitysets": [
+      "Things=https://eclipse.org/fennec/sta/1.1#Thing",
+      "Locations=https://eclipse.org/fennec/sta/1.1#Location",
+      "HistoricalLocations=https://eclipse.org/fennec/sta/1.1#HistoricalLocation",
+      "Datastreams=https://eclipse.org/fennec/sta/1.1#Datastream",
+      "Sensors=https://eclipse.org/fennec/sta/1.1#Sensor",
+      "ObservedProperties=https://eclipse.org/fennec/sta/1.1#ObservedProperty",
+      "Observations=https://eclipse.org/fennec/sta/1.1#Observation",
+      "FeaturesOfInterest=https://eclipse.org/fennec/sta/1.1#FeatureOfInterest"
+    ]
+  },
   "FennecPoolPhProbes": {
     "assignments": [
       "ph-wellenbecken=wellenbecken",

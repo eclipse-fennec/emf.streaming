@@ -12,6 +12,9 @@
  ********************************************************************/
 package org.eclipse.fennec.stream.sta.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.fennec.model.stream.ChangeSet;
 import org.eclipse.fennec.model.streammapping.StreamMapping;
 import org.eclipse.fennec.persistence.repository.api.Repository;
@@ -41,7 +44,7 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
  * <p>
  * Configuration required (PID {@value #PID}): {@code repository.target} names that repository,
  * {@code describer.target} the {@link TargetDescriber} (default: things named by their target id,
- * without location). Repository instances come from the prototype-scoped service, at most
+ * without location), {@code units} the units of features whose model carries none. Repository instances come from the prototype-scoped service, at most
  * {@code repositories} at once, all given back on deactivation. Every {@link StaListener} service
  * (e.g. the MQTT extension) hears about the stored batches.
  */
@@ -71,6 +74,12 @@ public class StaSinkComponent implements StreamSink {
 		String describer_target() default IdsTargetDescriberComponent.FILTER;
 
 		/**
+		 * @return the units of features by feature URI
+		 */
+		@AttributeDefinition(description = "Units of features whose model carries none: featureUri=name|symbol|definition")
+		String[] units() default {};
+
+		/**
 		 * @return the most repository instances in use at once
 		 */
 		@AttributeDefinition(description = "Most repository instances in use at once")
@@ -91,7 +100,12 @@ public class StaSinkComponent implements StreamSink {
 			@Reference(name = "describer", target = IdsTargetDescriberComponent.FILTER) TargetDescriber describer,
 			Config config) {
 		this.access = new RepositoryAccess(repositories::getService, repositories::ungetService, config.repositories());
-		this.sink = new StaSink(new StaMapper(describer), new RepositoryStaWriter(access));
+		Map<String, StaMapper.Unit> units = new HashMap<>();
+		for (String unit : config.units()) {
+			Map.Entry<String, StaMapper.Unit> entry = StaMapper.Unit.parse(unit);
+			units.put(entry.getKey(), entry.getValue());
+		}
+		this.sink = new StaSink(new StaMapper(describer, units), new RepositoryStaWriter(access));
 	}
 
 	/**

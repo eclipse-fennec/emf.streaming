@@ -166,6 +166,76 @@ releases them when it stops. A store is selected the same way as a projection:
 
 > Retention (the deletion rules of a mapping) removes entries and change sets through the repository.
 
+## SensorThings (STA 1.1)
+
+`org.eclipse.fennec.stream.sta` turns the entries of TIMESERIES slots into SensorThings
+observations (D-25, #56):
+- the target object becomes a Thing
+- its TIMESERIES slot a Datastream
+- the target feature an ObservedProperty
+- the source class a Sensor
+- the entry an Observation, with `phenomenonTime` = entry time and `resultTime` = change set time
+
+The component `FennecStaSink` is a `StreamSink`: the core hands it every change set right after
+the store, without dropping any. It writes into a repository whose unit maps the STA model
+(`https://eclipse.org/fennec/sta/1.1`).
+
+```json
+"fennec.jpa.EORMMappingService~sta": {
+  "fennec.jpa.eorm.mappingName": "sta",
+  "fennec.jpa.eorm.model.target": "(emf.nsURI=https://eclipse.org/fennec/sta/1.1)"
+},
+"fennec.jpa.EMPersistenceUnit~sta": {
+  "fennec.jpa.persistenceUnitName": "sta",
+  "fennec.jpa.mapping.target": "(fennec.jpa.eorm.mapping=sta)",
+  "fennec.jpa.ext.eclipselink.ddl-generation": "create-tables",
+  "fennec.jpa.dataSource.target": "(subprotocol=*)"
+},
+"fennec.repository.jpa~sta": {
+  "repositoryId": "sta",
+  "unit.target": "(osgi.unit.name=sta)"
+},
+"FennecStaSink": {
+  "repository.target": "(persistence.repository.id=sta)",
+  "describer.target": "(fennec.sta.describer=pool)",
+  "units": ["https://eclipse.org/fennec/ogc/example/bath/1.0#//Pool/waterTemperature=degree Celsius|°C|http://unitsofmeasure.org/ucum.html#para-30"]
+}
+```
+
+- **`describer.target`** selects a `TargetDescriber` that names and locates a thing. The default
+  names a thing by its target id and gives it no location. The pool example reads name and
+  geometry of the pool (`FennecPoolTargetDescriber`).
+- **`units`** gives the unit of a feature by its URI, for models that carry no annotation
+  `https://eclipse.org/fennec/sta` (`unit.name`, `unit.symbol`, `unit.definition`).
+
+emf.odata serves the repository, with the STA set names:
+
+```json
+"org.eclipse.fennec.odata.persistence.repository~sta": {
+  "Repository.target": "(persistence.repository.id=sta)",
+  "emf.nsURIs": ["https://eclipse.org/fennec/sta/1.1"]
+},
+"org.eclipse.fennec.odata.servlet~sta": {
+  "osgi.http.whiteboard.servlet.pattern": "/sta/v1.1/*",
+  "odata.model.entitysets": ["Things=https://eclipse.org/fennec/sta/1.1#Thing", "Datastreams=https://eclipse.org/fennec/sta/1.1#Datastream", "..."]
+}
+```
+
+> Until emf.odata#110 is in place the endpoint answers in OData form (`@odata.*`, EMF names such as
+> `phenomenonTimeStart`, `resultNumber`, `thing`), which STA clients do not understand yet (#55).
+> `Repository.target` is spelled with a capital R until emf.odata#111 is fixed (#59).
+
+**MQTT extension**: `FennecStaMqttPublisher` publishes each stored observation as STA JSON on
+`v1.1/Observations`, `v1.1/Datastreams(<id>)/Observations` and
+`v1.1/FeaturesOfInterest(<id>)/Observations`. It needs a Gecko Messaging instance on an MQTT broker:
+
+```json
+"FennecStaMqttPublisher": {
+  "publisher.target": "(osgi.messaging.name=mqtt)",
+  "serviceRoot": "http://localhost:8080/sta/v1.1"
+}
+```
+
 ## Transport
 
 Publisher and subscriber are factory configurations; each names a Gecko Messaging instance. See

@@ -59,8 +59,8 @@ import org.eclipse.fennec.stream.StreamValues;
  * else the change set's; resultTime = the change set's time; the result typed by the feature.</li>
  * </ul>
  * Keyframes, changelog entries and entries without a target feature yield nothing. The unit of a
- * datastream comes from the feature's annotation {@value #ANNOTATION} ({@code unit.name},
- * {@code unit.symbol}, {@code unit.definition}).
+ * datastream comes from the units given by feature URI, else from the feature's annotation
+ * {@value #ANNOTATION} ({@code unit.name}, {@code unit.symbol}, {@code unit.definition}).
  * <p>
  * Thread-safe; the target is described once per thing.
  */
@@ -76,13 +76,52 @@ public final class StaMapper {
 	private static final StaFactory STA = StaFactory.eINSTANCE;
 
 	private final TargetDescriber describer;
+	private final Map<String, Unit> units;
 	private final Map<String, TargetDescriber.Description> described = new ConcurrentHashMap<>();
+
+	/**
+	 * The unit of the datastreams of a feature.
+	 *
+	 * @param name e.g. {@code degree Celsius}
+	 * @param symbol e.g. {@code °C}
+	 * @param definition a URI defining the unit, may be {@code null}
+	 */
+	public record Unit(String name, String symbol, String definition) {
+
+		/**
+		 * @param text {@code featureUri=name|symbol|definition}, symbol and definition may be left out
+		 * @return the feature URI and its unit
+		 * @throws IllegalArgumentException if the text has no {@code =}
+		 */
+		public static Map.Entry<String, Unit> parse(String text) {
+			int equals = text.indexOf('=');
+			if (equals <= 0) {
+				throw new IllegalArgumentException("Unit '" + text + "' is not featureUri=name|symbol|definition");
+			}
+			String[] parts = text.substring(equals + 1).split("\\|", -1);
+			return Map.entry(text.substring(0, equals).trim(), new Unit(part(parts, 0), part(parts, 1), part(parts, 2)));
+		}
+
+		private static String part(String[] parts, int index) {
+			return parts.length > index && !parts[index].isBlank() ? parts[index].trim() : null;
+		}
+	}
 
 	/**
 	 * @param describer names and locates the target objects
 	 */
 	public StaMapper(TargetDescriber describer) {
+		this(describer, Map.of());
+	}
+
+	/**
+	 * @param describer names and locates the target objects
+	 * @param units the units of features by feature URI, ahead of their annotations - for features
+	 *        of models that cannot be annotated
+	 */
+	public StaMapper(TargetDescriber describer, Map<String, Unit> units) {
 		this.describer = requireNonNull(describer, "TargetDescriber is required");
+		this.units = Map.copyOf(requireNonNull(units, "Units are required"));
 	}
 
 	/**
@@ -187,7 +226,7 @@ public final class StaMapper {
 		return description;
 	}
 
-	private static Datastream datastream(StreamMapping mapping, StreamSlot slot, Thing thing, Map<String, EObject> entities) {
+	private Datastream datastream(StreamMapping mapping, StreamSlot slot, Thing thing, Map<String, EObject> entities) {
 		EStructuralFeature feature = slot.getTargetFeature();
 		String id = datastreamId(thing.getId(), feature);
 		if (entities.get(id) instanceof Datastream known) {
@@ -214,7 +253,7 @@ public final class StaMapper {
 		datastream.setId(id);
 		datastream.setName(thing.getName() + " " + feature.getName());
 		datastream.setObservationType(observationType(feature));
-		datastream.setUnitOfMeasurement(unit(feature));
+		datastream.setUnitOfMeasurement(unit(feature, units.get(StreamSlots.address(slot))));
 		datastream.setThing(thing);
 		datastream.setSensor(sensor);
 		datastream.setObservedProperty(property);
@@ -240,10 +279,14 @@ public final class StaMapper {
 		return OM + "OM_Observation";
 	}
 
-	private static UnitOfMeasurement unit(EStructuralFeature feature) {
+	private static UnitOfMeasurement unit(EStructuralFeature feature, Unit given) {
 		UnitOfMeasurement unit = STA.createUnitOfMeasurement();
 		EAnnotation annotation = feature.getEAnnotation(ANNOTATION);
-		if (annotation != null) {
+		if (given != null) {
+			unit.setName(given.name());
+			unit.setSymbol(given.symbol());
+			unit.setDefinition(given.definition());
+		} else if (annotation != null) {
 			unit.setName(annotation.getDetails().get("unit.name"));
 			unit.setSymbol(annotation.getDetails().get("unit.symbol"));
 			unit.setDefinition(annotation.getDetails().get("unit.definition"));
