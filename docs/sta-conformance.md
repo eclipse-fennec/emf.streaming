@@ -37,3 +37,7 @@ TEAM Engine web UI is at `http://localhost:8081/teamengine/` (`ogctest`/`ogctest
 Until the wire profile of emf.odata#110 exists and the STA profile is implemented here (#55), the
 endpoint answers in OData form (`@odata.*`, `phenomenonTimeStart` …): the baseline is red. The
 report shows what each stage of ADR-0010 achieves.
+
+Baseline (2026-11-08): the suite refuses the endpoint before the first test, as its service root
+document is the OData one - "The URL for Datastreams in Service Root URI is not compliant to
+SensorThings API." Stage 1 of ADR-0010 (the root document of the profile) is the first step.

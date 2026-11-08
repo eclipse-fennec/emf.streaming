@@ -46,8 +46,13 @@ run)
 	OUT="$DIR/generated/ets-sta"
 	mkdir -p "$OUT"
 	REPORT="$OUT/report-$(date +%Y%m%d-%H%M%S).rdf"
-	curl -s -u "$CREDENTIALS" -H 'Accept: application/rdf+xml' -G \
-		--data-urlencode "iut=$IUT" "http://localhost:$TE_PORT/teamengine/rest/suites/sta10/run" -o "$REPORT"
+	STATUS=$(curl -s -u "$CREDENTIALS" -H 'Accept: application/rdf+xml' -G -w '%{http_code}' \
+		--data-urlencode "iut=$IUT" "http://localhost:$TE_PORT/teamengine/rest/suites/sta10/run" -o "$REPORT")
+	if [ "$STATUS" != 200 ]; then
+		# the suite refused the endpoint before running any test (e.g. the service root document)
+		echo "ets-sta10 against $IUT: refused with HTTP $STATUS - $(sed -n 's:.*<p>\(.*\)</p>.*:\1:p' "$REPORT")" >&2
+		exit 1
+	fi
 	PASSED=$(grep -c 'earl:passed' "$REPORT" || true)
 	FAILED=$(grep -c 'earl:failed' "$REPORT" || true)
 	echo "ets-sta10 against $IUT: $PASSED passed, $FAILED failed - $REPORT"
