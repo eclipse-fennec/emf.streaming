@@ -103,6 +103,12 @@ class StaSinkOsgiTest {
 		for (Configuration configuration : configurations) {
 			configuration.delete();
 		}
+		// the next test must not get this test's sink or repository while they go away
+		long deadline = System.currentTimeMillis() + 20_000;
+		while ((!sinks.isEmpty() || !repositories.isEmpty()) && System.currentTimeMillis() < deadline) {
+			Thread.sleep(20);
+		}
+		assertThat(sinks.isEmpty() && repositories.isEmpty()).as("sink and repository are gone").isTrue();
 	}
 
 	@Test
