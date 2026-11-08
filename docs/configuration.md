@@ -212,7 +212,7 @@ emf.odata serves the repository, with the STA set names:
 
 ```json
 "org.eclipse.fennec.odata.persistence.repository~sta": {
-  "Repository.target": "(persistence.repository.id=sta)",
+  "repository.target": "(persistence.repository.id=sta)",
   "emf.nsURIs": ["https://eclipse.org/fennec/sta/1.1"]
 },
 "org.eclipse.fennec.odata.servlet~sta": {
@@ -225,7 +225,7 @@ emf.odata serves the repository, with the STA set names:
 > (`Datastreams('…')/Observations`, `$expand=Thing`). Until the wire profile SPI of emf.odata#110 is
 > in place and implemented here, the endpoint still answers in OData form (`@odata.*`, interval and
 > result split into `phenomenonTimeStart`/`resultNumber` …), which STA clients do not understand yet
-> (#55). `Repository.target` is spelled with a capital R until emf.odata#111 is fixed (#59).
+> (#55).
 
 **MQTT extension**: `FennecStaMqttPublisher` publishes each stored observation as STA JSON on
 `v1.1/Observations`, `v1.1/Datastreams(<id>)/Observations` and
