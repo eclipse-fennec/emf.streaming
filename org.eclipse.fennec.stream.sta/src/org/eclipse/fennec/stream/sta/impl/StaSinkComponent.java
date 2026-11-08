@@ -18,6 +18,7 @@ import org.eclipse.fennec.persistence.repository.api.Repository;
 import org.eclipse.fennec.stream.StreamSink;
 import org.eclipse.fennec.stream.persistence.RepositoryAccess;
 import org.eclipse.fennec.stream.sta.RepositoryStaWriter;
+import org.eclipse.fennec.stream.sta.StaListener;
 import org.eclipse.fennec.stream.sta.StaMapper;
 import org.eclipse.fennec.stream.sta.StaSink;
 import org.eclipse.fennec.stream.sta.TargetDescriber;
@@ -27,6 +28,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.ConfigurationPolicy;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.component.annotations.ReferenceScope;
 import org.osgi.service.metatype.annotations.AttributeDefinition;
 import org.osgi.service.metatype.annotations.Designate;
@@ -39,7 +42,8 @@ import org.osgi.service.metatype.annotations.ObjectClassDefinition;
  * Configuration required (PID {@value #PID}): {@code repository.target} names that repository,
  * {@code describer.target} the {@link TargetDescriber} (default: things named by their target id,
  * without location). Repository instances come from the prototype-scoped service, at most
- * {@code repositories} at once, all given back on deactivation.
+ * {@code repositories} at once, all given back on deactivation. Every {@link StaListener} service
+ * (e.g. the MQTT extension) hears about the stored batches.
  */
 @Component(name = StaSinkComponent.PID, configurationPolicy = ConfigurationPolicy.REQUIRE)
 @Designate(ocd = StaSinkComponent.Config.class)
@@ -88,6 +92,20 @@ public class StaSinkComponent implements StreamSink {
 			Config config) {
 		this.access = new RepositoryAccess(repositories::getService, repositories::ungetService, config.repositories());
 		this.sink = new StaSink(new StaMapper(describer), new RepositoryStaWriter(access));
+	}
+
+	/**
+	 * Whiteboard: every {@link StaListener} service hears about the batches stored while it is there.
+	 *
+	 * @param listener the listener
+	 */
+	@Reference(name = "listeners", cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
+	void addListener(StaListener listener) {
+		sink.addListener(listener);
+	}
+
+	void removeListener(StaListener listener) {
+		sink.removeListener(listener);
 	}
 
 	/**

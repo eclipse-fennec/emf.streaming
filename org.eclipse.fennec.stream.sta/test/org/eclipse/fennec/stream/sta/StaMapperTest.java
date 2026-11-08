@@ -148,6 +148,23 @@ class StaMapperTest {
 		assertThat(written).singleElement().satisfies(batch -> assertThat(batch.observations()).hasSize(1));
 	}
 
+	@Test
+	void listenersHearAboutABatchAfterItIsWrittenAndAFailingOneStopsNothing() {
+		List<String> events = new ArrayList<>();
+		StaSink sink = new StaSink(mapper, batch -> events.add("written"));
+		sink.addListener(batch -> {
+			throw new IllegalStateException("broken listener");
+		});
+		StaListener heard = batch -> events.add("heard " + batch.observations().size());
+		sink.addListener(heard);
+
+		sink.written(mapping, changeSet(set(temperature, "27.5", 1_000L)));
+		sink.removeListener(heard);
+		sink.written(mapping, changeSet(set(temperature, "28.5", 2_000L)));
+
+		assertThat(events).containsExactly("written", "heard 1", "written");
+	}
+
 	private StreamMapping mapping() {
 		StreamMapping created = StreamMappingFactory.eINSTANCE.createStreamMapping();
 		created.setId("pool-sta");
