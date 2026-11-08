@@ -208,7 +208,7 @@ public interface FeatureOfInterest extends EObject {
 	 * @return the value of the '<em>Observations</em>' reference list.
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getFeatureOfInterest_Observations()
 	 * @see org.eclipse.fennec.model.sta.Observation#getFeatureOfInterest
-	 * @model opposite="featureOfInterest"
+	 * @model opposite="FeatureOfInterest"
 	 * @generated
 	 */
 	EList<Observation> getObservations();

@@ -107,7 +107,7 @@ public interface HistoricalLocation extends EObject {
 	 * @see #setThing(Thing)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getHistoricalLocation_Thing()
 	 * @see org.eclipse.fennec.model.sta.Thing#getHistoricalLocations
-	 * @model opposite="historicalLocations" required="true"
+	 * @model opposite="HistoricalLocations" required="true"
 	 * @generated
 	 */
 	Thing getThing();
@@ -134,7 +134,7 @@ public interface HistoricalLocation extends EObject {
 	 * @return the value of the '<em>Locations</em>' reference list.
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getHistoricalLocation_Locations()
 	 * @see org.eclipse.fennec.model.sta.Location#getHistoricalLocations
-	 * @model opposite="historicalLocations"
+	 * @model opposite="HistoricalLocations"
 	 * @generated
 	 */
 	EList<Location> getLocations();

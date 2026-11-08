@@ -182,7 +182,7 @@ public interface ObservedProperty extends EObject {
 	 * @return the value of the '<em>Datastreams</em>' reference list.
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getObservedProperty_Datastreams()
 	 * @see org.eclipse.fennec.model.sta.Datastream#getObservedProperty
-	 * @model opposite="observedProperty"
+	 * @model opposite="ObservedProperty"
 	 * @generated
 	 */
 	EList<Datastream> getDatastreams();

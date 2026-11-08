@@ -343,7 +343,7 @@ public interface Datastream extends EObject {
 	 * @see #setThing(Thing)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getDatastream_Thing()
 	 * @see org.eclipse.fennec.model.sta.Thing#getDatastreams
-	 * @model opposite="datastreams" required="true"
+	 * @model opposite="Datastreams" required="true"
 	 * @generated
 	 */
 	Thing getThing();
@@ -370,7 +370,7 @@ public interface Datastream extends EObject {
 	 * @see #setSensor(Sensor)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getDatastream_Sensor()
 	 * @see org.eclipse.fennec.model.sta.Sensor#getDatastreams
-	 * @model opposite="datastreams" required="true"
+	 * @model opposite="Datastreams" required="true"
 	 * @generated
 	 */
 	Sensor getSensor();
@@ -397,7 +397,7 @@ public interface Datastream extends EObject {
 	 * @see #setObservedProperty(ObservedProperty)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getDatastream_ObservedProperty()
 	 * @see org.eclipse.fennec.model.sta.ObservedProperty#getDatastreams
-	 * @model opposite="datastreams" required="true"
+	 * @model opposite="Datastreams" required="true"
 	 * @generated
 	 */
 	ObservedProperty getObservedProperty();
@@ -424,7 +424,7 @@ public interface Datastream extends EObject {
 	 * @return the value of the '<em>Observations</em>' reference list.
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getDatastream_Observations()
 	 * @see org.eclipse.fennec.model.sta.Observation#getDatastream
-	 * @model opposite="datastream"
+	 * @model opposite="Datastream"
 	 * @generated
 	 */
 	EList<Observation> getObservations();
