@@ -12,13 +12,20 @@
  */
 package org.eclipse.fennec.model.streammapping.impl;
 
+import java.util.Collection;
+
 import org.eclipse.emf.common.notify.Notification;
 import org.eclipse.emf.common.notify.NotificationChain;
 
+import org.eclipse.emf.common.util.EList;
+
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.InternalEObject;
 
 import org.eclipse.emf.ecore.impl.ENotificationImpl;
+
+import org.eclipse.emf.ecore.util.EObjectResolvingEList;
 
 import org.eclipse.fennec.model.mapping.impl.MappingImpl;
 
@@ -47,6 +54,7 @@ import org.eclipse.fennec.model.streammapping.StreamMappingPackage;
  *   <li>{@link org.eclipse.fennec.model.streammapping.impl.StreamMappingImpl#getKeyframeEverySets <em>Keyframe Every Sets</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.streammapping.impl.StreamMappingImpl#getKeyframeEveryMinutes <em>Keyframe Every Minutes</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.streammapping.impl.StreamMappingImpl#isUndoable <em>Undoable</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.streammapping.impl.StreamMappingImpl#getExcludedFeatures <em>Excluded Features</em>}</li>
  * </ul>
  *
  * @generated
@@ -230,6 +238,16 @@ public class StreamMappingImpl extends MappingImpl implements StreamMapping {
 	 * @ordered
 	 */
 	protected boolean undoable = UNDOABLE_EDEFAULT;
+
+	/**
+	 * The cached value of the '{@link #getExcludedFeatures() <em>Excluded Features</em>}' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getExcludedFeatures()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<EStructuralFeature> excludedFeatures;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -512,6 +530,19 @@ public class StreamMappingImpl extends MappingImpl implements StreamMapping {
 	 * @generated
 	 */
 	@Override
+	public EList<EStructuralFeature> getExcludedFeatures() {
+		if (excludedFeatures == null) {
+			excludedFeatures = new EObjectResolvingEList<EStructuralFeature>(EStructuralFeature.class, this, StreamMappingPackage.STREAM_MAPPING__EXCLUDED_FEATURES);
+		}
+		return excludedFeatures;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
 			case StreamMappingPackage.STREAM_MAPPING__BATCH:
@@ -546,6 +577,8 @@ public class StreamMappingImpl extends MappingImpl implements StreamMapping {
 				return getKeyframeEveryMinutes();
 			case StreamMappingPackage.STREAM_MAPPING__UNDOABLE:
 				return isUndoable();
+			case StreamMappingPackage.STREAM_MAPPING__EXCLUDED_FEATURES:
+				return getExcludedFeatures();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -555,6 +588,7 @@ public class StreamMappingImpl extends MappingImpl implements StreamMapping {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
@@ -584,6 +618,10 @@ public class StreamMappingImpl extends MappingImpl implements StreamMapping {
 				return;
 			case StreamMappingPackage.STREAM_MAPPING__UNDOABLE:
 				setUndoable((Boolean)newValue);
+				return;
+			case StreamMappingPackage.STREAM_MAPPING__EXCLUDED_FEATURES:
+				getExcludedFeatures().clear();
+				getExcludedFeatures().addAll((Collection<? extends EStructuralFeature>)newValue);
 				return;
 		}
 		super.eSet(featureID, newValue);
@@ -624,6 +662,9 @@ public class StreamMappingImpl extends MappingImpl implements StreamMapping {
 			case StreamMappingPackage.STREAM_MAPPING__UNDOABLE:
 				setUndoable(UNDOABLE_EDEFAULT);
 				return;
+			case StreamMappingPackage.STREAM_MAPPING__EXCLUDED_FEATURES:
+				getExcludedFeatures().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -654,6 +695,8 @@ public class StreamMappingImpl extends MappingImpl implements StreamMapping {
 				return keyframeEveryMinutes != KEYFRAME_EVERY_MINUTES_EDEFAULT;
 			case StreamMappingPackage.STREAM_MAPPING__UNDOABLE:
 				return undoable != UNDOABLE_EDEFAULT;
+			case StreamMappingPackage.STREAM_MAPPING__EXCLUDED_FEATURES:
+				return excludedFeatures != null && !excludedFeatures.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

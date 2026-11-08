@@ -14,8 +14,16 @@ package org.eclipse.fennec.stream;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+
+import org.eclipse.emf.ecore.EAttribute;
+import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 import org.eclipse.fennec.model.streammapping.BatchKind;
 import org.eclipse.fennec.model.streammapping.BatchStrategy;
@@ -26,7 +34,9 @@ import org.eclipse.fennec.model.streammapping.StreamMapping;
 import org.eclipse.fennec.model.streammapping.StreamMappingFactory;
 import org.eclipse.fennec.model.streammapping.StreamSlot;
 import org.eclipse.fennec.mapping.Mappings;
+import org.eclipse.fennec.model.mapping.MappingFactory;
 import org.eclipse.fennec.model.mapping.Slot;
+import org.eclipse.fennec.model.mapping.ValueSource;
 
 /**
  * The effective settings of a stream slot: its own value where it sets one, else its
@@ -145,6 +155,68 @@ public final class StreamSlots {
 			groups.add(isSet(mapping.getExecutionGroup()) ? mapping.getExecutionGroup() : DEFAULT_GROUP);
 		}
 		return groups;
+	}
+
+	/**
+	 * The mapping as the core streams it. With {@code includeUnmapped = true} every attribute of the
+	 * target that no slot names and {@code excludedFeatures} does not list gets a slot of its own,
+	 * read as-is from the source (which is then the target class itself) and with the mapping's
+	 * defaults. Derived, transient and volatile attributes are left out, references need a slot of
+	 * their own (#47).
+	 *
+	 * @param mapping the mapping as registered, not changed
+	 * @return the mapping itself when it includes nothing unmapped, else an expanded copy
+	 */
+	public static StreamMapping expand(StreamMapping mapping) {
+		requireNonNull(mapping, "StreamMapping is required");
+		if (!Boolean.TRUE.equals(mapping.getIncludeUnmapped()) || mapping.getTarget() == null) {
+			return mapping;
+		}
+		StreamMapping expanded = EcoreUtil.copy(mapping);
+		Set<EStructuralFeature> named = new HashSet<>(mapping.getExcludedFeatures());
+		for (Slot slot : mapping.getSlots()) {
+			named.add(slot.getTargetFeature());
+		}
+		for (EAttribute attribute : mapping.getTarget().getEAllAttributes()) {
+			if (named.contains(attribute) || attribute.isDerived() || attribute.isTransient() || attribute.isVolatile()) {
+				continue;
+			}
+			ValueSource asIs = MappingFactory.eINSTANCE.createValueSource();
+			asIs.getFeaturePath().add(attribute);
+			StreamSlot slot = StreamMappingFactory.eINSTANCE.createStreamSlot();
+			slot.setTargetFeature(attribute);
+			slot.setValue(asIs);
+			expanded.getSlots().add(slot);
+		}
+		return expanded;
+	}
+
+	/**
+	 * The slots whose feature path follows a reference that is not a containment: they read another
+	 * object, and a change there offers nothing, so the slot keeps its old value until the source
+	 * itself is offered again (#49).
+	 *
+	 * @param mapping the mapping
+	 * @return one message per such slot, empty when every path stays in the source's aggregate
+	 */
+	public static List<String> pathsLeavingTheAggregate(StreamMapping mapping) {
+		requireNonNull(mapping, "StreamMapping is required");
+		List<String> messages = new ArrayList<>();
+		for (Slot slot : mapping.getSlots()) {
+			if (slot.getValue() == null) {
+				continue;
+			}
+			for (EStructuralFeature step : slot.getValue().getFeaturePath()) {
+				if (step instanceof EReference reference && !reference.isContainment()) {
+					messages.add("Stream mapping " + mapping.getId() + ", slot "
+							+ (slot.getTargetFeature() == null ? slot.getName() : slot.getTargetFeature().getName())
+							+ ": its path follows the reference '" + reference.getName()
+							+ "' out of the source's aggregate; a change there is not streamed until the source is offered again");
+					break;
+				}
+			}
+		}
+		return messages;
 	}
 
 	/**

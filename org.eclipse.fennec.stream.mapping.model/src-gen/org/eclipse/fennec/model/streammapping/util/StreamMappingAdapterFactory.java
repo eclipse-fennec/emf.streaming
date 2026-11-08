@@ -120,6 +120,10 @@ public class StreamMappingAdapterFactory extends AdapterFactoryImpl {
 				return createExpressionRuleAdapter();
 			}
 			@Override
+			public Adapter caseFunctionRule(FunctionRule object) {
+				return createFunctionRuleAdapter();
+			}
+			@Override
 			public Adapter caseBatchStrategy(BatchStrategy object) {
 				return createBatchStrategyAdapter();
 			}
@@ -286,6 +290,20 @@ public class StreamMappingAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createExpressionRuleAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link org.eclipse.fennec.model.streammapping.FunctionRule <em>Function Rule</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see org.eclipse.fennec.model.streammapping.FunctionRule
+	 * @generated
+	 */
+	public Adapter createFunctionRuleAdapter() {
 		return null;
 	}
 

@@ -19,6 +19,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamMapping/keyframeEverySets"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamMapping/keyframeEveryMinutes"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//StreamMapping/undoable"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference streammapping.ecore#//StreamMapping/excludedFeatures"/>
     </genClasses>
     <genClasses ecoreClass="streammapping.ecore#//StreamSlot">
       <genFeatures children="true" createChild="true" propertySortChoices="true" ecoreFeature="ecore:EReference streammapping.ecore#//StreamSlot/rule"/>
@@ -50,6 +51,9 @@
     </genClasses>
     <genClasses ecoreClass="streammapping.ecore#//ExpressionRule">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//ExpressionRule/expression"/>
+    </genClasses>
+    <genClasses ecoreClass="streammapping.ecore#//FunctionRule">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//FunctionRule/functionId"/>
     </genClasses>
     <genClasses ecoreClass="streammapping.ecore#//BatchStrategy">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute streammapping.ecore#//BatchStrategy/kind"/>

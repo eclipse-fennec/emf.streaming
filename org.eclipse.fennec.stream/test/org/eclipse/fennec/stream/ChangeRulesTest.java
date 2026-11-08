@@ -22,12 +22,15 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.fennec.mapping.ExpressionEvaluator;
+import org.eclipse.fennec.mapping.FunctionRegistry;
+import org.eclipse.fennec.stream.ChangeRules.ChangeCandidate;
 import org.eclipse.fennec.model.streammapping.AbsoluteChange;
 import org.eclipse.fennec.model.streammapping.ChangeRule;
 import org.eclipse.fennec.model.streammapping.CompositeRule;
 import org.eclipse.fennec.model.streammapping.CountChange;
 import org.eclipse.fennec.model.streammapping.DurationUnit;
 import org.eclipse.fennec.model.streammapping.ExpressionRule;
+import org.eclipse.fennec.model.streammapping.FunctionRule;
 import org.eclipse.fennec.model.streammapping.PercentageChange;
 import org.eclipse.fennec.model.streammapping.RuleOperator;
 import org.eclipse.fennec.model.streammapping.StreamMappingFactory;
@@ -165,6 +168,58 @@ class ChangeRulesTest {
 		assertThat(withExpressions.test(expression("value > 30.0"), state, 31.0, 1, SELF)).isTrue();
 		assertThat(seen.get()).containsEntry("value", 31.0).containsEntry("last", 24.0);
 		assertThat(withExpressions.test(expression("value > 30.0"), state, 29.0, 1, SELF)).isFalse();
+	}
+
+	@Test
+	void aFunctionRuleAsksTheNamedFunctionWithTheCandidate() {
+		AtomicReference<ChangeCandidate> seen = new AtomicReference<>();
+		FunctionRegistry functions = new FunctionRegistry();
+		functions.register("intoFault", input -> {
+			seen.set((ChangeCandidate) input);
+			return "FAULT".equals(((ChangeCandidate) input).value()) && !"FAULT".equals(((ChangeCandidate) input).last());
+		});
+		ChangeRules withFunctions = new ChangeRules(null, functions);
+		SlotState state = SlotState.of("OK", 0);
+
+		assertThat(withFunctions.offer(function("intoFault"), state, "FAULT", 1, SELF)).isTrue();
+		assertThat(seen.get()).isEqualTo(new ChangeCandidate(SELF, "FAULT", "OK"));
+		assertThat(withFunctions.offer(function("intoFault"), state, "FAULT", 2, SELF)).isFalse();
+		assertThat(withFunctions.offer(function("intoFault"), state, "OK", 3, SELF)).isFalse();
+	}
+
+	@Test
+	void aFunctionRuleThatCannotAnswerLetsTheValuePass() {
+		FunctionRegistry functions = new FunctionRegistry();
+		functions.register("text", input -> "no boolean");
+		functions.register("broken", input -> {
+			throw new IllegalStateException("broken");
+		});
+		ChangeRules withFunctions = new ChangeRules(null, functions);
+		SlotState state = SlotState.of(1.0, 0);
+
+		assertThat(withFunctions.test(function("unknown"), state, 2.0, 1, SELF)).isTrue();
+		assertThat(withFunctions.test(function("text"), state, 2.0, 1, SELF)).isTrue();
+		assertThat(withFunctions.test(function("broken"), state, 2.0, 1, SELF)).isTrue();
+		assertThat(rules.test(function("text"), state, 2.0, 1, SELF)).as("no registry").isTrue();
+	}
+
+	@Test
+	void aFunctionRuleComposesLikeAnyOther() {
+		FunctionRegistry functions = new FunctionRegistry();
+		functions.register("never", input -> Boolean.FALSE);
+		ChangeRules withFunctions = new ChangeRules(null, functions);
+		SlotState state = SlotState.of(1.0, 0);
+
+		assertThat(withFunctions.test(composite(RuleOperator.OR, function("never"), absolute(0.5)), state, 2.0, 1, SELF))
+				.isTrue();
+		assertThat(withFunctions.test(composite(RuleOperator.AND, function("never"), absolute(0.5)), state, 2.0, 1, SELF))
+				.isFalse();
+	}
+
+	private static FunctionRule function(String id) {
+		FunctionRule rule = F.createFunctionRule();
+		rule.setFunctionId(id);
+		return rule;
 	}
 
 	private static AbsoluteChange absolute(double delta) {

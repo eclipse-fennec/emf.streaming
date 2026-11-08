@@ -33,6 +33,7 @@ import org.eclipse.fennec.model.streammapping.CountChange;
 import org.eclipse.fennec.model.streammapping.DeletionRule;
 import org.eclipse.fennec.model.streammapping.DurationUnit;
 import org.eclipse.fennec.model.streammapping.ExpressionRule;
+import org.eclipse.fennec.model.streammapping.FunctionRule;
 import org.eclipse.fennec.model.streammapping.GuardPolicy;
 import org.eclipse.fennec.model.streammapping.Lateness;
 import org.eclipse.fennec.model.streammapping.PercentageChange;
@@ -114,6 +115,13 @@ public class StreamMappingPackageImpl extends EPackageImpl implements StreamMapp
 	 * @generated
 	 */
 	private EClass expressionRuleEClass = null;
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	private EClass functionRuleEClass = null;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -340,6 +348,16 @@ public class StreamMappingPackageImpl extends EPackageImpl implements StreamMapp
 	@Override
 	public EAttribute getStreamMapping_Undoable() {
 		return (EAttribute)streamMappingEClass.getEStructuralFeatures().get(8);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EReference getStreamMapping_ExcludedFeatures() {
+		return (EReference)streamMappingEClass.getEStructuralFeatures().get(9);
 	}
 
 	/**
@@ -578,6 +596,26 @@ public class StreamMappingPackageImpl extends EPackageImpl implements StreamMapp
 	 * @generated
 	 */
 	@Override
+	public EClass getFunctionRule() {
+		return functionRuleEClass;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
+	public EAttribute getFunctionRule_FunctionId() {
+		return (EAttribute)functionRuleEClass.getEStructuralFeatures().get(0);
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
+	@Override
 	public EClass getBatchStrategy() {
 		return batchStrategyEClass;
 	}
@@ -791,6 +829,7 @@ public class StreamMappingPackageImpl extends EPackageImpl implements StreamMapp
 		createEAttribute(streamMappingEClass, STREAM_MAPPING__KEYFRAME_EVERY_SETS);
 		createEAttribute(streamMappingEClass, STREAM_MAPPING__KEYFRAME_EVERY_MINUTES);
 		createEAttribute(streamMappingEClass, STREAM_MAPPING__UNDOABLE);
+		createEReference(streamMappingEClass, STREAM_MAPPING__EXCLUDED_FEATURES);
 
 		streamSlotEClass = createEClass(STREAM_SLOT);
 		createEReference(streamSlotEClass, STREAM_SLOT__RULE);
@@ -822,6 +861,9 @@ public class StreamMappingPackageImpl extends EPackageImpl implements StreamMapp
 
 		expressionRuleEClass = createEClass(EXPRESSION_RULE);
 		createEAttribute(expressionRuleEClass, EXPRESSION_RULE__EXPRESSION);
+
+		functionRuleEClass = createEClass(FUNCTION_RULE);
+		createEAttribute(functionRuleEClass, FUNCTION_RULE__FUNCTION_ID);
 
 		batchStrategyEClass = createEClass(BATCH_STRATEGY);
 		createEAttribute(batchStrategyEClass, BATCH_STRATEGY__KIND);
@@ -885,6 +927,7 @@ public class StreamMappingPackageImpl extends EPackageImpl implements StreamMapp
 		timeThrottleEClass.getESuperTypes().add(this.getChangeRule());
 		compositeRuleEClass.getESuperTypes().add(this.getChangeRule());
 		expressionRuleEClass.getESuperTypes().add(this.getChangeRule());
+		functionRuleEClass.getESuperTypes().add(this.getChangeRule());
 
 		// Initialize classes, features, and operations; add parameters
 		initEClass(streamMappingEClass, StreamMapping.class, "StreamMapping", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
@@ -897,6 +940,7 @@ public class StreamMappingPackageImpl extends EPackageImpl implements StreamMapp
 		initEAttribute(getStreamMapping_KeyframeEverySets(), ecorePackage.getEInt(), "keyframeEverySets", "100", 0, 1, StreamMapping.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getStreamMapping_KeyframeEveryMinutes(), ecorePackage.getEInt(), "keyframeEveryMinutes", "15", 0, 1, StreamMapping.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 		initEAttribute(getStreamMapping_Undoable(), ecorePackage.getEBoolean(), "undoable", "false", 0, 1, StreamMapping.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+		initEReference(getStreamMapping_ExcludedFeatures(), ecorePackage.getEStructuralFeature(), null, "excludedFeatures", null, 0, -1, StreamMapping.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_COMPOSITE, IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(streamSlotEClass, StreamSlot.class, "StreamSlot", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEReference(getStreamSlot_Rule(), this.getChangeRule(), null, "rule", null, 0, 1, StreamSlot.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, IS_COMPOSITE, !IS_RESOLVE_PROXIES, !IS_UNSETTABLE, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
@@ -928,6 +972,9 @@ public class StreamMappingPackageImpl extends EPackageImpl implements StreamMapp
 
 		initEClass(expressionRuleEClass, ExpressionRule.class, "ExpressionRule", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getExpressionRule_Expression(), ecorePackage.getEString(), "expression", null, 1, 1, ExpressionRule.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
+
+		initEClass(functionRuleEClass, FunctionRule.class, "FunctionRule", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
+		initEAttribute(getFunctionRule_FunctionId(), ecorePackage.getEString(), "functionId", null, 1, 1, FunctionRule.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);
 
 		initEClass(batchStrategyEClass, BatchStrategy.class, "BatchStrategy", !IS_ABSTRACT, !IS_INTERFACE, IS_GENERATED_INSTANCE_CLASS);
 		initEAttribute(getBatchStrategy_Kind(), this.getBatchKind(), "kind", "IMMEDIATE", 0, 1, BatchStrategy.class, !IS_TRANSIENT, !IS_VOLATILE, IS_CHANGEABLE, !IS_UNSETTABLE, !IS_ID, IS_UNIQUE, !IS_DERIVED, IS_ORDERED);

@@ -13,6 +13,7 @@
 package org.eclipse.fennec.stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.fennec.model.stream.ChangeEntry;
 import org.eclipse.fennec.model.stream.ChangeSet;
@@ -122,6 +124,30 @@ class EventCoreTest {
 		assertThat(pool.eGet(fx.currentTemperature)).isEqualTo(24.6);
 		assertThat(core.metrics().passed()).isEqualTo(2);
 		assertThat(core.metrics().rejected()).isEqualTo(3);
+	}
+
+	@Test
+	void aMappingIncludingUnmappedStreamsTheTargetObjectItself() throws Exception {
+		StreamMapping mapping = fx.mapping();
+		mapping.setMode(ProjectionMode.AUDIT_ONLY);
+		mapping.setIncludeUnmapped(true);
+		mapping.getExcludedFeatures().add(fx.poolId);
+		fx.registry.register(mapping);
+		core = fx.core(store).build();
+		EObject pool = EcoreUtil.create(fx.pool);
+		pool.eSet(fx.poolId, "pool-3");
+		pool.eSet(fx.poolName, "Kinderland");
+		pool.eSet(fx.currentPh, 7.1);
+		pool.eSet(fx.currentTemperature, 30.0);
+		pool.eSet(fx.depth, 2);
+
+		core.offer(pool, 1_000, null);
+		assertThat(core.awaitIdle(WAIT)).isTrue();
+
+		assertThat(entries(fx.stream("pool-3"))).extracting(ChangeEntry::getFeatureUri, ChangeEntry::getValueNew)
+				.as("currentTemperature and currentPh have slots of their own, reading the sensors")
+				.containsExactlyInAnyOrder(tuple("https://example.org/pool#//Pool/name", "Kinderland"),
+						tuple("https://example.org/pool#//Pool/depth", "2"));
 	}
 
 	@Test

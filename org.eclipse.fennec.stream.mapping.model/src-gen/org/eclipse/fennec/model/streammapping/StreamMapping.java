@@ -12,6 +12,10 @@
  */
 package org.eclipse.fennec.model.streammapping;
 
+import org.eclipse.emf.common.util.EList;
+
+import org.eclipse.emf.ecore.EStructuralFeature;
+
 import org.eclipse.fennec.model.mapping.Mapping;
 
 import org.osgi.annotation.versioning.ProviderType;
@@ -38,6 +42,7 @@ import org.osgi.annotation.versioning.ProviderType;
  *   <li>{@link org.eclipse.fennec.model.streammapping.StreamMapping#getKeyframeEverySets <em>Keyframe Every Sets</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.streammapping.StreamMapping#getKeyframeEveryMinutes <em>Keyframe Every Minutes</em>}</li>
  *   <li>{@link org.eclipse.fennec.model.streammapping.StreamMapping#isUndoable <em>Undoable</em>}</li>
+ *   <li>{@link org.eclipse.fennec.model.streammapping.StreamMapping#getExcludedFeatures <em>Excluded Features</em>}</li>
  * </ul>
  *
  * @see org.eclipse.fennec.model.streammapping.StreamMappingPackage#getStreamMapping()
@@ -316,5 +321,20 @@ public interface StreamMapping extends Mapping {
 	 * @generated
 	 */
 	void setUndoable(boolean value);
+
+	/**
+	 * Returns the value of the '<em><b>Excluded Features</b></em>' reference list.
+	 * The list contents are of type {@link org.eclipse.emf.ecore.EStructuralFeature}.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * <!-- begin-model-doc -->
+	 * With includeUnmapped = true: the attributes of the target that are not streamed. Without it, ignored.
+	 * <!-- end-model-doc -->
+	 * @return the value of the '<em>Excluded Features</em>' reference list.
+	 * @see org.eclipse.fennec.model.streammapping.StreamMappingPackage#getStreamMapping_ExcludedFeatures()
+	 * @model
+	 * @generated
+	 */
+	EList<EStructuralFeature> getExcludedFeatures();
 
 } // StreamMapping

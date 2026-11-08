@@ -146,6 +146,13 @@ public class StreamMappingSwitch<T> extends Switch<T> {
 				if (result == null) result = defaultCase(theEObject);
 				return result;
 			}
+			case StreamMappingPackage.FUNCTION_RULE: {
+				FunctionRule functionRule = (FunctionRule)theEObject;
+				T result = caseFunctionRule(functionRule);
+				if (result == null) result = caseChangeRule(functionRule);
+				if (result == null) result = defaultCase(theEObject);
+				return result;
+			}
 			case StreamMappingPackage.BATCH_STRATEGY: {
 				BatchStrategy batchStrategy = (BatchStrategy)theEObject;
 				T result = caseBatchStrategy(batchStrategy);
@@ -294,6 +301,21 @@ public class StreamMappingSwitch<T> extends Switch<T> {
 	 * @generated
 	 */
 	public T caseExpressionRule(ExpressionRule object) {
+		return null;
+	}
+
+	/**
+	 * Returns the result of interpreting the object as an instance of '<em>Function Rule</em>'.
+	 * <!-- begin-user-doc -->
+	 * This implementation returns null;
+	 * returning a non-null result will terminate the switch.
+	 * <!-- end-user-doc -->
+	 * @param object the target of the switch.
+	 * @return the result of interpreting the object as an instance of '<em>Function Rule</em>'.
+	 * @see #doSwitch(org.eclipse.emf.ecore.EObject) doSwitch(EObject)
+	 * @generated
+	 */
+	public T caseFunctionRule(FunctionRule object) {
 		return null;
 	}
 

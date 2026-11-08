@@ -42,7 +42,7 @@ public class StreamMappingEPackageConfigurator implements EPackageConfigurator {
 	 * service property.
 	 * @generated
 	 */
-	public static final String FINGERPRINT = "fp1:00a3e28be75cdc372fd7cc9a02a12e375bef5afb93b3a08cc8541c114b7b9c63";
+	public static final String FINGERPRINT = "fp1:b3fc797499786d0282d54eaa07bb3b01162e27b15e114bc447087d3509006642";
 
 	private StreamMappingPackage ePackage;
 

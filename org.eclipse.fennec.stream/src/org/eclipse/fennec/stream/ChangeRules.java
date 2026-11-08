@@ -23,12 +23,14 @@ import java.util.logging.Logger;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.fennec.mapping.ExpressionEvaluator;
+import org.eclipse.fennec.mapping.FunctionRegistry;
 import org.eclipse.fennec.model.streammapping.AbsoluteChange;
 import org.eclipse.fennec.model.streammapping.ChangeRule;
 import org.eclipse.fennec.model.streammapping.CompositeRule;
 import org.eclipse.fennec.model.streammapping.CountChange;
 import org.eclipse.fennec.model.streammapping.DurationUnit;
 import org.eclipse.fennec.model.streammapping.ExpressionRule;
+import org.eclipse.fennec.model.streammapping.FunctionRule;
 import org.eclipse.fennec.model.streammapping.PercentageChange;
 import org.eclipse.fennec.model.streammapping.TimeThrottle;
 
@@ -38,8 +40,8 @@ import org.eclipse.fennec.model.streammapping.TimeThrottle;
  * {@link #test} is free of side effects; {@link #offer} tests and then records the outcome in the
  * slot's state - the passed value becomes the comparison base, a rejected one only moves the offer
  * counter. The first value of a slot always passes. A rule that cannot be applied to a value (a
- * numeric rule on text, an expression without an expression language, a malformed composite) lets
- * the value pass: storing too much is better than losing data over a mapping mistake.
+ * numeric rule on text, an expression without an expression language, a function that is not
+ * registered or answers no Boolean, a malformed composite) lets the value pass: storing too much is better than losing data over a mapping mistake.
  * <p>
  * Thread-safe; the slot state is not and belongs to one lane of the event core.
  */
@@ -54,12 +56,33 @@ public final class ChangeRules {
 	private static final Logger LOGGER = Logger.getLogger(ChangeRules.class.getName());
 
 	private final ExpressionEvaluator evaluator;
+	private final FunctionRegistry functions;
+
+	/**
+	 * What a {@link FunctionRule}'s function is handed: it answers whether the value enters the stream
+	 * with a {@link Boolean}.
+	 *
+	 * @param self the source object
+	 * @param value the new value
+	 * @param last the last passed value of the slot
+	 */
+	public record ChangeCandidate(EObject self, Object value, Object last) {
+	}
 
 	/**
 	 * @param evaluator evaluates expression rules; {@code null} lets every expression rule pass
 	 */
 	public ChangeRules(ExpressionEvaluator evaluator) {
+		this(evaluator, null);
+	}
+
+	/**
+	 * @param evaluator evaluates expression rules; {@code null} lets every expression rule pass
+	 * @param functions the functions function rules name; {@code null} lets every function rule pass
+	 */
+	public ChangeRules(ExpressionEvaluator evaluator, FunctionRegistry functions) {
 		this.evaluator = evaluator;
+		this.functions = functions;
 	}
 
 	/**
@@ -116,6 +139,9 @@ public final class ChangeRules {
 		}
 		if (rule instanceof ExpressionRule expression) {
 			return expression(expression, state, value, self);
+		}
+		if (rule instanceof FunctionRule function) {
+			return function(function, state, value, self);
 		}
 		LOGGER.fine(() -> "Unknown change rule " + rule.eClass().getName() + " - the value passes");
 		return true;
@@ -180,6 +206,20 @@ public final class ChangeRules {
 			return passes.booleanValue();
 		}
 		LOGGER.fine(() -> "Expression rule '" + rule.getExpression() + "' gave no boolean - the value passes");
+		return true;
+	}
+
+	private boolean function(FunctionRule rule, SlotState state, Object value, EObject self) {
+		if (functions == null) {
+			LOGGER.fine(() -> "Function rule without functions - the value passes");
+			return true;
+		}
+		Optional<Object> result = functions.apply(rule.getFunctionId(),
+				new ChangeCandidate(self, value, state.lastValue()));
+		if (result.isPresent() && result.get() instanceof Boolean passes) {
+			return passes.booleanValue();
+		}
+		LOGGER.fine(() -> "Function rule '" + rule.getFunctionId() + "' gave no Boolean - the value passes");
 		return true;
 	}
 
