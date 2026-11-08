@@ -7,3 +7,6 @@ bin/
 bin_test/
 testdir/
 /cnf/cache
+# local builds of other workspaces (tools/localbuilds.sh)
+/cnf/localbuilds/
+/cnf/ext/localbuilds.bnd
