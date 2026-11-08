@@ -1,7 +1,8 @@
 Bundle-Name: Eclipse Fennec Stream SensorThings
 Bundle-Description: SensorThings API 1.1 as a projection target of the change stream: a stream sink \
 	that turns the entries of TIMESERIES slots into STA observations (things, datastreams, sensors and \
-	observed properties on the way) and writes them into a Fennec persistence repository.
+	observed properties on the way) and writes them into a Fennec persistence repository; the MQTT extension publishes them over \
+	Gecko Messaging.
 
 -workingset: streaming
 
@@ -13,6 +14,8 @@ Bundle-Description: SensorThings API 1.1 as a projection target of the change st
 	org.osgi.service.metatype.annotations;version=latest,\
 	org.osgi.util.pushstream;version=latest,\
 	org.osgi.util.promise;version=latest,\
+	org.osgi.util.function;version=latest,\
+	org.gecko.messaging.api;version=latest,\
 	org.eclipse.fennec.stream.model;version=snapshot,\
 	org.eclipse.fennec.stream.mapping.model;version=snapshot,\
 	org.eclipse.fennec.stream.sta.model;version=snapshot,\
@@ -27,5 +30,10 @@ Bundle-Description: SensorThings API 1.1 as a projection target of the change st
 	org.eclipse.fennec.command.model;version=latest,\
 	org.eclipse.fennec.expression.model;version=latest
 
+# The in-memory broker of Gecko Messaging carries the plain JUnit tests.
 -testpath: \
-	assertj-core
+	assertj-core,\
+	org.gecko.messaging.core;version=latest,\
+	org.osgi.framework;version=latest,\
+	org.osgi.util.tracker;version=latest,\
+	org.osgi.dto;version=latest
