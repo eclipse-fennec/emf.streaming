@@ -30,6 +30,7 @@ import org.eclipse.fennec.mapping.Mappings;
 import org.eclipse.fennec.model.mapping.Slot;
 import org.eclipse.fennec.model.sta.Datastream;
 import org.eclipse.fennec.model.sta.FeatureOfInterest;
+import org.eclipse.fennec.model.sta.HistoricalLocation;
 import org.eclipse.fennec.model.sta.Location;
 import org.eclipse.fennec.model.sta.Observation;
 import org.eclipse.fennec.model.sta.ObservedProperty;
@@ -50,8 +51,8 @@ import org.eclipse.fennec.stream.StreamValues;
 /**
  * Turns a change set into STA entities (requirement MOD-09, D-25):
  * <ul>
- * <li>target object → Thing ({@code <Class>:<targetId>}), its location → Location and
- * FeatureOfInterest (same id);</li>
+ * <li>target object → Thing ({@code <Class>:<targetId>}), its location → Location, a
+ * HistoricalLocation (since the first change set) and the FeatureOfInterest (all with the same id);</li>
  * <li>TIMESERIES slot of a target → Datastream ({@code <thing>.<feature>});</li>
  * <li>target feature → ObservedProperty ({@code <Class>.<feature>}, definition = feature URI);</li>
  * <li>source class of the slot → Sensor ({@code <mapping>:<SourceClass>});</li>
@@ -148,7 +149,7 @@ public final class StaMapper {
 			if (slot == null || slot.getTargetFeature() == null) {
 				continue;
 			}
-			Thing thing = thing(target, entry.getObjectId(), entities);
+			Thing thing = thing(target, entry.getObjectId(), changeSet.getTimestamp(), entities);
 			Datastream datastream = datastream(mapping, slot, thing, entities);
 			Observation observation = STA.createObservation();
 			observation.setId(changeSet.getId() + ":" + i);
@@ -189,7 +190,7 @@ public final class StaMapper {
 		return null;
 	}
 
-	private Thing thing(EClass target, String targetId, Map<String, EObject> entities) {
+	private Thing thing(EClass target, String targetId, long since, Map<String, EObject> entities) {
 		String id = thingId(target, targetId);
 		if (entities.get(id) instanceof Thing known) {
 			return known;
@@ -212,6 +213,13 @@ public final class StaMapper {
 			location.setLocation(description.geoJson());
 			entities.put(locationKey(id), location);
 			thing.getLocations().add(location);
+			// STA: setting the location of a thing records it in its history
+			HistoricalLocation history = STA.createHistoricalLocation();
+			history.setId(id);
+			history.setTime(new Date(since));
+			history.setThing(thing);
+			history.getLocations().add(location);
+			entities.put("history:" + id, history);
 		}
 		entities.put(id, thing);
 		entities.put(foiKey(id), foi);
