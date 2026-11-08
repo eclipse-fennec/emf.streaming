@@ -36,7 +36,7 @@ import org.eclipse.fennec.stream.persistence.RepositoryAccess;
  * Writes STA entities into a Fennec persistence repository; the repository's unit maps the STA
  * model, emf.odata serves it from there. Entities the repository does not hold yet are written in
  * stages, because a new graph whose types reference each other cannot be saved at once
- * (emf.persistence-jpa#406, workaround #57):
+ * (emf.persistence-jpa#409, workaround #57):
  * <ol>
  * <li>the new entities without references (attributes and contained values only);</li>
  * <li>their references, set on the stored instances;</li>
