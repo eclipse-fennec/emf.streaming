@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" xmi:version="2.0" copyrightText="Copyright (c) 2026 Contributors to the Eclipse Foundation.&#10;&#10;This program and the accompanying materials are made&#10;available under the terms of the Eclipse Public License 2.0&#10;which is available at https://www.eclipse.org/legal/epl-2.0/&#10;&#10;SPDX-License-Identifier: EPL-2.0&#10;&#10;Contributors:&#10;  Data In Motion Consulting - initial implementation" modelDirectory="/org.eclipse.fennec.stream.sta.model/src-gen" modelPluginID="org.eclipse.fennec.stream.sta.model" modelName="Sta" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" importerID="org.eclipse.emf.importer.ecore" complianceLevel="21.0" copyrightFields="false" operationReflection="true" importOrganizing="true" oSGiCompatible="true">
+  <foreignModel>sta.ecore</foreignModel>
+  <genPackages prefix="Sta" basePackage="org.eclipse.fennec.model" disposableProviderFactory="true" ecorePackage="sta.ecore#/">
+    <genDataTypes ecoreDataType="sta.ecore#//JsonObject"/>
+    <genDataTypes ecoreDataType="sta.ecore#//GeoJson"/>
+    <genClasses ecoreClass="sta.ecore#//Thing">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Thing/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Thing/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Thing/description"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Thing/properties"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Thing/locations"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Thing/historicalLocations"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Thing/datastreams"/>
+    </genClasses>
+    <genClasses ecoreClass="sta.ecore#//Location">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Location/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Location/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Location/description"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Location/encodingType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Location/location"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Location/properties"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Location/things"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Location/historicalLocations"/>
+    </genClasses>
+    <genClasses ecoreClass="sta.ecore#//HistoricalLocation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//HistoricalLocation/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//HistoricalLocation/time"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//HistoricalLocation/thing"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//HistoricalLocation/locations"/>
+    </genClasses>
+    <genClasses ecoreClass="sta.ecore#//Datastream">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Datastream/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Datastream/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Datastream/description"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Datastream/observationType"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference sta.ecore#//Datastream/unitOfMeasurement"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Datastream/observedArea"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Datastream/phenomenonTimeStart"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Datastream/phenomenonTimeEnd"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Datastream/resultTimeStart"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Datastream/resultTimeEnd"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Datastream/properties"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Datastream/thing"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Datastream/sensor"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Datastream/observedProperty"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Datastream/observations"/>
+    </genClasses>
+    <genClasses ecoreClass="sta.ecore#//UnitOfMeasurement">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//UnitOfMeasurement/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//UnitOfMeasurement/symbol"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//UnitOfMeasurement/definition"/>
+    </genClasses>
+    <genClasses ecoreClass="sta.ecore#//Sensor">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Sensor/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Sensor/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Sensor/description"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Sensor/encodingType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Sensor/metadata"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Sensor/properties"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Sensor/datastreams"/>
+    </genClasses>
+    <genClasses ecoreClass="sta.ecore#//ObservedProperty">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//ObservedProperty/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//ObservedProperty/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//ObservedProperty/definition"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//ObservedProperty/description"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//ObservedProperty/properties"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//ObservedProperty/datastreams"/>
+    </genClasses>
+    <genClasses ecoreClass="sta.ecore#//Observation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/phenomenonTimeStart"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/phenomenonTimeEnd"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/resultTime"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/resultNumber"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/resultBoolean"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/resultText"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/resultQuality"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/validTimeStart"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/validTimeEnd"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//Observation/parameters"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Observation/datastream"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//Observation/featureOfInterest"/>
+    </genClasses>
+    <genClasses ecoreClass="sta.ecore#//FeatureOfInterest">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//FeatureOfInterest/id"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//FeatureOfInterest/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//FeatureOfInterest/description"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//FeatureOfInterest/encodingType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//FeatureOfInterest/feature"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute sta.ecore#//FeatureOfInterest/properties"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference sta.ecore#//FeatureOfInterest/observations"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

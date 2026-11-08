@@ -30,6 +30,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -145,6 +146,7 @@ public final class EventCore implements StreamCore, AutoCloseable {
 	private static final long CLOSE_TIMEOUT_SECONDS = 5;
 
 	private final MappingRegistry mappings;
+	private final List<StreamSink> sinks = new CopyOnWriteArrayList<>();
 	/** Registered mapping → the mapping as streamed; weak, so a replaced mapping goes with its copy. */
 	private final Map<StreamMapping, StreamMapping> expanded = Collections.synchronizedMap(new WeakHashMap<>());
 	/** Registered mappings already checked for paths leaving the aggregate; weak like the copies. */
@@ -179,6 +181,7 @@ public final class EventCore implements StreamCore, AutoCloseable {
 		this.mapper = requireNonNull(builder.mapper, "Mapper is required");
 		this.rules = builder.rules != null ? builder.rules : new ChangeRules(null);
 		this.store = builder.store != null ? builder.store : new InMemoryStreamStore();
+		this.sinks.addAll(builder.sinks);
 		this.projections = builder.projections != null ? builder.projections : ProjectionSource.shared(Projection.NONE);
 		this.fingerprints = builder.fingerprints;
 		this.clock = builder.clock;
@@ -393,7 +396,7 @@ public final class EventCore implements StreamCore, AutoCloseable {
 			inverse.getEntries().add(invert(stream, entries.get(i)));
 		}
 		(undo ? stream.undoable : stream.redoable).pop();
-		write(inverse);
+		write(stream, inverse);
 		(undo ? stream.redoable : stream.undoable).push(inverse.getSequence());
 		for (ChangeEntry entry : inverse.getEntries()) {
 			projectReverted(stream, entry, now);
@@ -749,7 +752,7 @@ public final class EventCore implements StreamCore, AutoCloseable {
 			entry.setTimestamp(pending.eventTime);
 			changeSet.getEntries().add(entry);
 		}
-		write(changeSet);
+		write(stream, changeSet);
 		project(stream, batch.pending);
 		if (stream.mapping.isUndoable()) {
 			stream.undoable.push(changeSet.getSequence());
@@ -829,7 +832,7 @@ public final class EventCore implements StreamCore, AutoCloseable {
 		}
 		changeSet.getEntries().add(keyframe);
 		changeSet.setReason("keyframe");
-		write(changeSet);
+		write(stream, changeSet);
 		keyframes.incrementAndGet();
 		stream.lastKeyframeTime = now;
 		stream.setsSinceKeyframe = 0;
@@ -848,10 +851,34 @@ public final class EventCore implements StreamCore, AutoCloseable {
 		return changeSet;
 	}
 
-	private void write(ChangeSet changeSet) {
+	private void write(TargetStream stream, ChangeSet changeSet) {
 		store.append(changeSet);
 		changeSets.incrementAndGet();
+		for (StreamSink sink : sinks) {
+			try {
+				sink.written(stream.mapping, changeSet);
+			} catch (RuntimeException e) {
+				LOGGER.log(Level.WARNING, e, () -> "Stream sink " + sink + " failed on " + changeSet.getStreamId() + "@"
+						+ changeSet.getSequence() + " - the stream goes on");
+			}
+		}
 		output.publish(changeSet);
+	}
+
+	/**
+	 * Adds a sink; it sees the change sets written from now on.
+	 *
+	 * @param sink the sink
+	 */
+	public void addSink(StreamSink sink) {
+		sinks.add(requireNonNull(sink, "StreamSink is required"));
+	}
+
+	/**
+	 * @param sink a sink added before
+	 */
+	public void removeSink(StreamSink sink) {
+		sinks.remove(sink);
 	}
 
 	private SlotState restore(TargetStream stream, StreamSlot slot, String address) {
@@ -911,6 +938,7 @@ public final class EventCore implements StreamCore, AutoCloseable {
 		private Mapper mapper;
 		private ChangeRules rules;
 		private StreamStore store;
+		private final List<StreamSink> sinks = new ArrayList<>();
 		private ProjectionSource projections;
 		private Function<EPackage, String> fingerprints = ePackage -> String.valueOf(ePackage.getNsURI());
 		private Clock clock = Clock.systemUTC();
@@ -954,6 +982,15 @@ public final class EventCore implements StreamCore, AutoCloseable {
 		 */
 		public Builder store(StreamStore store) {
 			this.store = store;
+			return this;
+		}
+
+		/**
+		 * @param sink gets every change set written, after the store; more can be added on the core
+		 * @return this
+		 */
+		public Builder sink(StreamSink sink) {
+			sinks.add(requireNonNull(sink, "StreamSink is required"));
 			return this;
 		}
 

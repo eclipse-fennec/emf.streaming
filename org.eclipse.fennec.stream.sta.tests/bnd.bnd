@@ -1,0 +1,29 @@
+Test-Cases: ${classes;HIERARCHY_INDIRECTLY_ANNOTATED;org.junit.platform.commons.annotation.Testable;CONCRETE}
+Bundle-Name: Eclipse Fennec Stream SensorThings Tests
+Bundle-Description: OSGi integration tests of the SensorThings projection on JPA with an H2 database.
+
+-workingset: streaming
+
+-library: \
+	enableEMF,\
+	enableOSGi-Test
+
+-buildpath: \
+	org.eclipse.fennec.emf.osgi.api;version=latest,\
+	org.osgi.service.cm;version=latest,\
+	org.eclipse.fennec.atlas.configuration.model;version=latest,\
+	org.eclipse.fennec.mapping.model;version=snapshot,\
+	org.eclipse.fennec.stream.model;version=snapshot,\
+	org.eclipse.fennec.stream.mapping.model;version=snapshot,\
+	org.eclipse.fennec.stream.sta.model;version=snapshot,\
+	org.eclipse.fennec.stream;version=snapshot,\
+	org.eclipse.fennec.persistence.repository;version=latest,\
+	org.eclipse.fennec.persistence.query;version=latest,\
+	org.eclipse.fennec.query.model;version=latest,\
+	org.eclipse.fennec.expression.model;version=latest
+
+-testpath: \
+	assertj-core
+
+# Bundles the test run requires without compiling against them: build them first.
+-dependson: org.eclipse.fennec.stream.sta,org.eclipse.fennec.stream.sta.model,org.eclipse.fennec.stream.persistence

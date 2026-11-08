@@ -1,0 +1,25 @@
+-library: enableOSGi-Test
+
+-runfw: org.apache.felix.framework
+-runee: JavaSE-21
+
+-runrequires: \
+	bnd.identity;id='org.eclipse.fennec.stream.sta.tests',\
+	bnd.identity;id='org.eclipse.fennec.stream.sta',\
+	bnd.identity;id='org.eclipse.fennec.stream.sta.model',\
+	bnd.identity;id='org.eclipse.fennec.emf.osgi.component.minimal',\
+	bnd.identity;id='org.eclipse.fennec.emf.osgi.metadata',\
+	bnd.identity;id='org.eclipse.fennec.persistence.eclipselink',\
+	bnd.identity;id='org.eclipse.fennec.persistence.repository.jpa',\
+	bnd.identity;id='org.eclipse.persistence.asm',\
+	bnd.identity;id='org.eclipse.persistence.jpa.jpql',\
+	bnd.identity;id='org.eclipse.daanse.jdbc.datasource.h2',\
+	bnd.identity;id='com.h2database',\
+	bnd.identity;id='org.apache.aries.spifly.dynamic.bundle',\
+	bnd.identity;id='org.apache.felix.configadmin',\
+	bnd.identity;id='org.apache.felix.scr',\
+	bnd.identity;id='assertj-core'
+
+-runblacklist: \
+	bnd.identity;id='org.apache.aries.spifly.dynamic.framework.extension'
+

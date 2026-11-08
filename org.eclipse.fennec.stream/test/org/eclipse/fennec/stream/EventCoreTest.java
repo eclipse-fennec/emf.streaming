@@ -19,6 +19,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
@@ -148,6 +149,25 @@ class EventCoreTest {
 				.as("currentTemperature and currentPh have slots of their own, reading the sensors")
 				.containsExactlyInAnyOrder(tuple("https://example.org/pool#//Pool/name", "Kinderland"),
 						tuple("https://example.org/pool#//Pool/depth", "2"));
+	}
+
+	@Test
+	void everySinkSeesEveryChangeSetAfterTheStoreAndAFailingOneStopsNothing() throws Exception {
+		fx.registry.register(fx.mapping());
+		fx.pool("pool-1");
+		List<String> seen = new CopyOnWriteArrayList<>();
+		core = fx.core(store).sink((mapping, changeSet) -> {
+			throw new IllegalStateException("broken sink");
+		}).build();
+		core.addSink((mapping, changeSet) -> seen.add(mapping.getId() + ":" + changeSet.getSequence() + ":"
+				+ store.lastSequence(changeSet.getStreamId())));
+
+		core.offer(fx.temp("t1", "pool-1", 24.5), 1_000, null);
+		core.offer(fx.temp("t1", "pool-1", 25.5), 2_000, null);
+		assertThat(core.awaitIdle(WAIT)).isTrue();
+
+		// value, keyframe, value - each already stored when the sink sees it
+		assertThat(seen).containsExactly("pool-streams:1:1", "pool-streams:2:2", "pool-streams:3:3");
 	}
 
 	@Test
