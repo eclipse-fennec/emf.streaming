@@ -205,12 +205,22 @@ the store, without dropping any. It writes into a repository whose unit maps the
 - **`describer.target`** selects a `TargetDescriber` that names and locates a thing. The default
   names a thing by its target id and gives it no location. The pool example reads name and
   geometry of the pool (`FennecPoolTargetDescriber`).
-- **`units`** gives the unit of a feature by its URI (`name|symbol|definition`). This is the
-  preferred way: the domain model stays free of SensorThings information.
-- As a fallback only, a feature may carry the annotation `https://eclipse.org/fennec/sta`
-  (`unit.name`, `unit.symbol`, `unit.definition`). It is read when `units` names no unit for
-  the feature. Prefer the configuration — the annotation puts STA-specific metadata into the
-  domain model.
+- **Units.** The unit of a datastream is resolved in this order; the first match wins:
+  1. `units` of the sink, by feature URI (`name|symbol|definition`). Use it for models you
+     cannot change.
+  2. The neutral annotation `https://eclipse.org/fennec/unit` on the feature (`name`, `symbol`,
+     `definition`). This is the preferred place in your own models. A unit is part of what a
+     value means, like its type, so it belongs to the domain model. It is not a SensorThings
+     concept. Later it will be read as the unit aspect of model.metadata
+     (eclipse-fennec/model.metadata#33).
+  3. *Deprecated:* the annotation `https://eclipse.org/fennec/sta` (`unit.name`, `unit.symbol`,
+     `unit.definition`). Do not use it in new models. It puts STA-specific metadata into the
+     domain model.
+
+  The rule of thumb for metadata on a feature: information that changes what stored values
+  mean (type, multiplicity, unit) belongs to the model. Information that only one target or
+  protocol needs (STA names, `@iot` controls, OData sets, topics) belongs to that target's
+  mapping or configuration.
 
 emf.odata serves the repository, with the STA set names, in the SensorThings wire format of
 `FennecStaWireProfile` (`@iot.*` control information, absolute links, the STA root document):

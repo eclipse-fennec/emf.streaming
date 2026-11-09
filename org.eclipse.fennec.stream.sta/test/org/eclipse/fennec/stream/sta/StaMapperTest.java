@@ -66,9 +66,9 @@ class StaMapperTest {
 		ePackage.setNsPrefix("pool");
 		ePackage.setNsURI(NS);
 		EAnnotation unit = EcoreFactory.eINSTANCE.createEAnnotation();
-		unit.setSource(StaMapper.ANNOTATION);
-		unit.getDetails().put("unit.name", "degree Celsius");
-		unit.getDetails().put("unit.symbol", "°C");
+		unit.setSource(StaMapper.UNIT_ANNOTATION);
+		unit.getDetails().put("name", "degree Celsius");
+		unit.getDetails().put("symbol", "°C");
 		temperature.getEAnnotations().add(unit);
 	}
 
@@ -186,6 +186,23 @@ class StaMapperTest {
 				.extracting("name", "symbol", "definition").containsExactly("kelvin", "K", "http://qudt.org/vocab/unit/K");
 		assertThat(batch.observations().get(1).getDatastream().getUnitOfMeasurement())
 				.extracting("name", "symbol", "definition").containsExactly("flag", null, null);
+	}
+
+	@Test
+	@SuppressWarnings("deprecation")
+	void theFormerStaAnnotationIsAFallbackBehindTheNeutralOne() {
+		EAnnotation legacy = EcoreFactory.eINSTANCE.createEAnnotation();
+		legacy.setSource(StaMapper.ANNOTATION);
+		legacy.getDetails().put("unit.symbol", "%");
+		open.getEAnnotations().add(legacy);
+		EAnnotation ignored = EcoreUtil.copy(legacy);
+		ignored.getDetails().put("unit.symbol", "K");
+		temperature.getEAnnotations().add(ignored);
+
+		StaBatch batch = mapper.map(mapping, changeSet(set(temperature, "300", 1_000L), set(open, "true", 1_000L)));
+
+		assertThat(batch.observations().get(0).getDatastream().getUnitOfMeasurement().getSymbol()).isEqualTo("°C");
+		assertThat(batch.observations().get(1).getDatastream().getUnitOfMeasurement().getSymbol()).isEqualTo("%");
 	}
 
 	private StreamMapping mapping() {

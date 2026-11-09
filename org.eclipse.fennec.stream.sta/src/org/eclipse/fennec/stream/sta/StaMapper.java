@@ -64,15 +64,29 @@ import org.eclipse.fennec.stream.StreamValues;
  * else the change set's; resultTime = the change set's time; the result typed by the feature.</li>
  * </ul>
  * Keyframes, changelog entries and entries without a target feature yield nothing. The unit of a
- * datastream comes from the units given by feature URI (preferred, keeps the domain model free of
- * STA metadata), else as a fallback from the feature's annotation
- * {@value #ANNOTATION} ({@code unit.name}, {@code unit.symbol}, {@code unit.definition}).
+ * datastream comes, first match wins, from the units given by feature URI, from the neutral
+ * annotation {@value #UNIT_ANNOTATION} on the feature ({@code name}, {@code symbol},
+ * {@code definition}), or from the deprecated annotation {@value #ANNOTATION}
+ * ({@code unit.name}, {@code unit.symbol}, {@code unit.definition}).
  * <p>
  * Thread-safe; the target is described once per thing.
  */
 public final class StaMapper {
 
-	/** Source of the annotation on a target feature that gives the unit of its datastream. */
+	/**
+	 * Source of the neutral annotation on a target feature that gives the unit of its values
+	 * ({@code name}, {@code symbol}, {@code definition}). The unit is part of the meaning of a
+	 * value, not of SensorThings.
+	 */
+	public static final String UNIT_ANNOTATION = "https://eclipse.org/fennec/unit";
+
+	/**
+	 * Source of the former STA-specific unit annotation ({@code unit.name}, {@code unit.symbol},
+	 * {@code unit.definition}).
+	 *
+	 * @deprecated use {@link #UNIT_ANNOTATION}; STA metadata does not belong into a domain model
+	 */
+	@Deprecated
 	public static final String ANNOTATION = "https://eclipse.org/fennec/sta";
 
 	/** The member of {@code properties} (of {@code parameters}) holding the key of an entity. */
@@ -321,15 +335,20 @@ public final class StaMapper {
 
 	private static UnitOfMeasurement unit(EStructuralFeature feature, Unit given) {
 		UnitOfMeasurement unit = STA.createUnitOfMeasurement();
-		EAnnotation annotation = feature.getEAnnotation(ANNOTATION);
+		EAnnotation neutral = feature.getEAnnotation(UNIT_ANNOTATION);
+		EAnnotation legacy = feature.getEAnnotation(ANNOTATION);
 		if (given != null) {
 			unit.setName(given.name());
 			unit.setSymbol(given.symbol());
 			unit.setDefinition(given.definition());
-		} else if (annotation != null) {
-			unit.setName(annotation.getDetails().get("unit.name"));
-			unit.setSymbol(annotation.getDetails().get("unit.symbol"));
-			unit.setDefinition(annotation.getDetails().get("unit.definition"));
+		} else if (neutral != null) {
+			unit.setName(neutral.getDetails().get("name"));
+			unit.setSymbol(neutral.getDetails().get("symbol"));
+			unit.setDefinition(neutral.getDetails().get("definition"));
+		} else if (legacy != null) {
+			unit.setName(legacy.getDetails().get("unit.name"));
+			unit.setSymbol(legacy.getDetails().get("unit.symbol"));
+			unit.setDefinition(legacy.getDetails().get("unit.definition"));
 		}
 		return unit;
 	}
