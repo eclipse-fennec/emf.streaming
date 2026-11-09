@@ -150,7 +150,33 @@ With that, the identity map is a complete picture: which ids belong together and
 object comes from. Stream mapping (sensor → pool) and join (pool → GeoJSON pool → OGC feature)
 use the same map.
 
-### 3.4 The object store
+#### Navigation and the dependency graph
+
+At run time the stream, the mapping models and the identity map together produce the result: from
+any object the platform knows the related objects and can navigate to them quickly (sensor →
+pool → GeoJSON pool → OGC feature, and back). The same information is a **dependency graph** of
+instances and of models: which sources feed which object, which mappings and listeners depend on
+it. It can be visualized directly, for the user and for impact analysis (what is affected when a
+sensor fails or a mapping changes).
+
+### 3.4 The UI for the identity map
+
+Creating the identity map means relating instances to each other, so it needs UI components of
+its own, apart from dragging values onto features (§2). For the pool the workflow likely starts on
+a map:
+
+1. **Start from the geometry:** the GeoJSON pools are drawn on a map. The user picks one.
+2. **Pick the domain object:** in the database the user selects the pool this geometry belongs to,
+   with its description. Now pool and GeoJSON pool ids are related.
+3. **Assign the sensors:** the sensors are drawn on the same map. Clicking a sensor assigns it to
+   the selected pool.
+4. **Declare the primary element:** the pool, whose events drive the join.
+
+After these steps the identity map for this pool is complete. The other direction works too: pick
+the primary element first (load pool `8`), add its GeoJSON pool from its source, then assign the
+sensors on the map.
+
+### 3.5 The object store
 
 The central piece, and the main missing building block. It starts in emf.streaming and can move
 into a project of its own later.
@@ -175,7 +201,7 @@ into a project of its own later.
   to the stream level (`Recording`, see `timeseries-access`); how this connects to the store is
   open.
 
-### 3.5 Windowing, batching, coalescing
+### 3.6 Windowing, batching, coalescing
 
 Many changes become fewer events. This is configurable **per source** and **per listener**:
 
@@ -191,7 +217,7 @@ Many changes become fewer events. This is configurable **per source** and **per 
 
 OCL expresses most of the conditions and aggregations.
 
-### 3.6 Listeners and outputs
+### 3.7 Listeners and outputs
 
 Listeners hang on the store and are configured, not coded:
 
@@ -199,10 +225,10 @@ Listeners hang on the store and are configured, not coded:
 - **composition** of derived objects (the OGC feature from pool and GeoJSON pool);
 - **MQTT output** of the whole object or its changes (today the STA MQTT publisher, to be made
   generic);
-- **rules** (§3.7);
-- **services** (§3.8).
+- **rules** (§3.8);
+- **services** (§3.9).
 
-### 3.7 Rules
+### 3.8 Rules
 
 Some reactions are rules over the live objects: derived values (virtual sensors), conditions,
 actions, timing. A rule language exists as a draft in emf.matter
@@ -214,7 +240,7 @@ actions, timing. A rule language exists as a draft in emf.matter
 
 Mapping stays with QVT; expressions stay with OCL. The rule engine is the missing third piece.
 
-### 3.8 Generated models and service design
+### 3.9 Generated models and service design
 
 The output of a mapping need not be an existing model. It can be **a new Ecore generated from
 the mapping**: the target class with exactly the slots the user connected. That model is
@@ -258,7 +284,8 @@ Nothing is generated as code. A new service is a model change.
 | **Generating an Ecore from a mapping** | **missing** | |
 | **REST model ⇄ DDSR mapping, OpenAPI** | **missing** | emf.services |
 | **Rule engine** | **draft** | emf.matter (`rule-language.md`) |
-| **UI** | **missing** | |
+| **Dependency graph** of instances and models, visualized | **missing** (the information is in the mapping and identity map) | |
+| **UI**: value mapping, identity map editor (map-based), service design | **missing** | |
 
 ## 5. Open questions
 
@@ -266,7 +293,7 @@ Nothing is generated as code. A new service is a model change.
   EMF notifications, stream change sets, or both.
 - **Eviction and consistency:** what happens to a pending window when its object is evicted.
 - **Time series:** how the stream's time series and the store's current state are stored and
-  queried together (§3.4).
+  queried together (§3.5).
 - **Deadband levels:** where a source-level rule and a target-level rule are configured, and
   whether both live in the mapping (§3.2).
 - **Join model:** primary/secondary roles and mapping tables as an extension of
