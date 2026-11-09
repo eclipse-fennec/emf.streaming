@@ -34,10 +34,13 @@ TEAM Engine web UI is at `http://localhost:8081/teamengine/` (`ogctest`/`ogctest
 
 ## Expected state
 
-Until the wire profile of emf.odata#110 exists and the STA profile is implemented here (#55), the
-endpoint answers in OData form (`@odata.*`, `phenomenonTimeStart` …): the baseline is red. The
-report shows what each stage of ADR-0010 achieves.
+The endpoint writes the SensorThings wire format through the wire profile of emf.odata (#55);
+the stages of emf.odata ADR-0010 still missing keep some tests red.
 
-Baseline (2026-11-08): the suite refuses the endpoint before the first test, as its service root
-document is the OData one - "The URL for Datastreams in Service Root URI is not compliant to
-SensorThings API." Stage 1 of ADR-0010 (the root document of the profile) is the first step.
+| Date | Result | Open |
+|---|---|---|
+| 2026-11-08 | refused before the first test: the root document was the OData one | wire profile (emf.odata#110) |
+| 2026-11-09 | 2 passed (`checkServiceRootUri`, `readNonexistentEntity`), 4 failed | `phenomenonTime`/`result` (emf.odata#119), property as `{"name":…}` (emf.odata#125), `$ref` on sets and `@iot.selfLink` in references (emf.odata#126) |
+
+The suite reads `@iot.id` as a number; the STA projection derives numeric ids from its keys for
+that reason.

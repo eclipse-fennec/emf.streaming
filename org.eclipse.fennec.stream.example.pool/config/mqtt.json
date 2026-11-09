@@ -11,5 +11,8 @@
   "FennecStaMqttPublisher": {
     "publisher.target": "(osgi.messaging.name=sta)",
     "serviceRoot": "http://localhost:8080/sta/v1.1"
+  },
+  "FennecStaWireProfile": {
+    "mqtt.endpoints": ["mqtt://localhost:11893"]
   }
 }

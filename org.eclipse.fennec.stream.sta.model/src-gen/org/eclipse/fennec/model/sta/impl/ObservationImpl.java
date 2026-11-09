@@ -62,7 +62,7 @@ public class ObservationImpl extends MinimalEObjectImpl.Container implements Obs
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String ID_EDEFAULT = null;
+	protected static final long ID_EDEFAULT = 0L;
 
 	/**
 	 * The cached value of the '{@link #getId() <em>Id</em>}' attribute.
@@ -72,7 +72,7 @@ public class ObservationImpl extends MinimalEObjectImpl.Container implements Obs
 	 * @generated
 	 * @ordered
 	 */
-	protected String id = ID_EDEFAULT;
+	protected long id = ID_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getPhenomenonTimeStart() <em>Phenomenon Time Start</em>}' attribute.
@@ -319,7 +319,7 @@ public class ObservationImpl extends MinimalEObjectImpl.Container implements Obs
 	 * @generated
 	 */
 	@Override
-	public String getId() {
+	public long getId() {
 		return id;
 	}
 
@@ -329,8 +329,8 @@ public class ObservationImpl extends MinimalEObjectImpl.Container implements Obs
 	 * @generated
 	 */
 	@Override
-	public void setId(String newId) {
-		String oldId = id;
+	public void setId(long newId) {
+		long oldId = id;
 		id = newId;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, StaPackage.OBSERVATION__ID, oldId, id));
@@ -775,7 +775,7 @@ public class ObservationImpl extends MinimalEObjectImpl.Container implements Obs
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case StaPackage.OBSERVATION__ID:
-				setId((String)newValue);
+				setId((Long)newValue);
 				return;
 			case StaPackage.OBSERVATION__PHENOMENON_TIME_START:
 				setPhenomenonTimeStart((Date)newValue);
@@ -877,7 +877,7 @@ public class ObservationImpl extends MinimalEObjectImpl.Container implements Obs
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case StaPackage.OBSERVATION__ID:
-				return ID_EDEFAULT == null ? id != null : !ID_EDEFAULT.equals(id);
+				return id != ID_EDEFAULT;
 			case StaPackage.OBSERVATION__PHENOMENON_TIME_START:
 				return PHENOMENON_TIME_START_EDEFAULT == null ? phenomenonTimeStart != null : !PHENOMENON_TIME_START_EDEFAULT.equals(phenomenonTimeStart);
 			case StaPackage.OBSERVATION__PHENOMENON_TIME_END:

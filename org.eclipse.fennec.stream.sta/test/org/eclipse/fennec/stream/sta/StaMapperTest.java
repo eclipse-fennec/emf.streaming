@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EAttribute;
@@ -79,21 +80,23 @@ class StaMapperTest {
 
 		assertThat(batch.observations()).hasSize(2);
 		Observation observation = batch.observations().get(0);
-		assertThat(observation.getId()).isEqualTo("cs-1:0");
+		assertThat(observation.getId()).isEqualTo(StaMapper.id("cs-1:0"));
+		assertThat(observation.getParameters()).isEqualTo("{\"fennec.key\":\"cs-1:0\"}");
 		assertThat(observation.getResultNumber()).isEqualTo(27.5);
 		assertThat(observation.getPhenomenonTimeStart()).isEqualTo(new Date(1_000));
 		assertThat(observation.getResultTime()).isEqualTo(new Date(5_000));
 		Datastream datastream = observation.getDatastream();
-		assertThat(datastream.getId()).isEqualTo("Pool:kinderland.temperature");
+		assertThat(datastream.getId()).isEqualTo(StaMapper.id("Pool:kinderland.temperature"));
 		assertThat(datastream.getName()).isEqualTo("Kinderland temperature");
 		assertThat(datastream.getObservationType()).endsWith("OM_Measurement");
 		assertThat(datastream.getUnitOfMeasurement().getSymbol()).isEqualTo("°C");
 		assertThat(datastream.getObservedProperty().getDefinition()).isEqualTo(NS + "#//Pool/temperature");
-		assertThat(datastream.getSensor().getId()).isEqualTo("pool-sta:Probe");
+		assertThat(datastream.getSensor().getId()).isEqualTo(StaMapper.id("pool-sta:Probe"));
 		Thing thing = datastream.getThing();
-		assertThat(thing.getId()).isEqualTo("Pool:kinderland");
+		assertThat(thing.getId()).isEqualTo(StaMapper.id("Pool:kinderland"));
+		assertThat(thing.getProperties()).isEqualTo("{\"fennec.key\":\"Pool:kinderland\"}");
 		assertThat(thing.getLocations()).extracting(Location::getLocation).singleElement().asString().contains("Point");
-		assertThat(observation.getFeatureOfInterest().getId()).isEqualTo("Pool:kinderland");
+		assertThat(observation.getFeatureOfInterest().getId()).isEqualTo(StaMapper.id("Pool:kinderland"));
 
 		Observation truth = batch.observations().get(1);
 		assertThat(truth.getResultBoolean()).isTrue();
@@ -105,8 +108,9 @@ class StaMapperTest {
 			assertThat(history.getLocations()).containsExactlyElementsOf(thing.getLocations());
 		});
 		assertThat(batch.entities()).extracting(EcoreUtil::getID).as("each entity once, referenced ones first")
-				.containsExactly("Pool:kinderland", "Pool:kinderland", "Pool:kinderland", "Pool:kinderland", "Pool.temperature",
-						"pool-sta:Probe", "Pool:kinderland.temperature", "Pool.open", "Pool:kinderland.open");
+				.containsExactly(Stream.of("Pool:kinderland", "Pool:kinderland", "Pool:kinderland", "Pool:kinderland", "Pool.temperature",
+						"pool-sta:Probe", "Pool:kinderland.temperature", "Pool.open", "Pool:kinderland.open")
+						.map(key -> Long.toString(StaMapper.id(key))).toArray(String[]::new));
 	}
 
 	@Test

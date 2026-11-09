@@ -37,7 +37,7 @@ public final class StaJson {
 		requireNonNull(observation, "Observation is required");
 		String self = serviceRoot + "/Observations(" + key(observation.getId()) + ")";
 		StringBuilder json = new StringBuilder("{");
-		member(json, "@iot.id", string(observation.getId()));
+		member(json, "@iot.id", Long.toString(observation.getId()));
 		member(json, "@iot.selfLink", string(self));
 		member(json, "phenomenonTime", string(time(observation.getPhenomenonTimeStart(), observation.getPhenomenonTimeEnd())));
 		member(json, "resultTime", observation.getResultTime() == null ? "null" : string(time(observation.getResultTime(), null)));
@@ -49,10 +49,10 @@ public final class StaJson {
 
 	/**
 	 * @param id an entity id
-	 * @return the id as an STA key literal: a quoted string, single quotes doubled
+	 * @return the id as an STA key literal
 	 */
-	public static String key(String id) {
-		return "'" + id.replace("'", "''") + "'";
+	public static String key(long id) {
+		return Long.toString(id);
 	}
 
 	private static String result(Observation observation) {
@@ -78,7 +78,7 @@ public final class StaJson {
 		json.append(string(name)).append(':').append(value);
 	}
 
-	private static String string(String text) {
+	static String string(String text) {
 		StringBuilder quoted = new StringBuilder("\"");
 		for (int i = 0; i < text.length(); i++) {
 			char c = text.charAt(i);

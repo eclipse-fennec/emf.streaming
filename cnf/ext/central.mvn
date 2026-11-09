@@ -170,6 +170,7 @@ org.eclipse.fennec.ogc:net.opengis.cql2.model:0.1.0-SNAPSHOT
 org.eclipse.fennec.ogc:org.qgis.project.model:0.1.0-SNAPSHOT
 # OData server (emf.odata) - the SensorThings endpoint of the pool example (D-25)
 org.eclipse.fennec.odata:org.eclipse.fennec.odata.runtime:0.1.0-SNAPSHOT
+org.eclipse.fennec.odata:org.eclipse.fennec.odata.wire.api:0.1.0-SNAPSHOT
 org.eclipse.fennec.odata:org.eclipse.fennec.odata.persistence:0.1.0-SNAPSHOT
 org.eclipse.fennec.odata:org.eclipse.fennec.odata.persistence.api:0.1.0-SNAPSHOT
 org.eclipse.fennec.odata:org.eclipse.fennec.odata.csdl:0.1.0-SNAPSHOT

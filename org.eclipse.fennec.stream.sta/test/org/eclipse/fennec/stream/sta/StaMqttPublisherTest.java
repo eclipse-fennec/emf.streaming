@@ -61,43 +61,43 @@ class StaMqttPublisherTest {
 
 	@Test
 	void anObservationIsWrittenAsStaJson() {
-		Observation observation = observation("cs-1:0", 27.5);
+		Observation observation = observation(42, 27.5);
 		observation.setPhenomenonTimeEnd(new Date(2_000));
 
-		assertThat(StaJson.observation(observation, "http://host/sta/v1.1")).isEqualTo("{\"@iot.id\":\"cs-1:0\","
-				+ "\"@iot.selfLink\":\"http://host/sta/v1.1/Observations('cs-1:0')\","
+		assertThat(StaJson.observation(observation, "http://host/sta/v1.1")).isEqualTo("{\"@iot.id\":42,"
+				+ "\"@iot.selfLink\":\"http://host/sta/v1.1/Observations(42)\","
 				+ "\"phenomenonTime\":\"1970-01-01T00:00:01Z/1970-01-01T00:00:02Z\",\"resultTime\":\"1970-01-01T00:00:05Z\","
-				+ "\"result\":27.5,\"Datastream@iot.navigationLink\":\"http://host/sta/v1.1/Observations('cs-1:0')/Datastream\","
-				+ "\"FeatureOfInterest@iot.navigationLink\":\"http://host/sta/v1.1/Observations('cs-1:0')/FeatureOfInterest\"}");
+				+ "\"result\":27.5,\"Datastream@iot.navigationLink\":\"http://host/sta/v1.1/Observations(42)/Datastream\","
+				+ "\"FeatureOfInterest@iot.navigationLink\":\"http://host/sta/v1.1/Observations(42)/FeatureOfInterest\"}");
 		observation.setResultNumber(null);
 		observation.setResultText("say \"hi\"\n");
 		assertThat(StaJson.observation(observation, "r")).contains("\"result\":\"say \\\"hi\\\"\\n\"");
-		assertThat(StaJson.key("it's")).isEqualTo("'it''s'");
+		assertThat(StaJson.key(7L)).isEqualTo("7");
 	}
 
 	@Test
 	void everyStoredObservationIsPublishedOnItsTopics() throws Exception {
 		instance = start();
 		List<String> received = new CopyOnWriteArrayList<>();
-		for (String topic : List.of("v1.1/Observations", "v1.1/Datastreams('Pool:k.temperature')/Observations",
-				"v1.1/FeaturesOfInterest('Pool:k')/Observations")) {
+		for (String topic : List.of("v1.1/Observations", "v1.1/Datastreams(11)/Observations",
+				"v1.1/FeaturesOfInterest(12)/Observations")) {
 			instance.subscribe(topic).forEach(message -> received
 					.add(topic + " " + StandardCharsets.UTF_8.decode(message.payload()).toString()));
 		}
 		await(() -> instance.getRuntimeDTO().subscriptions.length == 3);
 		StaMqttPublisher publisher = new StaMqttPublisher(publisher(instance), "http://host/sta/v1.1", "v1.1");
 
-		publisher.stored(new StaBatch(List.of(), List.of(observation("cs-1:0", 27.5))));
+		publisher.stored(new StaBatch(List.of(), List.of(observation(42, 27.5))));
 
 		await(() -> received.size() == 3);
-		assertThat(received).allSatisfy(message -> assertThat(message).contains("\"@iot.id\":\"cs-1:0\"", "\"result\":27.5"));
+		assertThat(received).allSatisfy(message -> assertThat(message).contains("\"@iot.id\":42", "\"result\":27.5"));
 	}
 
-	private static Observation observation(String id, double result) {
+	private static Observation observation(long id, double result) {
 		Datastream datastream = StaFactory.eINSTANCE.createDatastream();
-		datastream.setId("Pool:k.temperature");
+		datastream.setId(11);
 		FeatureOfInterest feature = StaFactory.eINSTANCE.createFeatureOfInterest();
-		feature.setId("Pool:k");
+		feature.setId(12);
 		Observation observation = StaFactory.eINSTANCE.createObservation();
 		observation.setId(id);
 		observation.setPhenomenonTimeStart(new Date(1_000));

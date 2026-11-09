@@ -45,6 +45,7 @@ import org.eclipse.fennec.model.streammapping.StreamMappingFactory;
 import org.eclipse.fennec.model.streammapping.StreamSlot;
 import org.eclipse.fennec.persistence.repository.api.Repository;
 import org.eclipse.fennec.stream.StreamSink;
+import org.eclipse.fennec.stream.sta.StaMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -124,14 +125,14 @@ class StaSinkOsgiTest {
 		assertThat(repository.count(StaPackage.Literals.OBSERVATION)).isEqualTo(2);
 		assertThat(repository.count(StaPackage.Literals.DATASTREAM)).isEqualTo(1);
 		assertThat(repository.count(StaPackage.Literals.THING)).isEqualTo(1);
-		Datastream datastream = (Datastream) repository.getEObject(StaPackage.Literals.DATASTREAM, "Pool:kinderland.temperature");
-		assertThat(datastream.getThing().getId()).isEqualTo("Pool:kinderland");
+		Datastream datastream = (Datastream) repository.getEObject(StaPackage.Literals.DATASTREAM, StaMapper.id("Pool:kinderland.temperature"));
+		assertThat(datastream.getThing().getId()).isEqualTo(StaMapper.id("Pool:kinderland"));
 		assertThat(datastream.getObservedProperty().getDefinition()).isEqualTo("https://example.org/pool#//Pool/temperature");
 		assertThat(datastream.getUnitOfMeasurement()).isNotNull();
-		Observation observation = (Observation) repository.getEObject(StaPackage.Literals.OBSERVATION, "cs-2:0");
+		Observation observation = (Observation) repository.getEObject(StaPackage.Literals.OBSERVATION, StaMapper.id("cs-2:0"));
 		assertThat(observation.getResultNumber()).isEqualTo(28.0);
 		assertThat(observation.getDatastream().getId()).isEqualTo(datastream.getId());
-		assertThat(observation.getFeatureOfInterest().getId()).isEqualTo("Pool:kinderland");
+		assertThat(observation.getFeatureOfInterest().getId()).isEqualTo(StaMapper.id("Pool:kinderland"));
 	}
 
 	@Test
