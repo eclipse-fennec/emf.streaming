@@ -29,6 +29,6 @@ Bundle-Description: Transport of the Fennec change stream over Gecko Messaging (
 	org.osgi.util.tracker;version=latest,\
 	org.osgi.dto;version=latest,\
 	org.eclipse.fennec.atlas.configuration.model;version=latest,\
-	org.eclipse.fennec.mapping.model;version=snapshot,\
-	org.eclipse.fennec.mapping;version=snapshot,\
+	org.eclipse.fennec.mapping.model;version=latest,\
+	org.eclipse.fennec.mapping;version=latest,\
 	org.eclipse.fennec.stream.mapping.model;version=snapshot

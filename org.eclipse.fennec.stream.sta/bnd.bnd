@@ -19,9 +19,9 @@ Bundle-Description: SensorThings API 1.1 as a projection target of the change st
 	org.eclipse.fennec.stream.model;version=snapshot,\
 	org.eclipse.fennec.stream.mapping.model;version=snapshot,\
 	org.eclipse.fennec.stream.sta.model;version=snapshot,\
-	org.eclipse.fennec.mapping.model;version=snapshot,\
+	org.eclipse.fennec.mapping.model;version=latest,\
 	org.eclipse.fennec.atlas.configuration.model;version=latest,\
-	org.eclipse.fennec.mapping;version=snapshot,\
+	org.eclipse.fennec.mapping;version=latest,\
 	org.eclipse.fennec.stream;version=snapshot,\
 	org.eclipse.fennec.stream.persistence;version=snapshot,\
 	org.eclipse.fennec.persistence.repository;version=latest,\

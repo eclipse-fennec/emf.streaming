@@ -12,7 +12,7 @@ Bundle-Description: OSGi integration tests of the SensorThings projection on JPA
 	org.eclipse.fennec.emf.osgi.api;version=latest,\
 	org.osgi.service.cm;version=latest,\
 	org.eclipse.fennec.atlas.configuration.model;version=latest,\
-	org.eclipse.fennec.mapping.model;version=snapshot,\
+	org.eclipse.fennec.mapping.model;version=latest,\
 	org.eclipse.fennec.stream.model;version=snapshot,\
 	org.eclipse.fennec.stream.mapping.model;version=snapshot,\
 	org.eclipse.fennec.stream.sta;version=snapshot,\

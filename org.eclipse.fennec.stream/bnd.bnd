@@ -12,8 +12,8 @@ Bundle-Description: Plain-Java core of the Fennec change stream: effective slot 
 	org.osgi.util.promise;version=latest,\
 	org.osgi.util.function;version=latest,\
 	org.eclipse.fennec.atlas.configuration.model;version=latest,\
-	org.eclipse.fennec.mapping.model;version=snapshot,\
-	org.eclipse.fennec.mapping;version=snapshot,\
+	org.eclipse.fennec.mapping.model;version=latest,\
+	org.eclipse.fennec.mapping;version=latest,\
 	org.eclipse.fennec.stream.model;version=snapshot,\
 	org.eclipse.fennec.stream.mapping.model;version=snapshot
 

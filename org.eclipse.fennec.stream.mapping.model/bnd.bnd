@@ -21,7 +21,7 @@ src=${^src},src-gen
 -buildpath: \
 	org.osgi.service.condition;version=latest,\
 	org.eclipse.fennec.atlas.configuration.model;version=latest,\
-	org.eclipse.fennec.mapping.model;version=snapshot
+	org.eclipse.fennec.mapping.model;version=latest
 
 -testpath: \
 	assertj-core
