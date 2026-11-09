@@ -216,7 +216,7 @@ public interface Datastream extends EObject {
 	 * @return the value of the '<em>Phenomenon Time Start</em>' attribute.
 	 * @see #setPhenomenonTimeStart(Date)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getDatastream_PhenomenonTimeStart()
-	 * @model annotation="https://eclipse.org/fennec/sta/wire interval='phenomenonTime' part='start'"
+	 * @model
 	 * @generated
 	 */
 	Date getPhenomenonTimeStart();
@@ -241,7 +241,7 @@ public interface Datastream extends EObject {
 	 * @return the value of the '<em>Phenomenon Time End</em>' attribute.
 	 * @see #setPhenomenonTimeEnd(Date)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getDatastream_PhenomenonTimeEnd()
-	 * @model annotation="https://eclipse.org/fennec/sta/wire interval='phenomenonTime' part='end'"
+	 * @model
 	 * @generated
 	 */
 	Date getPhenomenonTimeEnd();
@@ -266,7 +266,7 @@ public interface Datastream extends EObject {
 	 * @return the value of the '<em>Result Time Start</em>' attribute.
 	 * @see #setResultTimeStart(Date)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getDatastream_ResultTimeStart()
-	 * @model annotation="https://eclipse.org/fennec/sta/wire interval='resultTime' part='start'"
+	 * @model
 	 * @generated
 	 */
 	Date getResultTimeStart();
@@ -291,7 +291,7 @@ public interface Datastream extends EObject {
 	 * @return the value of the '<em>Result Time End</em>' attribute.
 	 * @see #setResultTimeEnd(Date)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getDatastream_ResultTimeEnd()
-	 * @model annotation="https://eclipse.org/fennec/sta/wire interval='resultTime' part='end'"
+	 * @model
 	 * @generated
 	 */
 	Date getResultTimeEnd();
