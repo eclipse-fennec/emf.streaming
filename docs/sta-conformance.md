@@ -42,6 +42,7 @@ the stages of emf.odata ADR-0010 still missing keep some tests red.
 | 2026-11-08 | refused before the first test: the root document was the OData one | wire profile (emf.odata#110) |
 | 2026-11-09 | 2 passed (`checkServiceRootUri`, `readNonexistentEntity`), 4 failed | `phenomenonTime`/`result` (emf.odata#119), property as `{"name":…}` (emf.odata#125), `$ref` on sets and `@iot.selfLink` in references (emf.odata#126) |
 | 2026-11-09 (#125, #126 in) | 2 passed, 4 failed — the property and reference reads pass; missing `description`s fixed | `phenomenonTime`/`result` (emf.odata#119), `$value` on `unitOfMeasurement` (emf.odata#130), `Things(…)/Datastreams(…)/Sensor/Datastreams` 400 ("no duplicates", emf.persistence-jpa#413) |
+| 2026-11-09 (wire mapping, #69–#71) | **5 passed, 1 failed** — `phenomenonTime`/`result` as wire properties, `unitOfMeasurement/$value` | `Things(…)/HistoricalLocations(…)/Locations(…)/HistoricalLocations` 400 ("no duplicates" over a many-to-many opposite, emf.persistence-jpa#415) |
 
 The suite reads `@iot.id` as a number; the STA projection derives numeric ids from its keys for
 that reason.

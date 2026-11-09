@@ -245,10 +245,15 @@ The `@iot.id` of an entity is a number derived from its key (`Pool:kinderland`,
 `Pool:kinderland.waterTemperature`, ...); the key is in `properties` (`parameters` of an
 observation) as `fennec.key`.
 
-> Not in STA form yet (emf.odata#110): `phenomenonTime` and `result` are still split into
-> `phenomenonTimeStart`/`resultNumber` ... (emf.odata#119), and `$value` of a complex property
-> such as `unitOfMeasurement` is 400 (emf.odata#130). A property reads as `{"name":…}`
-> (`propertyMember`), references as `{"@iot.selfLink":…}`.
+The profile also brings the STA wire properties over several attributes (`mapping()`, emf.odata#119):
+`phenomenonTime`, `resultTime` and `validTime` are ISO 8601 instants or intervals (`s/e`) over
+their start/end attributes, and `result` is the one set of `resultNumber`, `resultBoolean` and
+`resultText`. `$filter`, `$orderby` and `$select` work on these names and are pushed down to the
+attributes. A property reads as `{"name":…}`, `$value` also works for structured values
+(`unitOfMeasurement/$value`), and references read as `{"@iot.selfLink":…}`.
+
+> Not in STA form yet: JSON-valued properties (`properties`, `parameters`, `feature`) are written
+> as JSON text, not as objects (emf.odata#118).
 
 **MQTT extension**: `FennecStaMqttPublisher` publishes each stored observation as STA JSON on
 `v1.1/Observations`, `v1.1/Datastreams(<id>)/Observations` and

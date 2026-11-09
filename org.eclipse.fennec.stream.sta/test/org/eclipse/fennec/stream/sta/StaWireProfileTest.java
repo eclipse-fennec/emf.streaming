@@ -46,6 +46,7 @@ class StaWireProfileTest {
 		assertThat(profile.controls().type()).isNull();
 		assertThat(profile.absoluteLinks()).isTrue();
 		assertThat(profile.keyInBody(StaPackage.Literals.THING)).isFalse();
+		assertThat(profile.structuredRawValue()).isTrue();
 	}
 
 	@Test
