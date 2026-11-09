@@ -15,6 +15,7 @@ package org.eclipse.fennec.stream.sta;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import org.eclipse.emf.ecore.EClassifier;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.EcoreFactory;
 import org.eclipse.emf.ecore.EcorePackage;
+import org.eclipse.emf.ecore.InternalEObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.fennec.model.mapping.MappingFactory;
 import org.eclipse.fennec.model.mapping.ValueSource;
@@ -34,6 +36,7 @@ import org.eclipse.fennec.model.sta.Datastream;
 import org.eclipse.fennec.model.sta.Location;
 import org.eclipse.fennec.model.sta.Observation;
 import org.eclipse.fennec.model.sta.Thing;
+import org.eclipse.fennec.model.sta.UnitOfMeasurement;
 import org.eclipse.fennec.model.stream.ChangeEntry;
 import org.eclipse.fennec.model.stream.ChangeSet;
 import org.eclipse.fennec.model.stream.DeltaKind;
@@ -42,6 +45,8 @@ import org.eclipse.fennec.model.stream.StreamFactory;
 import org.eclipse.fennec.model.streammapping.StreamMapping;
 import org.eclipse.fennec.model.streammapping.StreamMappingFactory;
 import org.eclipse.fennec.model.streammapping.StreamSlot;
+import org.eclipse.fennec.model.units.UnitsFactory;
+import org.eclipse.fennec.model.units.catalog.UnitCatalogs;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -202,6 +207,55 @@ class StaMapperTest {
 		assertThat(datastream.getThing().getLocations()).extracting(Location::getDescription)
 				.containsExactly("Location of Kinderland");
 		assertThat(batch.observations().get(0).getFeatureOfInterest().getDescription()).isEqualTo("Pool kinderland");
+	}
+
+	@Test
+	void aUcumCodeInTheAnnotationTakesTheUnitFromTheCatalog() {
+		annotate(temperature, Map.of("code", "Cel"));
+		annotate(open, Map.of("code", "kg.m/s2"));
+		annotate(state, Map.of("code", "%", "name", "relative humidity"));
+
+		StaBatch batch = mapper.map(mapping,
+				changeSet(set(temperature, "27.5", 1_000L), set(open, "true", 1_000L), set(state, "x", 1_000L)));
+
+		assertThat(unitOf(batch, 0)).containsExactly("degree Celsius", "°C", "http://qudt.org/vocab/unit/DEG_C");
+		assertThat(unitOf(batch, 1)).containsExactly("kg.m/s2", "kg.m/s2", null);
+		assertThat(unitOf(batch, 2)).containsExactly("relative humidity", "%", "http://qudt.org/vocab/unit/PERCENT");
+	}
+
+	@Test
+	void aReferenceInTheAnnotationIsACatalogUnit() {
+		EAnnotation unit = annotate(temperature, Map.of());
+		InternalEObject proxy = (InternalEObject) UnitsFactory.eINSTANCE.createUnit();
+		proxy.eSetProxyURI(UnitCatalogs.unitUri("K"));
+		unit.getReferences().add(proxy);
+
+		StaBatch batch = mapper.map(mapping, changeSet(set(temperature, "300", 1_000L)));
+
+		assertThat(unitOf(batch, 0)).containsExactly("kelvin", "K", "http://qudt.org/vocab/unit/K");
+	}
+
+	@Test
+	void aConfiguredUcumCodeIsTheCatalogUnit() {
+		StaMapper withUnits = new StaMapper(TargetDescriber.IDS, Map.ofEntries(StaMapper.Unit.parse(NS + "#//Pool/temperature=K")));
+
+		StaBatch batch = withUnits.map(mapping, changeSet(set(temperature, "300", 1_000L)));
+
+		assertThat(unitOf(batch, 0)).containsExactly("kelvin", "K", "http://qudt.org/vocab/unit/K");
+	}
+
+	private static EAnnotation annotate(EAttribute feature, Map<String, String> details) {
+		feature.getEAnnotations().removeIf(annotation -> StaMapper.UNIT_ANNOTATION.equals(annotation.getSource()));
+		EAnnotation annotation = EcoreFactory.eINSTANCE.createEAnnotation();
+		annotation.setSource(StaMapper.UNIT_ANNOTATION);
+		annotation.getDetails().putAll(details);
+		feature.getEAnnotations().add(annotation);
+		return annotation;
+	}
+
+	private static List<String> unitOf(StaBatch batch, int observation) {
+		UnitOfMeasurement unit = batch.observations().get(observation).getDatastream().getUnitOfMeasurement();
+		return Arrays.asList(unit.getName(), unit.getSymbol(), unit.getDefinition());
 	}
 
 	@Test

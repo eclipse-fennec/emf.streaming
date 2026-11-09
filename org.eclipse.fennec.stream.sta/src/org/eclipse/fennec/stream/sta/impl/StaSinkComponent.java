@@ -76,7 +76,7 @@ public class StaSinkComponent implements StreamSink {
 		/**
 		 * @return the units of features by feature URI
 		 */
-		@AttributeDefinition(description = "Units of features whose model carries none: featureUri=name|symbol|definition")
+		@AttributeDefinition(description = "Units of features whose model carries none: featureUri=name|symbol|definition, or featureUri=<UCUM code> of the unit catalog (e.g. Cel)")
 		String[] units() default {};
 
 		/**
