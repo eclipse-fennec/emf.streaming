@@ -198,7 +198,7 @@ the store, without dropping any. It writes into a repository whose unit maps the
 "FennecStaSink": {
   "repository.target": "(persistence.repository.id=sta)",
   "describer.target": "(fennec.sta.describer=pool)",
-  "units": ["https://eclipse.org/fennec/ogc/example/bath/1.0#//Pool/waterTemperature=degree Celsius|°C|http://unitsofmeasure.org/ucum.html#para-30"]
+  "units": ["https://eclipse.org/fennec/ogc/example/bath/1.0#//Pool/waterTemperature=Cel"]
 }
 ```
 
@@ -206,13 +206,18 @@ the store, without dropping any. It writes into a repository whose unit maps the
   names a thing by its target id and gives it no location. The pool example reads name and
   geometry of the pool (`FennecPoolTargetDescriber`).
 - **Units.** The unit of a datastream is resolved in this order; the first match wins:
-  1. `units` of the sink, by feature URI (`name|symbol|definition`). Use it for models you
-     cannot change.
-  2. The neutral annotation `https://eclipse.org/fennec/unit` on the feature (`name`, `symbol`,
-     `definition`). This is the preferred place in your own models. A unit is part of what a
-     value means, like its type, so it belongs to the domain model. It is not a SensorThings
-     concept. Later it will be read as the unit aspect of model.metadata
-     (eclipse-fennec/model.metadata#33).
+  1. `units` of the sink, by feature URI: `name|symbol|definition`, or just a UCUM code of the
+     shared unit catalog (fennec.models, `https://eclipse.org/fennec/units`), e.g.
+     `…#//Pool/waterTemperature=Cel` → degree Celsius, °C, `http://qudt.org/vocab/unit/DEG_C`.
+     Use it for models you cannot change.
+  2. The shared annotation `https://eclipse.org/fennec/unit` on the feature. This is the
+     preferred place in your own models. A unit is part of what a value means, like its type, so
+     it belongs to the domain model; it is not a SensorThings concept. The annotation gives:
+     - a reference into the unit catalog (`references="https://eclipse.org/fennec/units#Cel"`;
+       generated packages drop annotation references, so prefer the code there), or
+     - the UCUM `code` (`code=Cel`); a code the catalog does not list (`kg.m/s2`) is its own name
+       and symbol;
+     - `name`, `symbol`, `definition` refine or replace what the catalog gives.
   3. *Deprecated:* the annotation `https://eclipse.org/fennec/sta` (`unit.name`, `unit.symbol`,
      `unit.definition`). Do not use it in new models. It puts STA-specific metadata into the
      domain model.

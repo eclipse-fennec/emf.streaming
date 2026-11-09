@@ -193,3 +193,6 @@ org.ow2.asm:asm-commons:9.9.1
 org.ow2.asm:asm-util:9.9.1
 org.ow2.asm:asm-tree:9.9.1
 org.ow2.asm:asm-analysis:9.9.1
+
+# Units of measurement and their catalog (fennec.models#18): the STA datastream unit by UCUM code.
+org.eclipse.fennec.models:org.eclipse.fennec.units.model:0.1.0-SNAPSHOT

@@ -130,7 +130,7 @@
     "repository.target": "(persistence.repository.id=sta)",
     "describer.target": "(fennec.sta.describer=pool)",
     "units": [
-      "https://eclipse.org/fennec/ogc/example/bath/1.0#//Pool/waterTemperature=degree Celsius|°C|http://unitsofmeasure.org/ucum.html#para-30",
+      "https://eclipse.org/fennec/ogc/example/bath/1.0#//Pool/waterTemperature=Cel",
       "https://eclipse.org/fennec/ogc/example/bath/1.0#//Pool/ph=pH|pH|"
     ]
   },

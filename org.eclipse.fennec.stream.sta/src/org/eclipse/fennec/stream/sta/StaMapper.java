@@ -48,6 +48,7 @@ import org.eclipse.fennec.model.stream.Recording;
 import org.eclipse.fennec.model.stream.support.StreamAddresses;
 import org.eclipse.fennec.model.streammapping.StreamMapping;
 import org.eclipse.fennec.model.streammapping.StreamSlot;
+import org.eclipse.fennec.model.units.catalog.UnitCatalogs;
 import org.eclipse.fennec.stream.StreamSlots;
 import org.eclipse.fennec.stream.StreamValues;
 
@@ -69,21 +70,23 @@ import org.eclipse.fennec.stream.StreamValues;
  * {@code <Class>.<feature>}) for observed properties and datastreams.
  * <p>
  * Keyframes, changelog entries and entries without a target feature yield nothing. The unit of a
- * datastream comes, first match wins, from the units given by feature URI, from the neutral
- * annotation {@value #UNIT_ANNOTATION} on the feature ({@code name}, {@code symbol},
- * {@code definition}), or from the deprecated annotation {@value #ANNOTATION}
- * ({@code unit.name}, {@code unit.symbol}, {@code unit.definition}).
+ * datastream comes, first match wins, from the units given by feature URI (a lone name that is a
+ * UCUM code of the unit catalog of fennec.models stands for that unit), from the shared
+ * annotation {@value #UNIT_ANNOTATION} on the feature (a reference into the unit catalog or a
+ * UCUM {@code code}, refined by {@code name}, {@code symbol}, {@code definition}), or from the
+ * deprecated annotation {@value #ANNOTATION} ({@code unit.name}, {@code unit.symbol},
+ * {@code unit.definition}).
  * <p>
  * Thread-safe; the target is described once per thing.
  */
 public final class StaMapper {
 
 	/**
-	 * Source of the neutral annotation on a target feature that gives the unit of its values
-	 * ({@code name}, {@code symbol}, {@code definition}). The unit is part of the meaning of a
-	 * value, not of SensorThings.
+	 * Source of the shared annotation on a target feature that gives the unit of its values
+	 * ({@link UnitCatalogs#ANNOTATION_SOURCE}). The unit is part of the meaning of a value, not
+	 * of SensorThings.
 	 */
-	public static final String UNIT_ANNOTATION = "https://eclipse.org/fennec/unit";
+	public static final String UNIT_ANNOTATION = UnitCatalogs.ANNOTATION_SOURCE;
 
 	/**
 	 * Source of the former STA-specific unit annotation ({@code unit.name}, {@code unit.symbol},
@@ -104,6 +107,8 @@ public final class StaMapper {
 	private static final StaFactory STA = StaFactory.eINSTANCE;
 
 	private final TargetDescriber describer;
+	private final UnitResolver resolver = new UnitResolver();
+
 	private final Map<String, Unit> units;
 	private final Map<String, TargetDescriber.Description> described = new ConcurrentHashMap<>();
 
@@ -145,11 +150,17 @@ public final class StaMapper {
 	/**
 	 * @param describer names and locates the target objects
 	 * @param units the units of features by feature URI, ahead of their annotations - for features
-	 *        of models that cannot be annotated
+	 *        of models that cannot be annotated; a unit with a name only that is a UCUM code of
+	 *        the unit catalog stands for the catalog unit
 	 */
 	public StaMapper(TargetDescriber describer, Map<String, Unit> units) {
 		this.describer = requireNonNull(describer, "TargetDescriber is required");
-		this.units = Map.copyOf(requireNonNull(units, "Units are required"));
+		Map<String, Unit> resolved = new LinkedHashMap<>();
+		requireNonNull(units, "Units are required").forEach((feature, unit) -> resolved.put(feature,
+				unit.symbol() == null && unit.definition() == null && unit.name() != null
+						? resolver.code(unit.name()).orElse(unit)
+						: unit));
+		this.units = Map.copyOf(resolved);
 	}
 
 	/**
@@ -352,18 +363,14 @@ public final class StaMapper {
 		return OM + "OM_Observation";
 	}
 
-	private static UnitOfMeasurement unit(EStructuralFeature feature, Unit given) {
+	private UnitOfMeasurement unit(EStructuralFeature feature, Unit given) {
 		UnitOfMeasurement unit = STA.createUnitOfMeasurement();
-		EAnnotation neutral = feature.getEAnnotation(UNIT_ANNOTATION);
+		Unit chosen = given != null ? given : resolver.annotated(feature).orElse(null);
 		EAnnotation legacy = feature.getEAnnotation(ANNOTATION);
-		if (given != null) {
-			unit.setName(given.name());
-			unit.setSymbol(given.symbol());
-			unit.setDefinition(given.definition());
-		} else if (neutral != null) {
-			unit.setName(neutral.getDetails().get("name"));
-			unit.setSymbol(neutral.getDetails().get("symbol"));
-			unit.setDefinition(neutral.getDetails().get("definition"));
+		if (chosen != null) {
+			unit.setName(chosen.name());
+			unit.setSymbol(chosen.symbol());
+			unit.setDefinition(chosen.definition());
 		} else if (legacy != null) {
 			unit.setName(legacy.getDetails().get("unit.name"));
 			unit.setSymbol(legacy.getDetails().get("unit.symbol"));
