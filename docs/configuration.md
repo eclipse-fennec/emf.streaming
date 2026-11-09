@@ -205,8 +205,12 @@ the store, without dropping any. It writes into a repository whose unit maps the
 - **`describer.target`** selects a `TargetDescriber` that names and locates a thing. The default
   names a thing by its target id and gives it no location. The pool example reads name and
   geometry of the pool (`FennecPoolTargetDescriber`).
-- **`units`** gives the unit of a feature by its URI, for models that carry no annotation
-  `https://eclipse.org/fennec/sta` (`unit.name`, `unit.symbol`, `unit.definition`).
+- **`units`** gives the unit of a feature by its URI (`name|symbol|definition`). This is the
+  preferred way: the domain model stays free of SensorThings information.
+- As a fallback only, a feature may carry the annotation `https://eclipse.org/fennec/sta`
+  (`unit.name`, `unit.symbol`, `unit.definition`). It is read when `units` names no unit for
+  the feature. Prefer the configuration — the annotation puts STA-specific metadata into the
+  domain model.
 
 emf.odata serves the repository, with the STA set names, in the SensorThings wire format of
 `FennecStaWireProfile` (`@iot.*` control information, absolute links, the STA root document):

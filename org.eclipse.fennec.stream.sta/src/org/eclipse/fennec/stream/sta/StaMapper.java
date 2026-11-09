@@ -64,7 +64,8 @@ import org.eclipse.fennec.stream.StreamValues;
  * else the change set's; resultTime = the change set's time; the result typed by the feature.</li>
  * </ul>
  * Keyframes, changelog entries and entries without a target feature yield nothing. The unit of a
- * datastream comes from the units given by feature URI, else from the feature's annotation
+ * datastream comes from the units given by feature URI (preferred, keeps the domain model free of
+ * STA metadata), else as a fallback from the feature's annotation
  * {@value #ANNOTATION} ({@code unit.name}, {@code unit.symbol}, {@code unit.definition}).
  * <p>
  * Thread-safe; the target is described once per thing.
