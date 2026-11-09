@@ -15,7 +15,7 @@ Bundle-Description: OSGi integration tests of the repository stream store on JPA
 	org.osgi.util.pushstream;version=latest,\
 	org.osgi.util.promise;version=latest,\
 	org.eclipse.fennec.atlas.configuration.model;version=latest,\
-	org.eclipse.fennec.mapping.model;version=snapshot,\
+	org.eclipse.fennec.mapping.model;version=latest,\
 	org.eclipse.fennec.stream.model;version=snapshot,\
 	org.eclipse.fennec.stream.mapping.model;version=snapshot,\
 	org.eclipse.fennec.stream;version=snapshot,\
@@ -25,4 +25,4 @@ Bundle-Description: OSGi integration tests of the repository stream store on JPA
 	assertj-core
 
 # Bundles the test run requires without compiling against them: build them first.
--dependson: org.eclipse.fennec.stream.persistence,org.eclipse.fennec.stream.osgi,org.eclipse.fennec.mapping.osgi,org.eclipse.fennec.mapping.ocl,org.eclipse.fennec.stream.mapping.model
+-dependson: org.eclipse.fennec.stream.persistence,org.eclipse.fennec.stream.osgi,org.eclipse.fennec.stream.mapping.model

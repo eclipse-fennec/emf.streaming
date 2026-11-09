@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -34,14 +33,10 @@ import org.eclipse.fennec.stream.persistence.RepositoryAccess;
 
 /**
  * Writes STA entities into a Fennec persistence repository; the repository's unit maps the STA
- * model, emf.odata serves it from there. Entities the repository does not hold yet are written in
- * stages, because a new graph whose types reference each other cannot be saved at once
- * (emf.persistence-jpa#409, workaround #57):
- * <ol>
- * <li>the new entities without references (attributes and contained values only);</li>
- * <li>their references, set on the stored instances;</li>
- * <li>the observations, referring to stored instances only.</li>
- * </ol>
+ * model, emf.odata serves it from there. A batch is saved in one {@code saveAll}: the observations
+ * with the entities the repository does not hold yet, their references to entities it holds already
+ * pointing at the stored instances.
+ * <p>
  * Entities are remembered once stored; new ones are stored one lane at a time, observations in
  * parallel. Thread-safe through the {@link RepositoryAccess}.
  */
@@ -62,16 +57,10 @@ public final class RepositoryStaWriter implements StaWriter {
 		requireNonNull(batch, "StaBatch is required");
 		try {
 			repositories.call(repository -> {
-				if (!batch.entities().stream().allMatch(entity -> stored.contains(key(entity)))) {
-					store(batch.entities(), repository);
-				}
-				Map<String, EObject> loaded = new HashMap<>();
-				List<EObject> observations = new ArrayList<>();
-				for (Observation observation : batch.observations()) {
-					observations.add(link(observation, repository, loaded));
-				}
-				if (!observations.isEmpty()) {
-					repository.saveAll(observations);
+				if (batch.entities().stream().allMatch(entity -> stored.contains(key(entity)))) {
+					save(new LinkedHashMap<>(), batch.observations(), repository);
+				} else {
+					store(batch, repository);
 				}
 				return null;
 			});
@@ -81,84 +70,73 @@ public final class RepositoryStaWriter implements StaWriter {
 	}
 
 	/**
-	 * Stores the entities not stored yet. One lane at a time: lanes of different targets share
-	 * sensors and observed properties, and two of them inserting the same one would collide.
+	 * Stores the entities not stored yet together with the observations. One lane at a time:
+	 * lanes of different targets share sensors and observed properties, and two of them inserting
+	 * the same one would collide.
 	 */
-	private void store(List<EObject> entities, Repository repository) throws IOException {
+	private void store(StaBatch batch, Repository repository) throws IOException {
 		synchronized (stored) {
 			Map<String, EObject> fresh = new LinkedHashMap<>();
-			for (EObject entity : entities) {
+			for (EObject entity : batch.entities()) {
 				if (!stored.contains(key(entity)) && !repository.exist(entity.eClass(), EcoreUtil.getID(entity))) {
 					fresh.put(key(entity), entity);
 				}
 			}
-			if (!fresh.isEmpty()) {
-				List<EObject> bare = new ArrayList<>();
-				for (EObject entity : fresh.values()) {
-					bare.add(withoutReferences(entity));
-				}
-				repository.saveAll(bare);
-				Map<String, EObject> loaded = new HashMap<>();
-				List<EObject> linked = new ArrayList<>();
-				for (EObject entity : fresh.values()) {
-					linked.add(link(entity, repository, loaded));
-				}
-				repository.saveAll(linked);
-			}
-			for (EObject entity : entities) {
+			save(fresh, batch.observations(), repository);
+			for (EObject entity : batch.entities()) {
 				stored.add(key(entity));
 			}
 		}
 	}
 
-	/** A new object with the attributes and contained values of the given one, and no references. */
-	private static EObject withoutReferences(EObject object) {
-		EObject bare = EcoreUtil.create(object.eClass());
-		for (EAttribute attribute : object.eClass().getEAllAttributes()) {
-			if (object.eIsSet(attribute) && attribute.isChangeable() && !attribute.isDerived()) {
-				bare.eSet(attribute, object.eGet(attribute));
-			}
+	/** Saves the new entities and the observations at once, their other references on stored instances. */
+	private static void save(Map<String, EObject> fresh, List<Observation> observations, Repository repository)
+			throws IOException {
+		for (Observation observation : observations) {
+			fresh.put(key(observation), observation);
 		}
-		for (EReference reference : object.eClass().getEAllContainments()) {
-			if (object.eIsSet(reference)) {
-				bare.eSet(reference, EcoreUtil.copy((EObject) object.eGet(reference)));
-			}
+		if (fresh.isEmpty()) {
+			return;
 		}
-		return bare;
+		Map<String, EObject> loaded = new HashMap<>();
+		for (EObject object : fresh.values()) {
+			attach(object, fresh, repository, loaded);
+		}
+		repository.saveAll(new ArrayList<>(fresh.values()));
 	}
 
-	/**
-	 * The object to save with its references on stored instances: an entity is replaced by its
-	 * stored instance, an observation is new and only refers to them. Only the owning side of a
-	 * one-to-many pair is set; the opposite follows.
-	 */
-	private static EObject link(EObject object, Repository repository, Map<String, EObject> loaded) throws IOException {
-		EObject target = object instanceof Observation ? withoutReferences(object) : stored(object, repository, loaded);
-		for (EReference reference : object.eClass().getEAllReferences()) {
-			if (reference.isContainment() || reference.isContainer() || !object.eIsSet(reference)) {
+	/** Points the references of a new entity that lead to entities stored already at the stored instances. */
+	private static void attach(EObject entity, Map<String, EObject> fresh, Repository repository,
+			Map<String, EObject> loaded) throws IOException {
+		for (EReference reference : entity.eClass().getEAllReferences()) {
+			if (reference.isContainment() || reference.isContainer() || !entity.eIsSet(reference)) {
 				continue;
-			}
-			EReference opposite = reference.getEOpposite();
-			if (reference.isMany() && opposite != null && !opposite.isMany()) {
-				continue; // the inverse side: set from the other end
 			}
 			if (reference.isMany()) {
 				@SuppressWarnings("unchecked")
-				List<EObject> values = (List<EObject>) object.eGet(reference);
-				@SuppressWarnings("unchecked")
-				List<EObject> targets = (List<EObject>) target.eGet(reference);
-				for (EObject value : values) {
-					EObject linked = stored(value, repository, loaded);
-					if (!targets.contains(linked)) {
-						targets.add(linked);
+				List<EObject> values = (List<EObject>) entity.eGet(reference);
+				for (EObject value : new ArrayList<>(values)) {
+					if (!isFresh(value, fresh)) {
+						EObject target = stored(value, repository, loaded);
+						if (target != value) {
+							values.remove(value);
+							if (!values.contains(target)) {
+								values.add(target);
+							}
+						}
 					}
 				}
 			} else {
-				EObject value = (EObject) object.eGet(reference);
-				target.eSet(reference, stored(value, repository, loaded));
+				EObject value = (EObject) entity.eGet(reference);
+				if (!isFresh(value, fresh)) {
+					entity.eSet(reference, stored(value, repository, loaded));
+				}
 			}
 		}
-		return target;
+	}
+
+	private static boolean isFresh(EObject value, Map<String, EObject> fresh) {
+		return value == null || EcoreUtil.getID(value) == null || fresh.containsKey(key(value));
 	}
 
 	private static EObject stored(EObject entity, Repository repository, Map<String, EObject> loaded) throws IOException {

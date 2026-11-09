@@ -24,6 +24,6 @@ Bundle-Description: The change stream on a Fennec persistence repository (JPA or
 
 -testpath: \
 	org.eclipse.fennec.persistence.capabilities;version=latest,\
-	org.eclipse.fennec.mapping.model;version=snapshot,\
+	org.eclipse.fennec.mapping.model;version=latest,\
 	org.eclipse.fennec.atlas.configuration.model;version=latest,\
 	assertj-core
