@@ -59,7 +59,7 @@ public class ObservedPropertyImpl extends MinimalEObjectImpl.Container implement
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String ID_EDEFAULT = null;
+	protected static final long ID_EDEFAULT = 0L;
 
 	/**
 	 * The cached value of the '{@link #getId() <em>Id</em>}' attribute.
@@ -69,7 +69,7 @@ public class ObservedPropertyImpl extends MinimalEObjectImpl.Container implement
 	 * @generated
 	 * @ordered
 	 */
-	protected String id = ID_EDEFAULT;
+	protected long id = ID_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getName() <em>Name</em>}' attribute.
@@ -186,7 +186,7 @@ public class ObservedPropertyImpl extends MinimalEObjectImpl.Container implement
 	 * @generated
 	 */
 	@Override
-	public String getId() {
+	public long getId() {
 		return id;
 	}
 
@@ -196,8 +196,8 @@ public class ObservedPropertyImpl extends MinimalEObjectImpl.Container implement
 	 * @generated
 	 */
 	@Override
-	public void setId(String newId) {
-		String oldId = id;
+	public void setId(long newId) {
+		long oldId = id;
 		id = newId;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, StaPackage.OBSERVED_PROPERTY__ID, oldId, id));
@@ -371,7 +371,7 @@ public class ObservedPropertyImpl extends MinimalEObjectImpl.Container implement
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case StaPackage.OBSERVED_PROPERTY__ID:
-				setId((String)newValue);
+				setId((Long)newValue);
 				return;
 			case StaPackage.OBSERVED_PROPERTY__NAME:
 				setName((String)newValue);
@@ -432,7 +432,7 @@ public class ObservedPropertyImpl extends MinimalEObjectImpl.Container implement
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case StaPackage.OBSERVED_PROPERTY__ID:
-				return ID_EDEFAULT == null ? id != null : !ID_EDEFAULT.equals(id);
+				return id != ID_EDEFAULT;
 			case StaPackage.OBSERVED_PROPERTY__NAME:
 				return NAME_EDEFAULT == null ? name != null : !NAME_EDEFAULT.equals(name);
 			case StaPackage.OBSERVED_PROPERTY__DEFINITION:

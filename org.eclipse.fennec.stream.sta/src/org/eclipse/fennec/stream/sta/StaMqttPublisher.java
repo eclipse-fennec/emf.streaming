@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.eclipse.fennec.model.sta.Datastream;
+import org.eclipse.fennec.model.sta.FeatureOfInterest;
 import org.eclipse.fennec.model.sta.Observation;
 import org.gecko.messaging.api.MessagePublisher;
 
@@ -69,15 +71,15 @@ public final class StaMqttPublisher implements StaListener {
 	 * @return the topics it is published on
 	 */
 	public List<String> topics(Observation observation) {
-		String datastream = observation.getDatastream() == null ? null : observation.getDatastream().getId();
-		String feature = observation.getFeatureOfInterest() == null ? null : observation.getFeatureOfInterest().getId();
+		Datastream datastream = observation.getDatastream();
+		FeatureOfInterest feature = observation.getFeatureOfInterest();
 		List<String> topics = new ArrayList<>();
 		topics.add(prefix + "/Observations");
 		if (datastream != null) {
-			topics.add(prefix + "/Datastreams(" + StaJson.key(datastream) + ")/Observations");
+			topics.add(prefix + "/Datastreams(" + StaJson.key(datastream.getId()) + ")/Observations");
 		}
 		if (feature != null) {
-			topics.add(prefix + "/FeaturesOfInterest(" + StaJson.key(feature) + ")/Observations");
+			topics.add(prefix + "/FeaturesOfInterest(" + StaJson.key(feature.getId()) + ")/Observations");
 		}
 		return topics;
 	}

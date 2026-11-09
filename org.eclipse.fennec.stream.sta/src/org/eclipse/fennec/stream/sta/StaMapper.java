@@ -12,6 +12,7 @@
  ********************************************************************/
 package org.eclipse.fennec.stream.sta;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.emf.common.util.Enumerator;
@@ -49,10 +51,12 @@ import org.eclipse.fennec.stream.StreamSlots;
 import org.eclipse.fennec.stream.StreamValues;
 
 /**
- * Turns a change set into STA entities (requirement MOD-09, D-25):
+ * Turns a change set into STA entities (requirement MOD-09, D-25). Every entity has a key; its
+ * {@code @iot.id} is a number derived from it ({@link #id(String)}), the key itself is kept in
+ * {@code properties} ({@code parameters} of an observation) as {@value #KEY}:
  * <ul>
  * <li>target object → Thing ({@code <Class>:<targetId>}), its location → Location, a
- * HistoricalLocation (since the first change set) and the FeatureOfInterest (all with the same id);</li>
+ * HistoricalLocation (since the first change set) and the FeatureOfInterest (all with the same key);</li>
  * <li>TIMESERIES slot of a target → Datastream ({@code <thing>.<feature>});</li>
  * <li>target feature → ObservedProperty ({@code <Class>.<feature>}, definition = feature URI);</li>
  * <li>source class of the slot → Sensor ({@code <mapping>:<SourceClass>});</li>
@@ -69,6 +73,9 @@ public final class StaMapper {
 
 	/** Source of the annotation on a target feature that gives the unit of its datastream. */
 	public static final String ANNOTATION = "https://eclipse.org/fennec/sta";
+
+	/** The member of {@code properties} (of {@code parameters}) holding the key of an entity. */
+	public static final String KEY = "fennec.key";
 
 	/** The encoding of locations and features of interest. */
 	public static final String GEO_JSON = "application/geo+json";
@@ -149,33 +156,49 @@ public final class StaMapper {
 			if (slot == null || slot.getTargetFeature() == null) {
 				continue;
 			}
+			String thingKey = thingId(target, entry.getObjectId());
 			Thing thing = thing(target, entry.getObjectId(), changeSet.getTimestamp(), entities);
-			Datastream datastream = datastream(mapping, slot, thing, entities);
+			Datastream datastream = datastream(mapping, slot, thing, thingKey, entities);
 			Observation observation = STA.createObservation();
-			observation.setId(changeSet.getId() + ":" + i);
+			String key = changeSet.getId() + ":" + i;
+			observation.setId(id(key));
+			observation.setParameters(keyJson(key));
 			observation.setPhenomenonTimeStart(new Date(StreamAddresses.eventTime(entry)));
 			observation.setResultTime(new Date(changeSet.getTimestamp()));
 			result(observation, StreamValues.decode(entry.getValueNew(), slot.getTargetFeature().getEType()));
 			observation.setDatastream(datastream);
-			observation.setFeatureOfInterest((FeatureOfInterest) entities.get(foiKey(thing.getId())));
+			observation.setFeatureOfInterest((FeatureOfInterest) entities.get(foiKey(thingKey)));
 			observations.add(observation);
 		}
 		return new StaBatch(new ArrayList<>(entities.values()), observations);
 	}
 
 	/**
+	 * The {@code @iot.id} of an entity: the first 63 bits of the name-based UUID of its key, never
+	 * 0. Stable, so a lane writes the same entity again without looking it up; STA clients and the
+	 * conformance suite expect numeric ids.
+	 *
+	 * @param key the key of the entity
+	 * @return its id
+	 */
+	public static long id(String key) {
+		long id = UUID.nameUUIDFromBytes(key.getBytes(UTF_8)).getMostSignificantBits() & Long.MAX_VALUE;
+		return id == 0 ? 1 : id;
+	}
+
+	/**
 	 * @param targetClass the class of a target object
 	 * @param targetId its id
-	 * @return the id of its thing
+	 * @return the key of its thing
 	 */
 	public static String thingId(EClass targetClass, String targetId) {
 		return targetClass.getName() + ":" + targetId;
 	}
 
 	/**
-	 * @param thingId the id of a thing
+	 * @param thingId the key of a thing
 	 * @param feature a target feature
-	 * @return the id of the datastream of that feature
+	 * @return the key of the datastream of that feature
 	 */
 	public static String datastreamId(String thingId, EStructuralFeature feature) {
 		return thingId + "." + feature.getName();
@@ -197,17 +220,20 @@ public final class StaMapper {
 		}
 		TargetDescriber.Description description = described.computeIfAbsent(id, key -> describe(target, targetId));
 		Thing thing = STA.createThing();
-		thing.setId(id);
+		thing.setId(id(id));
+		thing.setProperties(keyJson(id));
 		thing.setName(description.name());
 		thing.setDescription(description.description());
 		FeatureOfInterest foi = STA.createFeatureOfInterest();
-		foi.setId(id);
+		foi.setId(id(id));
+		foi.setProperties(keyJson(id));
 		foi.setName(description.name());
 		foi.setEncodingType(GEO_JSON);
 		foi.setFeature(description.geoJson());
 		if (description.geoJson() != null) {
 			Location location = STA.createLocation();
-			location.setId(id);
+			location.setId(id(id));
+			location.setProperties(keyJson(id));
 			location.setName(description.name());
 			location.setEncodingType(GEO_JSON);
 			location.setLocation(description.geoJson());
@@ -215,7 +241,7 @@ public final class StaMapper {
 			thing.getLocations().add(location);
 			// STA: setting the location of a thing records it in its history
 			HistoricalLocation history = STA.createHistoricalLocation();
-			history.setId(id);
+			history.setId(id(id));
 			history.setTime(new Date(since));
 			history.setThing(thing);
 			history.getLocations().add(location);
@@ -234,15 +260,18 @@ public final class StaMapper {
 		return description;
 	}
 
-	private Datastream datastream(StreamMapping mapping, StreamSlot slot, Thing thing, Map<String, EObject> entities) {
+	private Datastream datastream(StreamMapping mapping, StreamSlot slot, Thing thing, String thingKey,
+			Map<String, EObject> entities) {
 		EStructuralFeature feature = slot.getTargetFeature();
-		String id = datastreamId(thing.getId(), feature);
+		String id = datastreamId(thingKey, feature);
 		if (entities.get(id) instanceof Datastream known) {
 			return known;
 		}
 		ObservedProperty property = (ObservedProperty) entities.computeIfAbsent("property:" + StreamSlots.address(slot), key -> {
 			ObservedProperty created = STA.createObservedProperty();
-			created.setId(feature.getEContainingClass().getName() + "." + feature.getName());
+			String propertyKey = feature.getEContainingClass().getName() + "." + feature.getName();
+			created.setId(id(propertyKey));
+			created.setProperties(keyJson(propertyKey));
 			created.setName(feature.getName());
 			created.setDefinition(StreamSlots.address(slot));
 			return created;
@@ -251,14 +280,16 @@ public final class StaMapper {
 		String sensorId = mapping.getId() + ":" + (source == null ? "?" : source.getName());
 		Sensor sensor = (Sensor) entities.computeIfAbsent("sensor:" + sensorId, key -> {
 			Sensor created = STA.createSensor();
-			created.setId(sensorId);
+			created.setId(id(sensorId));
+			created.setProperties(keyJson(sensorId));
 			created.setName(source == null ? sensorId : source.getName());
 			created.setEncodingType("text/plain");
 			created.setMetadata("Stream mapping " + mapping.getId() + (source == null ? "" : ", source " + Mappings.uriOf(source)));
 			return created;
 		});
 		Datastream datastream = STA.createDatastream();
-		datastream.setId(id);
+		datastream.setId(id(id));
+		datastream.setProperties(keyJson(id));
 		datastream.setName(thing.getName() + " " + feature.getName());
 		datastream.setObservationType(observationType(feature));
 		datastream.setUnitOfMeasurement(unit(feature, units.get(StreamSlots.address(slot))));
@@ -312,6 +343,10 @@ public final class StaMapper {
 		} else if (value != null) {
 			observation.setResultText(String.valueOf(value));
 		}
+	}
+
+	private static String keyJson(String key) {
+		return "{" + StaJson.string(KEY) + ":" + StaJson.string(key) + "}";
 	}
 
 	private static String locationKey(String thingId) {

@@ -40,7 +40,7 @@ public class StaEPackageConfigurator implements EPackageConfigurator {
 	 * service property.
 	 * @generated
 	 */
-	public static final String FINGERPRINT = "fp1:f4e0e35b7a3cf68ef4fd24fd91d1e1b6e02fad7d6b7afaecac102751ecc3074b";
+	public static final String FINGERPRINT = "fp1:5749ae11e3c50edfea95f8265646b9cd1c65c7c2f02eb72d462e93f335410838";
 
 	private StaPackage ePackage;
 

@@ -28,7 +28,8 @@ Bundle-Description: SensorThings API 1.1 as a projection target of the change st
 	org.eclipse.fennec.persistence.query;version=latest,\
 	org.eclipse.fennec.query.model;version=latest,\
 	org.eclipse.fennec.command.model;version=latest,\
-	org.eclipse.fennec.expression.model;version=latest
+	org.eclipse.fennec.expression.model;version=latest,\
+	org.eclipse.fennec.odata.wire.api;version=latest
 
 # The in-memory broker of Gecko Messaging carries the plain JUnit tests.
 -testpath: \

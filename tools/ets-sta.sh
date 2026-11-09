@@ -53,8 +53,8 @@ run)
 		echo "ets-sta10 against $IUT: refused with HTTP $STATUS - $(sed -n 's:.*<p>\(.*\)</p>.*:\1:p' "$REPORT")" >&2
 		exit 1
 	fi
-	PASSED=$(grep -c 'earl:passed' "$REPORT" || true)
-	FAILED=$(grep -c 'earl:failed' "$REPORT" || true)
+	PASSED=$(grep -c 'earl#passed' "$REPORT" || true)
+	FAILED=$(grep -c 'earl#failed' "$REPORT" || true)
 	echo "ets-sta10 against $IUT: $PASSED passed, $FAILED failed - $REPORT"
 	;;
 down)

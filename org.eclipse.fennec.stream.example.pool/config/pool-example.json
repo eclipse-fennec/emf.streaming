@@ -142,6 +142,7 @@
   },
   "org.eclipse.fennec.odata.servlet~sta": {
     "osgi.http.whiteboard.servlet.pattern": "/sta/v1.1/*",
+    "wireProfile.target": "(odata.wire.profile=sta)",
     "odata.model.entitysets": [
       "Things=https://eclipse.org/fennec/sta/1.1#Thing",
       "Locations=https://eclipse.org/fennec/sta/1.1#Location",

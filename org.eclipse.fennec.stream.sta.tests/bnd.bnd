@@ -15,6 +15,7 @@ Bundle-Description: OSGi integration tests of the SensorThings projection on JPA
 	org.eclipse.fennec.mapping.model;version=snapshot,\
 	org.eclipse.fennec.stream.model;version=snapshot,\
 	org.eclipse.fennec.stream.mapping.model;version=snapshot,\
+	org.eclipse.fennec.stream.sta;version=snapshot,\
 	org.eclipse.fennec.stream.sta.model;version=snapshot,\
 	org.eclipse.fennec.stream;version=snapshot,\
 	org.eclipse.fennec.persistence.repository;version=latest,\

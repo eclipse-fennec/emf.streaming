@@ -27,7 +27,7 @@ The concept and the first metamodel come from the *unified persistence* work in
 | `org.eclipse.fennec.stream.persistence` | Store and projection on a Fennec persistence repository (JPA or Mongo): change sets as ordinary models, slot values by update commands |
 | `org.eclipse.fennec.stream.tck` | The store contract as JUnit 5 tests to extend; the in-memory and the repository store run it |
 | `org.eclipse.fennec.stream.sta.model` | The OGC SensorThings API 1.1 data model (Thing, Location, Datastream, Sensor, ObservedProperty, Observation, FeatureOfInterest) |
-| `org.eclipse.fennec.stream.sta` | SensorThings as a projection target: a stream sink that turns the entries of TIMESERIES slots into observations in a persistence repository; MQTT extension ([docs/sta-conformance.md](docs/sta-conformance.md): conformance test) |
+| `org.eclipse.fennec.stream.sta` | SensorThings as a projection target: a stream sink that turns the entries of TIMESERIES slots into observations in a persistence repository; the STA wire profile for emf.odata; MQTT extension ([docs/sta-conformance.md](docs/sta-conformance.md): conformance test) |
 | `org.eclipse.fennec.stream.messaging` | Transport over Gecko Messaging: channels per object, CloudEvents, payload codec SPI, retained keyframes ([docs/transport.md](docs/transport.md)) |
 | `org.eclipse.fennec.stream.codec.json` | JSON payload through the Fennec EMF codec |
 

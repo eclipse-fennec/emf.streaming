@@ -208,7 +208,8 @@ the store, without dropping any. It writes into a repository whose unit maps the
 - **`units`** gives the unit of a feature by its URI, for models that carry no annotation
   `https://eclipse.org/fennec/sta` (`unit.name`, `unit.symbol`, `unit.definition`).
 
-emf.odata serves the repository, with the STA set names:
+emf.odata serves the repository, with the STA set names, in the SensorThings wire format of
+`FennecStaWireProfile` (`@iot.*` control information, absolute links, the STA root document):
 
 ```json
 "org.eclipse.fennec.odata.persistence.repository~sta": {
@@ -217,15 +218,22 @@ emf.odata serves the repository, with the STA set names:
 },
 "org.eclipse.fennec.odata.servlet~sta": {
   "osgi.http.whiteboard.servlet.pattern": "/sta/v1.1/*",
+  "wireProfile.target": "(odata.wire.profile=sta)",
   "odata.model.entitysets": ["Things=https://eclipse.org/fennec/sta/1.1#Thing", "Datastreams=https://eclipse.org/fennec/sta/1.1#Datastream", "..."]
 }
 ```
 
-> The STA model carries the STA names, so paths and `$expand` already read as in STA
-> (`Datastreams('…')/Observations`, `$expand=Thing`). Until the wire profile SPI of emf.odata#110 is
-> in place and implemented here, the endpoint still answers in OData form (`@odata.*`, interval and
-> result split into `phenomenonTimeStart`/`resultNumber` …), which STA clients do not understand yet
-> (#55).
+`odata.base.url` sets the absolute URL of the links when the request does not tell it (behind a
+proxy). `FennecStaWireProfile` runs without configuration; `mqtt.endpoints` announces the MQTT
+extension in the root document.
+
+The `@iot.id` of an entity is a number derived from its key (`Pool:kinderland`,
+`Pool:kinderland.waterTemperature`, ...); the key is in `properties` (`parameters` of an
+observation) as `fennec.key`.
+
+> Not in STA form yet (emf.odata#110): `phenomenonTime` and `result` are still split into
+> `phenomenonTimeStart`/`resultNumber` ... (emf.odata#119), a property reads as `{"value":…}`
+> (emf.odata#125), references as `@odata.id` (emf.odata#126).
 
 **MQTT extension**: `FennecStaMqttPublisher` publishes each stored observation as STA JSON on
 `v1.1/Observations`, `v1.1/Datastreams(<id>)/Observations` and

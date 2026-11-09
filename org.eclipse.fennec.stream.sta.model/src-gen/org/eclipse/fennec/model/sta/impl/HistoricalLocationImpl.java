@@ -59,7 +59,7 @@ public class HistoricalLocationImpl extends MinimalEObjectImpl.Container impleme
 	 * @generated
 	 * @ordered
 	 */
-	protected static final String ID_EDEFAULT = null;
+	protected static final long ID_EDEFAULT = 0L;
 
 	/**
 	 * The cached value of the '{@link #getId() <em>Id</em>}' attribute.
@@ -69,7 +69,7 @@ public class HistoricalLocationImpl extends MinimalEObjectImpl.Container impleme
 	 * @generated
 	 * @ordered
 	 */
-	protected String id = ID_EDEFAULT;
+	protected long id = ID_EDEFAULT;
 
 	/**
 	 * The default value of the '{@link #getTime() <em>Time</em>}' attribute.
@@ -136,7 +136,7 @@ public class HistoricalLocationImpl extends MinimalEObjectImpl.Container impleme
 	 * @generated
 	 */
 	@Override
-	public String getId() {
+	public long getId() {
 		return id;
 	}
 
@@ -146,8 +146,8 @@ public class HistoricalLocationImpl extends MinimalEObjectImpl.Container impleme
 	 * @generated
 	 */
 	@Override
-	public void setId(String newId) {
-		String oldId = id;
+	public void setId(long newId) {
+		long oldId = id;
 		id = newId;
 		if (eNotificationRequired())
 			eNotify(new ENotificationImpl(this, Notification.SET, StaPackage.HISTORICAL_LOCATION__ID, oldId, id));
@@ -317,7 +317,7 @@ public class HistoricalLocationImpl extends MinimalEObjectImpl.Container impleme
 	public void eSet(int featureID, Object newValue) {
 		switch (featureID) {
 			case StaPackage.HISTORICAL_LOCATION__ID:
-				setId((String)newValue);
+				setId((Long)newValue);
 				return;
 			case StaPackage.HISTORICAL_LOCATION__TIME:
 				setTime((Date)newValue);
@@ -366,7 +366,7 @@ public class HistoricalLocationImpl extends MinimalEObjectImpl.Container impleme
 	public boolean eIsSet(int featureID) {
 		switch (featureID) {
 			case StaPackage.HISTORICAL_LOCATION__ID:
-				return ID_EDEFAULT == null ? id != null : !ID_EDEFAULT.equals(id);
+				return id != ID_EDEFAULT;
 			case StaPackage.HISTORICAL_LOCATION__TIME:
 				return TIME_EDEFAULT == null ? time != null : !TIME_EDEFAULT.equals(time);
 			case StaPackage.HISTORICAL_LOCATION__THING:
