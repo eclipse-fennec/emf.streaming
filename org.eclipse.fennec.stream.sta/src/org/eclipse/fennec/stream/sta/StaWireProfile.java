@@ -99,6 +99,12 @@ public class StaWireProfile implements WireProfile {
 		return requireNonNull(property, "Property is required").getName();
 	}
 
+	/** STA addresses the raw value of any property, {@code Datastreams(1)/unitOfMeasurement/$value} (9.2.5). */
+	@Override
+	public boolean structuredRawValue() {
+		return true;
+	}
+
 	@Override
 	public Optional<WireMapping> mapping() {
 		return Optional.of(mapping);
