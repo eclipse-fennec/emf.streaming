@@ -20,14 +20,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.fennec.odata.wire.api.ControlNames;
 import org.eclipse.fennec.odata.wire.api.ServiceRoot;
 import org.eclipse.fennec.odata.wire.api.WireProfile;
 
 /**
  * The SensorThings API 1.1 wire format on an emf.odata service root (emf.odata ADR-0010):
- * {@code @iot.*} control information with absolute links, the key only as {@code @iot.id}, and
- * the STA root document with its server settings. Querying, paging and {@code $metadata} stay
+ * {@code @iot.*} control information with absolute links, the key only as {@code @iot.id}, a
+ * property value under the property's own name ({@code {"name":"…"}}, 9.2.4), and the STA root
+ * document with its server settings. Querying, paging and {@code $metadata} stay
  * those of the OData runtime.
  */
 public class StaWireProfile implements WireProfile {
@@ -76,6 +78,11 @@ public class StaWireProfile implements WireProfile {
 	@Override
 	public boolean absoluteLinks() {
 		return true;
+	}
+
+	@Override
+	public String propertyMember(EStructuralFeature property) {
+		return requireNonNull(property, "Property is required").getName();
 	}
 
 	@Override
