@@ -112,6 +112,44 @@ feature path) yields the target id, and `cacheable` marks a stable result. Missi
 - **mapping tables** as a resolver kind;
 - **fetching** secondary objects, lazy or eager.
 
+#### Loading secondary objects through proxy URIs
+
+EMF already has the mechanism to load an object on demand: a **proxy** with a URI, resolved when
+it is first accessed. The platform uses it for secondary objects:
+
+- **Every secondary source has a base URI.** Where the GeoJSON pools come from has to be
+  configured anyway: a REST or OpenAPI interface, a database, a file. That configuration yields
+  the base URI of all potential GeoJSON pools, e.g. `https://gis.example.org/pools/` or a
+  persistence URI of a repository.
+- **The resolved id completes the URI.** Once the identity map (below) gives the secondary id
+  of a primary object, the URI of the secondary object is the base URI plus that id:
+  `https://gis.example.org/pools/GP-0815`.
+- **The object is a proxy until needed.** The composed object references the secondary object as
+  a proxy with this URI. Resolving it loads the instance from its source through the matching
+  resource factory (REST, persistence, CSV) and puts it into the object store. **Lazy** means
+  resolving on first access; **eager** means resolving when the primary object arrives.
+
+So a join needs no special loader per source: the source is a resource behind a URI, and EMF's
+proxy resolution does the fetching.
+
+#### The identity map
+
+Before any of this, the platform has to know **which ids belong together**: which temperature and
+pH sensors belong to which pool, and which GeoJSON pool belongs to which pool. These assignments
+are made somewhere, and that somewhere is a model: an **identity map** for a whole set of
+EClasses, saying where the data comes from and which ids correspond.
+
+- **Static assignments** for small, stable sets: sensors `5` and `12` belong to pool `8`.
+- **Mapping tables** for larger or external sets: the GeoJSON pools come from a CSV file. The file
+  is loaded and becomes EMF objects; each row says that pool `8` (feature `poolId`) corresponds to
+  GeoJSON pool `GP-0815` (feature `geoJsonPool`). The map records the file's name and location.
+- **Rules** where an assignment is computed rather than listed (OCL, a function).
+- **Sources:** for each EClass, the base URI its objects are loaded from (see above).
+
+With that, the identity map is a complete picture: which ids belong together and where each
+object comes from. Stream mapping (sensor → pool) and join (pool → GeoJSON pool → OGC feature)
+use the same map.
+
 ### 3.4 The object store
 
 The central piece, and the main missing building block. It starts in emf.streaming and can move
@@ -215,6 +253,8 @@ Nothing is generated as code. A new service is a model change.
 | **Object store** (cache, events, eviction, lifecycle) | **missing** | starts in emf.streaming |
 | **Windowing / batching / coalescing** per source and listener | **missing** (window types exist in the stream mapping) | emf.streaming |
 | **Join / composition** (primary, secondary, mapping tables, lazy/eager) | **missing** | mapping model + store |
+| **Identity map** (static assignments, CSV mapping tables, base URIs per EClass) | **missing** | mapping model |
+| Loading secondary objects on demand | mechanism exists (EMF proxies); resource factories per source kind partly missing | EMF, emf.persistence-jpa |
 | **Generating an Ecore from a mapping** | **missing** | |
 | **REST model ⇄ DDSR mapping, OpenAPI** | **missing** | emf.services |
 | **Rule engine** | **draft** | emf.matter (`rule-language.md`) |
@@ -231,6 +271,10 @@ Nothing is generated as code. A new service is a model change.
   whether both live in the mapping (§3.2).
 - **Join model:** primary/secondary roles and mapping tables as an extension of
   `IdentityResolution`, or a composition model of its own.
+- **Identity map:** whether it is part of the mapping model or a model of its own that several
+  mappings share; how a mapping table (CSV, database) is described and kept up to date.
+- **Proxy resolution:** which resource factories exist per source kind (REST/OpenAPI, persistence,
+  CSV), and how a failed resolution is handled (retry, leave the proxy, event).
 - **Generated Ecore:** how a generated model evolves when the mapping changes (versions,
   fingerprints, the metadata of `emf.osgi`).
 - **Service design:** what the REST model looks like and where it lives (emf.services or
@@ -243,7 +287,8 @@ The pool example end to end, as the first proof:
 1. Sensors (MQTT) → stream with source deadband → `Pool.currentTemperature`, `Pool.currentPh`
    (largely exists today; see the pool example).
 2. Object store holding the pools; persistence as a listener.
-3. `GeoJsonPool` as a secondary source, joined into an OGC feature via `Pool.id` /
-   `GeoJsonPool.poolId`, served through emf.ogc.features.
-4. A generated Ecore of the OGC feature, registered in the model atlas.
-5. A REST model with `GET /pools/{id}`, mapped to DDSR, with a generated OpenAPI.
+3. An identity map: sensors → pools (static), pools → GeoJSON pools (a CSV mapping table).
+4. `GeoJsonPool` as a secondary source behind a base URI, loaded as a proxy and joined into an
+   OGC feature, served through emf.ogc.features.
+5. A generated Ecore of the OGC feature, registered in the model atlas.
+6. A REST model with `GET /pools/{id}`, mapped to DDSR, with a generated OpenAPI.
