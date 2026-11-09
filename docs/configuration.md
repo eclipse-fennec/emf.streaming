@@ -246,8 +246,9 @@ The `@iot.id` of an entity is a number derived from its key (`Pool:kinderland`,
 observation) as `fennec.key`.
 
 > Not in STA form yet (emf.odata#110): `phenomenonTime` and `result` are still split into
-> `phenomenonTimeStart`/`resultNumber` ... (emf.odata#119), a property reads as `{"value":…}`
-> (emf.odata#125), references as `@odata.id` (emf.odata#126).
+> `phenomenonTimeStart`/`resultNumber` ... (emf.odata#119), and `$value` of a complex property
+> such as `unitOfMeasurement` is 400 (emf.odata#130). A property reads as `{"name":…}`
+> (`propertyMember`), references as `{"@iot.selfLink":…}`.
 
 **MQTT extension**: `FennecStaMqttPublisher` publishes each stored observation as STA JSON on
 `v1.1/Observations`, `v1.1/Datastreams(<id>)/Observations` and

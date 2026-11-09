@@ -28,6 +28,7 @@ import org.eclipse.emf.ecore.EAnnotation;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.fennec.mapping.Mappings;
 import org.eclipse.fennec.model.mapping.Slot;
 import org.eclipse.fennec.model.sta.Datastream;
@@ -63,6 +64,10 @@ import org.eclipse.fennec.stream.StreamValues;
  * <li>SET entry → Observation ({@code <changeSet>:<index>}): phenomenonTime = the entry's time,
  * else the change set's; resultTime = the change set's time; the result typed by the feature.</li>
  * </ul>
+ * Every entity gets the description STA requires: the target describer's for a thing (else
+ * {@code <Class> <targetId>}), the GenModel documentation of the feature (else
+ * {@code <Class>.<feature>}) for observed properties and datastreams.
+ * <p>
  * Keyframes, changelog entries and entries without a target feature yield nothing. The unit of a
  * datastream comes, first match wins, from the units given by feature URI, from the neutral
  * annotation {@value #UNIT_ANNOTATION} on the feature ({@code name}, {@code symbol},
@@ -238,11 +243,13 @@ public final class StaMapper {
 		thing.setId(id(id));
 		thing.setProperties(keyJson(id));
 		thing.setName(description.name());
-		thing.setDescription(description.description());
+		thing.setDescription(description.description() != null ? description.description()
+				: target.getName() + " " + targetId);
 		FeatureOfInterest foi = STA.createFeatureOfInterest();
 		foi.setId(id(id));
 		foi.setProperties(keyJson(id));
 		foi.setName(description.name());
+		foi.setDescription(thing.getDescription());
 		foi.setEncodingType(GEO_JSON);
 		foi.setFeature(description.geoJson());
 		if (description.geoJson() != null) {
@@ -250,6 +257,7 @@ public final class StaMapper {
 			location.setId(id(id));
 			location.setProperties(keyJson(id));
 			location.setName(description.name());
+			location.setDescription("Location of " + description.name());
 			location.setEncodingType(GEO_JSON);
 			location.setLocation(description.geoJson());
 			entities.put(locationKey(id), location);
@@ -275,6 +283,13 @@ public final class StaMapper {
 		return description;
 	}
 
+	/** The documentation of a feature (GenModel), else its qualified name. */
+	private static String describe(EStructuralFeature feature) {
+		String documentation = EcoreUtil.getDocumentation(feature);
+		return documentation != null && !documentation.isBlank() ? documentation
+				: feature.getEContainingClass().getName() + "." + feature.getName();
+	}
+
 	private Datastream datastream(StreamMapping mapping, StreamSlot slot, Thing thing, String thingKey,
 			Map<String, EObject> entities) {
 		EStructuralFeature feature = slot.getTargetFeature();
@@ -288,6 +303,7 @@ public final class StaMapper {
 			created.setId(id(propertyKey));
 			created.setProperties(keyJson(propertyKey));
 			created.setName(feature.getName());
+			created.setDescription(describe(feature));
 			created.setDefinition(StreamSlots.address(slot));
 			return created;
 		});
@@ -298,6 +314,8 @@ public final class StaMapper {
 			created.setId(id(sensorId));
 			created.setProperties(keyJson(sensorId));
 			created.setName(source == null ? sensorId : source.getName());
+			created.setDescription(source == null ? "Sensor of stream mapping " + mapping.getId()
+					: source.getName() + " of stream mapping " + mapping.getId());
 			created.setEncodingType("text/plain");
 			created.setMetadata("Stream mapping " + mapping.getId() + (source == null ? "" : ", source " + Mappings.uriOf(source)));
 			return created;
@@ -306,6 +324,7 @@ public final class StaMapper {
 		datastream.setId(id(id));
 		datastream.setProperties(keyJson(id));
 		datastream.setName(thing.getName() + " " + feature.getName());
+		datastream.setDescription(describe(feature) + " of " + thing.getName());
 		datastream.setObservationType(observationType(feature));
 		datastream.setUnitOfMeasurement(unit(feature, units.get(StreamSlots.address(slot))));
 		datastream.setThing(thing);

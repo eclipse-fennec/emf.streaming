@@ -189,6 +189,22 @@ class StaMapperTest {
 	}
 
 	@Test
+	void everyEntityCarriesTheDescriptionStaRequires() {
+		EcoreUtil.setDocumentation(temperature, "Water temperature");
+
+		StaBatch batch = mapper.map(mapping, changeSet(set(temperature, "27.5", 1_000L)));
+
+		Datastream datastream = batch.observations().get(0).getDatastream();
+		assertThat(datastream.getDescription()).isEqualTo("Water temperature of Kinderland");
+		assertThat(datastream.getObservedProperty().getDescription()).isEqualTo("Water temperature");
+		assertThat(datastream.getSensor().getDescription()).isEqualTo("Probe of stream mapping pool-sta");
+		assertThat(datastream.getThing().getDescription()).isEqualTo("Pool kinderland");
+		assertThat(datastream.getThing().getLocations()).extracting(Location::getDescription)
+				.containsExactly("Location of Kinderland");
+		assertThat(batch.observations().get(0).getFeatureOfInterest().getDescription()).isEqualTo("Pool kinderland");
+	}
+
+	@Test
 	@SuppressWarnings("deprecation")
 	void theFormerStaAnnotationIsAFallbackBehindTheNeutralOne() {
 		EAnnotation legacy = EcoreFactory.eINSTANCE.createEAnnotation();

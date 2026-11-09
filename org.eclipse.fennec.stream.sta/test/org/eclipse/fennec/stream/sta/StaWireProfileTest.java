@@ -45,6 +45,14 @@ class StaWireProfileTest {
 	}
 
 	@Test
+	void aPropertyValueIsNamedAfterTheProperty() {
+		StaWireProfile profile = new StaWireProfile();
+
+		assertThat(profile.propertyMember(StaPackage.Literals.THING__NAME)).isEqualTo("name");
+		assertThat(profile.propertyMember(StaPackage.Literals.DATASTREAM__UNIT_OF_MEASUREMENT)).isEqualTo("unitOfMeasurement");
+	}
+
+	@Test
 	void theRootDocumentListsTheSetsWithAbsoluteUrlsAndTheConformanceClasses() {
 		String document = new StaWireProfile().serviceDocument(ROOT).orElseThrow();
 
