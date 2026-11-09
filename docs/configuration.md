@@ -252,8 +252,9 @@ their start/end attributes, and `result` is the one set of `resultNumber`, `resu
 attributes. A property reads as `{"name":…}`, `$value` also works for structured values
 (`unitOfMeasurement/$value`), and references read as `{"@iot.selfLink":…}`.
 
-> Not in STA form yet: JSON-valued properties (`properties`, `parameters`, `feature`) are written
-> as JSON text, not as objects (emf.odata#118).
+Every `JsonObject` and `GeoJson` attribute (`properties`, `parameters`, `resultQuality`,
+`location`, `feature`, `observedArea`) is written and read as the JSON object itself, not as a
+string; such properties are not filterable.
 
 **MQTT extension**: `FennecStaMqttPublisher` publishes each stored observation as STA JSON on
 `v1.1/Observations`, `v1.1/Datastreams(<id>)/Observations` and

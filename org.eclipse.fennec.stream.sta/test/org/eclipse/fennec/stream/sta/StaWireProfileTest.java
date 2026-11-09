@@ -16,7 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 
+import org.eclipse.emf.ecore.EClass;
 import org.eclipse.fennec.model.sta.StaPackage;
+import org.eclipse.fennec.odata.wire.api.JsonTextHandler;
 import org.eclipse.fennec.odata.wire.api.ServiceRoot;
 import org.eclipse.fennec.odata.wire.mapping.ClassMapping;
 import org.eclipse.fennec.odata.wire.mapping.WireMapping;
@@ -58,22 +60,35 @@ class StaWireProfileTest {
 	}
 
 	@Test
-	void theWirePropertiesOfDatastreamAndObservationHaveAHandlerEach() {
+	void everyWirePropertyHasAHandlerOfItsShape() {
 		StaWireProfile profile = new StaWireProfile();
 		WireMapping mapping = profile.mapping().orElseThrow();
 
-		assertThat(mapping.getClasses()).extracting(ClassMapping::getEClass)
-				.containsExactly(StaPackage.Literals.DATASTREAM, StaPackage.Literals.OBSERVATION);
-		assertThat(mapping.getClasses().get(0).getProperties()).extracting(WireProperty::getName)
-				.containsExactly("phenomenonTime", "resultTime");
-		assertThat(mapping.getClasses().get(1).getProperties()).extracting(WireProperty::getName)
-				.containsExactly("phenomenonTime", "validTime", "result");
+		assertThat(mapping.getClasses()).extracting(ClassMapping::getEClass).containsExactly(StaPackage.Literals.THING,
+				StaPackage.Literals.LOCATION, StaPackage.Literals.DATASTREAM, StaPackage.Literals.SENSOR,
+				StaPackage.Literals.OBSERVED_PROPERTY, StaPackage.Literals.OBSERVATION,
+				StaPackage.Literals.FEATURE_OF_INTEREST);
+		assertThat(properties(mapping, StaPackage.Literals.DATASTREAM))
+				.containsExactly("observedArea", "properties", "phenomenonTime", "resultTime");
+		assertThat(properties(mapping, StaPackage.Literals.OBSERVATION))
+				.containsExactly("resultQuality", "parameters", "phenomenonTime", "validTime", "result");
+		assertThat(properties(mapping, StaPackage.Literals.LOCATION)).containsExactly("location", "properties");
+		assertThat(properties(mapping, StaPackage.Literals.FEATURE_OF_INTEREST)).containsExactly("feature", "properties");
 		for (ClassMapping classMapping : mapping.getClasses()) {
 			for (WireProperty property : classMapping.getProperties()) {
-				assertThat(profile.handler(property)).as(property.getName()).get()
-						.isInstanceOf("result".equals(property.getName()) ? StaResultHandler.class : StaIntervalHandler.class);
+				Class<?> expected = switch (property.getParts().size()) {
+				case 1 -> JsonTextHandler.class;
+				case 2 -> StaIntervalHandler.class;
+				default -> StaResultHandler.class;
+				};
+				assertThat(profile.handler(property)).as(property.getName()).get().isInstanceOf(expected);
 			}
 		}
+	}
+
+	private static List<String> properties(WireMapping mapping, EClass eClass) {
+		return mapping.getClasses().stream().filter(classMapping -> classMapping.getEClass() == eClass).findFirst()
+				.orElseThrow().getProperties().stream().map(WireProperty::getName).toList();
 	}
 
 	@Test

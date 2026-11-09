@@ -30,6 +30,7 @@ import org.eclipse.fennec.model.sta.Observation;
 import org.eclipse.fennec.model.sta.StaFactory;
 import org.eclipse.fennec.model.sta.StaPackage;
 import org.eclipse.fennec.odata.wire.api.OperandKind;
+import org.eclipse.fennec.odata.wire.api.WireJson;
 import org.eclipse.fennec.odata.wire.api.WireOperator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -114,6 +115,7 @@ class StaResultHandlerTest {
 	@Test
 	void refusesOtherValues() {
 		assertThatThrownBy(() -> handler.read(List.of(1))).isInstanceOf(IllegalArgumentException.class);
+		assertThatThrownBy(() -> handler.read(new WireJson("{\"a\":1}"))).isInstanceOf(IllegalArgumentException.class);
 	}
 
 	private static Map<EAttribute, Object> parts(Double number, Boolean bool, String text) {

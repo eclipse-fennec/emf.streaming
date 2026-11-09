@@ -35,14 +35,14 @@ import org.osgi.annotation.versioning.ProviderType;
  * </ul>
  * <!-- end-user-doc -->
  * <!-- begin-model-doc -->
- * The OGC SensorThings API 1.1 data model (OGC 18-088), as a projection target of the change stream: target object = Thing, TIMESERIES slot = Datastream, target feature = ObservedProperty, source class = Sensor, entry = Observation. Annotations with source https://eclipse.org/fennec/sta/wire mark a value type written as JSON (type=json, geojson). The wire properties over several attributes (phenomenonTime, resultTime, validTime as intervals; result over resultNumber/resultBoolean/resultText) are the wire mapping of the STA profile, not part of this model.
+ * The OGC SensorThings API 1.1 data model (OGC 18-088), as a projection target of the change stream: target object = Thing, TIMESERIES slot = Datastream, target feature = ObservedProperty, source class = Sensor, entry = Observation. How the STA wire format differs from the attributes (JsonObject and GeoJson attributes written as JSON; phenomenonTime, resultTime, validTime as intervals; result over resultNumber/resultBoolean/resultText) is the wire mapping of the STA profile, not part of this model.
  * <!-- end-model-doc -->
  * @see org.eclipse.fennec.model.sta.StaFactory
  * @model kind="package"
  * @generated
  */
 @ProviderType
-@EPackage(uri = StaPackage.eNS_URI, fingerprint = "fp1:b58249002553dec705941ce76d1828eb60472b5f927c1f19c9c2075cfc558398", genModel = "/model/sta.genmodel", genModelSourceLocations = {"model/sta.genmodel","org.eclipse.fennec.stream.sta.model/model/sta.genmodel"}, ecore = "/model/sta.ecore", ecoreSourceLocations = "/model/sta.ecore")
+@EPackage(uri = StaPackage.eNS_URI, fingerprint = "fp1:f8b4fb0c042379abd2478b4bf6550de88f3a5f8e23ccaacff5337bc3f6a11379", genModel = "/model/sta.genmodel", genModelSourceLocations = {"model/sta.genmodel","org.eclipse.fennec.stream.sta.model/model/sta.genmodel"}, ecore = "/model/sta.ecore", ecoreSourceLocations = "/model/sta.ecore")
 public interface StaPackage extends org.eclipse.emf.ecore.EPackage {
 	/**
 	 * The package name.
@@ -1849,7 +1849,6 @@ public interface StaPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @return the meta object for data type '<em>Json Object</em>'.
 	 * @see java.lang.String
 	 * @model instanceClass="java.lang.String"
-	 *        annotation="https://eclipse.org/fennec/sta/wire type='json'"
 	 * @generated
 	 */
 	EDataType getJsonObject();
@@ -1864,7 +1863,6 @@ public interface StaPackage extends org.eclipse.emf.ecore.EPackage {
 	 * @return the meta object for data type '<em>Geo Json</em>'.
 	 * @see java.lang.String
 	 * @model instanceClass="java.lang.String"
-	 *        annotation="https://eclipse.org/fennec/sta/wire type='geojson'"
 	 * @generated
 	 */
 	EDataType getGeoJson();

@@ -1232,32 +1232,6 @@ public class StaPackageImpl extends EPackageImpl implements StaPackage {
 
 		// Create resource
 		createResource(eNS_URI);
-
-		// Create annotations
-		// https://eclipse.org/fennec/sta/wire
-		createWireAnnotations();
-	}
-
-	/**
-	 * Initializes the annotations for <b>https://eclipse.org/fennec/sta/wire</b>.
-	 * <!-- begin-user-doc -->
-	 * <!-- end-user-doc -->
-	 * @generated
-	 */
-	protected void createWireAnnotations() {
-		String source = "https://eclipse.org/fennec/sta/wire";
-		addAnnotation
-		  (jsonObjectEDataType,
-		   source,
-		   new String[] {
-			   "type", "json"
-		   });
-		addAnnotation
-		  (geoJsonEDataType,
-		   source,
-		   new String[] {
-			   "type", "geojson"
-		   });
 	}
 
 } //StaPackageImpl
