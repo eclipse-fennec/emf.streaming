@@ -88,7 +88,6 @@ public interface Observation extends EObject {
 	 * @see #setPhenomenonTimeStart(Date)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getObservation_PhenomenonTimeStart()
 	 * @model required="true"
-	 *        annotation="https://eclipse.org/fennec/sta/wire interval='phenomenonTime' part='start'"
 	 * @generated
 	 */
 	Date getPhenomenonTimeStart();
@@ -113,7 +112,7 @@ public interface Observation extends EObject {
 	 * @return the value of the '<em>Phenomenon Time End</em>' attribute.
 	 * @see #setPhenomenonTimeEnd(Date)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getObservation_PhenomenonTimeEnd()
-	 * @model annotation="https://eclipse.org/fennec/sta/wire interval='phenomenonTime' part='end'"
+	 * @model
 	 * @generated
 	 */
 	Date getPhenomenonTimeEnd();
@@ -163,7 +162,7 @@ public interface Observation extends EObject {
 	 * @return the value of the '<em>Result Number</em>' attribute.
 	 * @see #setResultNumber(Double)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getObservation_ResultNumber()
-	 * @model annotation="https://eclipse.org/fennec/sta/wire name='result'"
+	 * @model
 	 * @generated
 	 */
 	Double getResultNumber();
@@ -188,7 +187,7 @@ public interface Observation extends EObject {
 	 * @return the value of the '<em>Result Boolean</em>' attribute.
 	 * @see #setResultBoolean(Boolean)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getObservation_ResultBoolean()
-	 * @model annotation="https://eclipse.org/fennec/sta/wire name='result'"
+	 * @model
 	 * @generated
 	 */
 	Boolean getResultBoolean();
@@ -213,7 +212,7 @@ public interface Observation extends EObject {
 	 * @return the value of the '<em>Result Text</em>' attribute.
 	 * @see #setResultText(String)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getObservation_ResultText()
-	 * @model annotation="https://eclipse.org/fennec/sta/wire name='result'"
+	 * @model
 	 * @generated
 	 */
 	String getResultText();
@@ -263,7 +262,7 @@ public interface Observation extends EObject {
 	 * @return the value of the '<em>Valid Time Start</em>' attribute.
 	 * @see #setValidTimeStart(Date)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getObservation_ValidTimeStart()
-	 * @model annotation="https://eclipse.org/fennec/sta/wire interval='validTime' part='start'"
+	 * @model
 	 * @generated
 	 */
 	Date getValidTimeStart();
@@ -288,7 +287,7 @@ public interface Observation extends EObject {
 	 * @return the value of the '<em>Valid Time End</em>' attribute.
 	 * @see #setValidTimeEnd(Date)
 	 * @see org.eclipse.fennec.model.sta.StaPackage#getObservation_ValidTimeEnd()
-	 * @model annotation="https://eclipse.org/fennec/sta/wire interval='validTime' part='end'"
+	 * @model
 	 * @generated
 	 */
 	Date getValidTimeEnd();

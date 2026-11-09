@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ecore:EPackage xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:version="2.0" name="sta" nsURI="https://eclipse.org/fennec/sta/1.1" nsPrefix="sta">
   <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
-    <details key="documentation" value="The OGC SensorThings API 1.1 data model (OGC 18-088), as a projection target of the change stream: target object = Thing, TIMESERIES slot = Datastream, target feature = ObservedProperty, source class = Sensor, entry = Observation. Annotations with source https://eclipse.org/fennec/sta/wire tell the STA wire profile what the model cannot say: a value type written as JSON (json, geojson), an interval split into start/end attributes (interval, part), and alternatives written under one name (name=result)."/>
+    <details key="documentation" value="The OGC SensorThings API 1.1 data model (OGC 18-088), as a projection target of the change stream: target object = Thing, TIMESERIES slot = Datastream, target feature = ObservedProperty, source class = Sensor, entry = Observation. Annotations with source https://eclipse.org/fennec/sta/wire mark a value type written as JSON (type=json, geojson). The wire properties over several attributes (phenomenonTime, resultTime, validTime as intervals; result over resultNumber/resultBoolean/resultText) are the wire mapping of the STA profile, not part of this model."/>
     <details key="basePackage" value="org.eclipse.fennec.model"/>
     <details key="copyrightText" value="Copyright (c) 2026 Contributors to the Eclipse Foundation.&#10;&#10;This program and the accompanying materials are made&#10;available under the terms of the Eclipse Public License 2.0&#10;which is available at https://www.eclipse.org/legal/epl-2.0/&#10;&#10;SPDX-License-Identifier: EPL-2.0&#10;&#10;Contributors:&#10;  Data In Motion Consulting - initial implementation"/>
     <details key="complianceLevel" value="21.0"/>
@@ -155,36 +155,20 @@
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
-      <eAnnotations source="https://eclipse.org/fennec/sta/wire">
-        <details key="interval" value="phenomenonTime"/>
-        <details key="part" value="start"/>
-      </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="phenomenonTimeEnd" lowerBound="0" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
-      </eAnnotations>
-      <eAnnotations source="https://eclipse.org/fennec/sta/wire">
-        <details key="interval" value="phenomenonTime"/>
-        <details key="part" value="end"/>
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="resultTimeStart" lowerBound="0" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
-      <eAnnotations source="https://eclipse.org/fennec/sta/wire">
-        <details key="interval" value="resultTime"/>
-        <details key="part" value="start"/>
-      </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="resultTimeEnd" lowerBound="0" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
-      </eAnnotations>
-      <eAnnotations source="https://eclipse.org/fennec/sta/wire">
-        <details key="interval" value="resultTime"/>
-        <details key="part" value="end"/>
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="properties" lowerBound="0" eType="#//JsonObject">
@@ -321,18 +305,10 @@
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value="When the value was observed: the entry time, else the change set time."/>
       </eAnnotations>
-      <eAnnotations source="https://eclipse.org/fennec/sta/wire">
-        <details key="interval" value="phenomenonTime"/>
-        <details key="part" value="start"/>
-      </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="phenomenonTimeEnd" lowerBound="0" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value="Set for an interval."/>
-      </eAnnotations>
-      <eAnnotations source="https://eclipse.org/fennec/sta/wire">
-        <details key="interval" value="phenomenonTime"/>
-        <details key="part" value="end"/>
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="resultTime" lowerBound="0" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate">
@@ -344,24 +320,15 @@
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
-      <eAnnotations source="https://eclipse.org/fennec/sta/wire">
-        <details key="name" value="result"/>
-      </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="resultBoolean" lowerBound="0" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBooleanObject">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
-      <eAnnotations source="https://eclipse.org/fennec/sta/wire">
-        <details key="name" value="result"/>
-      </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="resultText" lowerBound="0" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
-      </eAnnotations>
-      <eAnnotations source="https://eclipse.org/fennec/sta/wire">
-        <details key="name" value="result"/>
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="resultQuality" lowerBound="0" eType="#//JsonObject">
@@ -373,18 +340,10 @@
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
       </eAnnotations>
-      <eAnnotations source="https://eclipse.org/fennec/sta/wire">
-        <details key="interval" value="validTime"/>
-        <details key="part" value="start"/>
-      </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="validTimeEnd" lowerBound="0" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EDate">
       <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
         <details key="documentation" value=""/>
-      </eAnnotations>
-      <eAnnotations source="https://eclipse.org/fennec/sta/wire">
-        <details key="interval" value="validTime"/>
-        <details key="part" value="end"/>
       </eAnnotations>
     </eStructuralFeatures>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="parameters" lowerBound="0" eType="#//JsonObject">

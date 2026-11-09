@@ -27,7 +27,7 @@ import org.eclipse.fennec.model.sta.StaPackage;
  * The package will be registered into a OSGi base model registry.
  * <!-- end-user-doc -->
  * <!-- begin-model-doc -->
- * The OGC SensorThings API 1.1 data model (OGC 18-088), as a projection target of the change stream: target object = Thing, TIMESERIES slot = Datastream, target feature = ObservedProperty, source class = Sensor, entry = Observation. Annotations with source https://eclipse.org/fennec/sta/wire tell the STA wire profile what the model cannot say: a value type written as JSON (json, geojson), an interval split into start/end attributes (interval, part), and alternatives written under one name (name=result).
+ * The OGC SensorThings API 1.1 data model (OGC 18-088), as a projection target of the change stream: target object = Thing, TIMESERIES slot = Datastream, target feature = ObservedProperty, source class = Sensor, entry = Observation. Annotations with source https://eclipse.org/fennec/sta/wire mark a value type written as JSON (type=json, geojson). The wire properties over several attributes (phenomenonTime, resultTime, validTime as intervals; result over resultNumber/resultBoolean/resultText) are the wire mapping of the STA profile, not part of this model.
  * <!-- end-model-doc -->
  * @see EPackageConfigurator
  * @generated
@@ -40,7 +40,7 @@ public class StaEPackageConfigurator implements EPackageConfigurator {
 	 * service property.
 	 * @generated
 	 */
-	public static final String FINGERPRINT = "fp1:5749ae11e3c50edfea95f8265646b9cd1c65c7c2f02eb72d462e93f335410838";
+	public static final String FINGERPRINT = "fp1:b58249002553dec705941ce76d1828eb60472b5f927c1f19c9c2075cfc558398";
 
 	private StaPackage ePackage;
 

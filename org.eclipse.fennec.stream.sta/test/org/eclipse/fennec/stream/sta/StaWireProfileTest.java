@@ -18,6 +18,10 @@ import java.util.List;
 
 import org.eclipse.fennec.model.sta.StaPackage;
 import org.eclipse.fennec.odata.wire.api.ServiceRoot;
+import org.eclipse.fennec.odata.wire.mapping.ClassMapping;
+import org.eclipse.fennec.odata.wire.mapping.WireMapping;
+import org.eclipse.fennec.odata.wire.mapping.WireMappingFactory;
+import org.eclipse.fennec.odata.wire.mapping.WireProperty;
 import org.junit.jupiter.api.Test;
 
 class StaWireProfileTest {
@@ -50,6 +54,34 @@ class StaWireProfileTest {
 
 		assertThat(profile.propertyMember(StaPackage.Literals.THING__NAME)).isEqualTo("name");
 		assertThat(profile.propertyMember(StaPackage.Literals.DATASTREAM__UNIT_OF_MEASUREMENT)).isEqualTo("unitOfMeasurement");
+	}
+
+	@Test
+	void theWirePropertiesOfDatastreamAndObservationHaveAHandlerEach() {
+		StaWireProfile profile = new StaWireProfile();
+		WireMapping mapping = profile.mapping().orElseThrow();
+
+		assertThat(mapping.getClasses()).extracting(ClassMapping::getEClass)
+				.containsExactly(StaPackage.Literals.DATASTREAM, StaPackage.Literals.OBSERVATION);
+		assertThat(mapping.getClasses().get(0).getProperties()).extracting(WireProperty::getName)
+				.containsExactly("phenomenonTime", "resultTime");
+		assertThat(mapping.getClasses().get(1).getProperties()).extracting(WireProperty::getName)
+				.containsExactly("phenomenonTime", "validTime", "result");
+		for (ClassMapping classMapping : mapping.getClasses()) {
+			for (WireProperty property : classMapping.getProperties()) {
+				assertThat(profile.handler(property)).as(property.getName()).get()
+						.isInstanceOf("result".equals(property.getName()) ? StaResultHandler.class : StaIntervalHandler.class);
+			}
+		}
+	}
+
+	@Test
+	void aPropertyOfAnotherShapeHasNoHandler() {
+		WireProperty odd = WireMappingFactory.eINSTANCE.createWireProperty();
+		odd.setName("odd");
+		odd.getParts().add(StaPackage.Literals.THING__NAME);
+
+		assertThat(new StaWireProfile().handler(odd)).isEmpty();
 	}
 
 	@Test

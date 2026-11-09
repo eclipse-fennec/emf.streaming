@@ -19,17 +19,26 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
 import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.fennec.model.sta.StaPackage;
 import org.eclipse.fennec.odata.wire.api.ControlNames;
 import org.eclipse.fennec.odata.wire.api.ServiceRoot;
 import org.eclipse.fennec.odata.wire.api.WireProfile;
+import org.eclipse.fennec.odata.wire.api.WirePropertyHandler;
+import org.eclipse.fennec.odata.wire.mapping.ClassMapping;
+import org.eclipse.fennec.odata.wire.mapping.WireMapping;
+import org.eclipse.fennec.odata.wire.mapping.WireMappingFactory;
+import org.eclipse.fennec.odata.wire.mapping.WireProperty;
 
 /**
  * The SensorThings API 1.1 wire format on an emf.odata service root (emf.odata ADR-0010):
  * {@code @iot.*} control information with absolute links, the key only as {@code @iot.id}, a
- * property value under the property's own name ({@code {"name":"…"}}, 9.2.4), and the STA root
- * document with its server settings. Querying, paging and {@code $metadata} stay
+ * property value under the property's own name ({@code {"name":"…"}}, 9.2.4), the STA root
+ * document with its server settings, and the wire properties over several attributes (#69): the
+ * time intervals {@code phenomenonTime}, {@code resultTime}, {@code validTime}
+ * ({@link StaIntervalHandler}) and {@code result} ({@link StaResultHandler}). Querying, paging and {@code $metadata} stay
  * those of the OData runtime.
  */
 public class StaWireProfile implements WireProfile {
@@ -50,7 +59,12 @@ public class StaWireProfile implements WireProfile {
 	/** The conformance class of the MQTT extension, announced with its endpoints. */
 	public static final String MQTT_RECEIVE = SPEC + "receive-updates-via-mqtt/receive-updates";
 
+	/** The wire property over {@code resultNumber}, {@code resultBoolean} and {@code resultText}. */
+	public static final String RESULT = "result";
+
 	private final List<String> mqttEndpoints;
+
+	private final WireMapping mapping = createMapping();
 
 	/** A profile without the MQTT extension. */
 	public StaWireProfile() {
@@ -86,6 +100,23 @@ public class StaWireProfile implements WireProfile {
 	}
 
 	@Override
+	public Optional<WireMapping> mapping() {
+		return Optional.of(mapping);
+	}
+
+	@Override
+	public Optional<WirePropertyHandler> handler(WireProperty property) {
+		List<EAttribute> parts = requireNonNull(property, "Wire property is required").getParts();
+		if (RESULT.equals(property.getName()) && parts.size() == 3) {
+			return Optional.of(new StaResultHandler(parts.get(0), parts.get(1), parts.get(2)));
+		}
+		if (!RESULT.equals(property.getName()) && parts.size() == 2) {
+			return Optional.of(new StaIntervalHandler(parts.get(0), parts.get(1)));
+		}
+		return Optional.empty();
+	}
+
+	@Override
 	public Optional<String> serviceDocument(ServiceRoot root) {
 		requireNonNull(root, "ServiceRoot is required");
 		String value = root.entitySets().stream()
@@ -102,6 +133,41 @@ public class StaWireProfile implements WireProfile {
 		}
 		settings.append('}');
 		return Optional.of("{\"value\":" + value + ",\"serverSettings\":" + settings + "}");
+	}
+
+	/**
+	 * The wire properties of STA 1.1 over the attributes of {@code sta.ecore}: intervals with the
+	 * parts start, end; {@code result} with the parts number, boolean, text.
+	 */
+	private static WireMapping createMapping() {
+		WireMapping created = WireMappingFactory.eINSTANCE.createWireMapping();
+		created.getClasses().add(classMapping(StaPackage.Literals.DATASTREAM,
+				property("phenomenonTime", StaPackage.Literals.DATASTREAM__PHENOMENON_TIME_START,
+						StaPackage.Literals.DATASTREAM__PHENOMENON_TIME_END),
+				property("resultTime", StaPackage.Literals.DATASTREAM__RESULT_TIME_START,
+						StaPackage.Literals.DATASTREAM__RESULT_TIME_END)));
+		created.getClasses().add(classMapping(StaPackage.Literals.OBSERVATION,
+				property("phenomenonTime", StaPackage.Literals.OBSERVATION__PHENOMENON_TIME_START,
+						StaPackage.Literals.OBSERVATION__PHENOMENON_TIME_END),
+				property("validTime", StaPackage.Literals.OBSERVATION__VALID_TIME_START,
+						StaPackage.Literals.OBSERVATION__VALID_TIME_END),
+				property(RESULT, StaPackage.Literals.OBSERVATION__RESULT_NUMBER,
+						StaPackage.Literals.OBSERVATION__RESULT_BOOLEAN, StaPackage.Literals.OBSERVATION__RESULT_TEXT)));
+		return created;
+	}
+
+	private static ClassMapping classMapping(EClass eClass, WireProperty... properties) {
+		ClassMapping created = WireMappingFactory.eINSTANCE.createClassMapping();
+		created.setEClass(eClass);
+		created.getProperties().addAll(List.of(properties));
+		return created;
+	}
+
+	private static WireProperty property(String name, EAttribute... parts) {
+		WireProperty created = WireMappingFactory.eINSTANCE.createWireProperty();
+		created.setName(name);
+		created.getParts().addAll(List.of(parts));
+		return created;
 	}
 
 	private static String array(List<String> values) {
