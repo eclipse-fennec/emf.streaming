@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ecore:EPackage xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmi:version="2.0" name="sta" nsURI="https://eclipse.org/fennec/sta/1.1" nsPrefix="sta">
   <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
-    <details key="documentation" value="The OGC SensorThings API 1.1 data model (OGC 18-088), as a projection target of the change stream: target object = Thing, TIMESERIES slot = Datastream, target feature = ObservedProperty, source class = Sensor, entry = Observation. Annotations with source https://eclipse.org/fennec/sta/wire mark a value type written as JSON (type=json, geojson). The wire properties over several attributes (phenomenonTime, resultTime, validTime as intervals; result over resultNumber/resultBoolean/resultText) are the wire mapping of the STA profile, not part of this model."/>
+    <details key="documentation" value="The OGC SensorThings API 1.1 data model (OGC 18-088), as a projection target of the change stream: target object = Thing, TIMESERIES slot = Datastream, target feature = ObservedProperty, source class = Sensor, entry = Observation. How the STA wire format differs from the attributes (JsonObject and GeoJson attributes written as JSON; phenomenonTime, resultTime, validTime as intervals; result over resultNumber/resultBoolean/resultText) is the wire mapping of the STA profile, not part of this model."/>
     <details key="basePackage" value="org.eclipse.fennec.model"/>
     <details key="copyrightText" value="Copyright (c) 2026 Contributors to the Eclipse Foundation.&#10;&#10;This program and the accompanying materials are made&#10;available under the terms of the Eclipse Public License 2.0&#10;which is available at https://www.eclipse.org/legal/epl-2.0/&#10;&#10;SPDX-License-Identifier: EPL-2.0&#10;&#10;Contributors:&#10;  Data In Motion Consulting - initial implementation"/>
     <details key="complianceLevel" value="21.0"/>
@@ -406,16 +406,10 @@
     <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
       <details key="documentation" value="A JSON object, kept as its text; written as the object itself."/>
     </eAnnotations>
-    <eAnnotations source="https://eclipse.org/fennec/sta/wire">
-      <details key="type" value="json"/>
-    </eAnnotations>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EDataType" name="GeoJson" instanceClassName="java.lang.String">
     <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
       <details key="documentation" value="A GeoJSON geometry, kept as its text; written as the object itself."/>
-    </eAnnotations>
-    <eAnnotations source="https://eclipse.org/fennec/sta/wire">
-      <details key="type" value="geojson"/>
     </eAnnotations>
   </eClassifiers>
 </ecore:EPackage>

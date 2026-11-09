@@ -15,15 +15,20 @@ package org.eclipse.fennec.stream.sta;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.eclipse.emf.ecore.EAttribute;
 import org.eclipse.emf.ecore.EClass;
+import org.eclipse.emf.ecore.EClassifier;
+import org.eclipse.emf.ecore.EDataType;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.fennec.model.sta.StaPackage;
 import org.eclipse.fennec.odata.wire.api.ControlNames;
+import org.eclipse.fennec.odata.wire.api.JsonTextHandler;
 import org.eclipse.fennec.odata.wire.api.ServiceRoot;
 import org.eclipse.fennec.odata.wire.api.WireProfile;
 import org.eclipse.fennec.odata.wire.api.WirePropertyHandler;
@@ -38,7 +43,8 @@ import org.eclipse.fennec.odata.wire.mapping.WireProperty;
  * property value under the property's own name ({@code {"name":"…"}}, 9.2.4), the STA root
  * document with its server settings, and the wire properties over several attributes (#69): the
  * time intervals {@code phenomenonTime}, {@code resultTime}, {@code validTime}
- * ({@link StaIntervalHandler}) and {@code result} ({@link StaResultHandler}). Querying, paging and {@code $metadata} stay
+ * ({@link StaIntervalHandler}), {@code result} ({@link StaResultHandler}), and every
+ * {@code JsonObject} or {@code GeoJson} attribute as the JSON itself ({@link JsonTextHandler}). Querying, paging and {@code $metadata} stay
  * those of the OData runtime.
  */
 public class StaWireProfile implements WireProfile {
@@ -119,6 +125,9 @@ public class StaWireProfile implements WireProfile {
 		if (!RESULT.equals(property.getName()) && parts.size() == 2) {
 			return Optional.of(new StaIntervalHandler(parts.get(0), parts.get(1)));
 		}
+		if (parts.size() == 1 && isJson(parts.get(0).getEAttributeType())) {
+			return Optional.of(new JsonTextHandler(parts.get(0)));
+		}
 		return Optional.empty();
 	}
 
@@ -142,30 +151,46 @@ public class StaWireProfile implements WireProfile {
 	}
 
 	/**
-	 * The wire properties of STA 1.1 over the attributes of {@code sta.ecore}: intervals with the
+	 * The wire properties of STA 1.1 over the attributes of {@code sta.ecore}: every
+	 * {@code JsonObject} and {@code GeoJson} attribute under its own name; intervals with the
 	 * parts start, end; {@code result} with the parts number, boolean, text.
 	 */
 	private static WireMapping createMapping() {
+		Map<EClass, List<WireProperty>> byClass = new LinkedHashMap<>();
+		for (EClassifier classifier : StaPackage.eINSTANCE.getEClassifiers()) {
+			if (classifier instanceof EClass eClass) {
+				for (EAttribute attribute : eClass.getEAttributes()) {
+					if (isJson(attribute.getEAttributeType())) {
+						byClass.computeIfAbsent(eClass, key -> new ArrayList<>()).add(property(attribute.getName(), attribute));
+					}
+				}
+			}
+		}
+		List<WireProperty> datastream = byClass.computeIfAbsent(StaPackage.Literals.DATASTREAM, key -> new ArrayList<>());
+		datastream.add(property("phenomenonTime", StaPackage.Literals.DATASTREAM__PHENOMENON_TIME_START,
+				StaPackage.Literals.DATASTREAM__PHENOMENON_TIME_END));
+		datastream.add(property("resultTime", StaPackage.Literals.DATASTREAM__RESULT_TIME_START,
+				StaPackage.Literals.DATASTREAM__RESULT_TIME_END));
+		List<WireProperty> observation = byClass.computeIfAbsent(StaPackage.Literals.OBSERVATION, key -> new ArrayList<>());
+		observation.add(property("phenomenonTime", StaPackage.Literals.OBSERVATION__PHENOMENON_TIME_START,
+				StaPackage.Literals.OBSERVATION__PHENOMENON_TIME_END));
+		observation.add(property("validTime", StaPackage.Literals.OBSERVATION__VALID_TIME_START,
+				StaPackage.Literals.OBSERVATION__VALID_TIME_END));
+		observation.add(property(RESULT, StaPackage.Literals.OBSERVATION__RESULT_NUMBER,
+				StaPackage.Literals.OBSERVATION__RESULT_BOOLEAN, StaPackage.Literals.OBSERVATION__RESULT_TEXT));
 		WireMapping created = WireMappingFactory.eINSTANCE.createWireMapping();
-		created.getClasses().add(classMapping(StaPackage.Literals.DATASTREAM,
-				property("phenomenonTime", StaPackage.Literals.DATASTREAM__PHENOMENON_TIME_START,
-						StaPackage.Literals.DATASTREAM__PHENOMENON_TIME_END),
-				property("resultTime", StaPackage.Literals.DATASTREAM__RESULT_TIME_START,
-						StaPackage.Literals.DATASTREAM__RESULT_TIME_END)));
-		created.getClasses().add(classMapping(StaPackage.Literals.OBSERVATION,
-				property("phenomenonTime", StaPackage.Literals.OBSERVATION__PHENOMENON_TIME_START,
-						StaPackage.Literals.OBSERVATION__PHENOMENON_TIME_END),
-				property("validTime", StaPackage.Literals.OBSERVATION__VALID_TIME_START,
-						StaPackage.Literals.OBSERVATION__VALID_TIME_END),
-				property(RESULT, StaPackage.Literals.OBSERVATION__RESULT_NUMBER,
-						StaPackage.Literals.OBSERVATION__RESULT_BOOLEAN, StaPackage.Literals.OBSERVATION__RESULT_TEXT)));
+		byClass.forEach((eClass, properties) -> created.getClasses().add(classMapping(eClass, properties)));
 		return created;
 	}
 
-	private static ClassMapping classMapping(EClass eClass, WireProperty... properties) {
+	private static boolean isJson(EDataType type) {
+		return type == StaPackage.Literals.JSON_OBJECT || type == StaPackage.Literals.GEO_JSON;
+	}
+
+	private static ClassMapping classMapping(EClass eClass, List<WireProperty> properties) {
 		ClassMapping created = WireMappingFactory.eINSTANCE.createClassMapping();
 		created.setEClass(eClass);
-		created.getProperties().addAll(List.of(properties));
+		created.getProperties().addAll(properties);
 		return created;
 	}
 
