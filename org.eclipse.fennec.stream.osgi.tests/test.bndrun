@@ -26,17 +26,17 @@
 
 -runbundles: \
 	assertj-core;version='[3.27.7,3.27.8)',\
-	com.fasterxml.jackson.core.jackson-annotations;version='[2.22.0,2.22.1)',\
+	com.fasterxml.jackson.core.jackson-annotations;version='[2.23.0,2.23.1)',\
 	junit-jupiter-api;version='[5.14.2,5.14.3)',\
 	junit-jupiter-params;version='[5.14.2,5.14.3)',\
 	junit-platform-commons;version='[1.14.2,1.14.3)',\
 	net.bytebuddy.byte-buddy;version='[1.18.4,1.18.5)',\
 	org.antlr.antlr4-runtime;version='[4.13.2,4.13.3)',\
-	org.apache.felix.configadmin;version='[1.9.26,1.9.27)',\
-	org.apache.felix.scr;version='[2.2.12,2.2.13)',\
-	org.eclipse.emf.common;version='[2.44.0,2.44.1)',\
-	org.eclipse.emf.ecore;version='[2.41.0,2.41.1)',\
-	org.eclipse.emf.ecore.xmi;version='[2.39.0,2.39.1)',\
+	org.apache.felix.configadmin;version='[1.10.0,1.10.1)',\
+	org.apache.felix.scr;version='[2.3.0,2.3.1)',\
+	org.eclipse.emf.common;version='[2.46.0,2.46.1)',\
+	org.eclipse.emf.ecore;version='[2.43.0,2.43.1)',\
+	org.eclipse.emf.ecore.xmi;version='[2.41.0,2.41.1)',\
 	org.eclipse.fennec.atlas.configuration.model;version='[1.0.0,1.0.1)',\
 	org.eclipse.fennec.codec;version='[0.1.0,0.1.1)',\
 	org.eclipse.fennec.codec.api;version='[0.1.0,0.1.1)',\
@@ -71,5 +71,5 @@
 	org.osgi.util.function;version='[1.2.0,1.2.1)',\
 	org.osgi.util.promise;version='[1.3.0,1.3.1)',\
 	org.osgi.util.pushstream;version='[1.1.0,1.1.1)',\
-	tools.jackson.core.jackson-core;version='[3.2.2,3.2.3)',\
-	tools.jackson.core.jackson-databind;version='[3.2.2,3.2.3)'
+	tools.jackson.core.jackson-core;version='[3.3.0,3.3.1)',\
+	tools.jackson.core.jackson-databind;version='[3.3.0,3.3.1)'
