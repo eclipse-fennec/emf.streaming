@@ -16,7 +16,8 @@
 	bnd.identity;id='org.eclipse.fennec.m2x.ocl.parser',\
 	bnd.identity;id='org.eclipse.fennec.persistence.eclipselink',\
 	bnd.identity;id='org.eclipse.fennec.persistence.repository.jpa',\
-	bnd.identity;id='org.eclipse.persistence.asm',\
+	bnd.identity;id='org.objectweb.asm',\
+	bnd.identity;id='org.objectweb.asm.commons',\
 	bnd.identity;id='org.eclipse.persistence.jpa.jpql',\
 	bnd.identity;id='org.eclipse.daanse.jdbc.datasource.h2',\
 	bnd.identity;id='com.h2database',\
