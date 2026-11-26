@@ -50,6 +50,11 @@
 -runfw: org.apache.felix.framework
 -runee: JavaSE-21
 
+# SBOM for `./gradlew sbom`: the exporter is included only once it has been fetched (see
+# cnf/sbom/plugin.bnd); resolve, the build and the tests ignore both lines.
+-include: ${if;${isfile;${workspace}/cnf/cache/sbom-exporter/org.gecko.bnd.sbom.jar};${workspace}/cnf/sbom/plugin.bnd}
+-sbom: level=medium, format=cyclonedx
+
 # Copy the bundles into the framework cache: with reference: URLs a snapshot refreshed in
 # ~/.m2 while the demo runs breaks class loading (ClassFormatError: Incompatible magic value)
 -runnoreferences: true
